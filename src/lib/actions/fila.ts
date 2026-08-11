@@ -12,16 +12,17 @@ export async function entrarNaFila(
 ): Promise<EntrarFilaState> {
   const nome = String(formData.get("nome") ?? "").trim();
   const telefone = String(formData.get("telefone") ?? "").trim();
-  const servicoIds = formData.getAll("servicoIds").map(String);
+  const barbeiroPreferidoId = String(formData.get("barbeiroPreferidoId") ?? "").trim() || null;
 
-  if (!nome) return { erro: "Informe seu nome." };
   if (!telefone) return { erro: "Informe seu telefone." };
-  if (servicoIds.length === 0) return { erro: "Escolha ao menos um serviço." };
+  if (!nome) return { erro: "Informe seu nome." };
 
-  const servicos = await prisma.servico.findMany({
-    where: { id: { in: servicoIds }, ativo: true },
-  });
-  if (servicos.length === 0) return { erro: "Serviços inválidos." };
+  if (barbeiroPreferidoId) {
+    const barbeiro = await prisma.barbeiro.findFirst({
+      where: { id: barbeiroPreferidoId, ativo: true },
+    });
+    if (!barbeiro) return { erro: "Barbeiro inválido." };
+  }
 
   const cliente = await prisma.cliente.upsert({
     where: { telefone },
@@ -29,20 +30,11 @@ export async function entrarNaFila(
     create: { nome, telefone },
   });
 
-  const precoTotalCentavos = servicos.reduce((soma, s) => soma + s.precoCentavos, 0);
-
   await prisma.atendimento.create({
     data: {
       clienteId: cliente.id,
       status: "AGUARDANDO",
-      precoTotalCentavos,
-      servicos: {
-        create: servicos.map((s) => ({
-          servicoId: s.id,
-          nomeSnapshot: s.nome,
-          precoCentavos: s.precoCentavos,
-        })),
-      },
+      barbeiroPreferidoId,
     },
   });
 
@@ -76,14 +68,46 @@ export async function chamarProximo(barbeiroIdSelecionado?: string) {
   revalidatePath("/fila");
 }
 
-export async function concluirAtendimento(atendimentoId: string) {
+export type ConcluirState = { erro?: string };
+
+export async function concluirAtendimento(
+  atendimentoId: string,
+  _prevState: ConcluirState,
+  formData: FormData
+): Promise<ConcluirState> {
   await requireSession(["ADMIN", "BARBEIRO"]);
+
+  const servicoIds = formData.getAll("servicoIds").map(String);
+  if (servicoIds.length === 0) {
+    return { erro: "Escolha ao menos um serviço realizado." };
+  }
+
+  const servicos = await prisma.servico.findMany({
+    where: { id: { in: servicoIds } },
+  });
+  if (servicos.length === 0) return { erro: "Serviços inválidos." };
+
+  const precoTotalCentavos = servicos.reduce((soma, s) => soma + s.precoCentavos, 0);
+
   await prisma.atendimento.update({
     where: { id: atendimentoId },
-    data: { status: "CONCLUIDO", concluidoEm: new Date() },
+    data: {
+      status: "CONCLUIDO",
+      concluidoEm: new Date(),
+      precoTotalCentavos,
+      servicos: {
+        create: servicos.map((s) => ({
+          servicoId: s.id,
+          nomeSnapshot: s.nome,
+          precoCentavos: s.precoCentavos,
+        })),
+      },
+    },
   });
+
   revalidatePath("/fila");
   revalidatePath("/admin/financeiro");
+  return {};
 }
 
 export async function cancelarAtendimento(atendimentoId: string) {

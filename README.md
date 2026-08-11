@@ -2,9 +2,9 @@
 
 Sistema web para barbearia que atende por **ordem de chegada** (fila), com:
 
-- **Totem de autoatendimento** (`/totem`): o cliente escolhe o(s) serviço(s), digita nome e telefone e entra na fila — sem precisar de login.
-- **Painel da fila** (`/fila`): os barbeiros chamam o próximo cliente e concluem o atendimento. O admin acompanha todos os atendimentos em andamento.
-- **Painel administrativo** (`/admin`): cadastro de serviços e preços, cadastro de barbeiros (com login próprio e comissão), histórico de clientes e relatório financeiro (hoje / semana / mês, total e por barbeiro).
+- **Totem de autoatendimento** (`/totem`): o cliente informa telefone, nome e escolhe (opcionalmente) o barbeiro de preferência, e entra na fila — sem precisar de login.
+- **Painel da fila** (`/fila`): os barbeiros chamam o próximo cliente e, ao concluir, escolhem o(s) serviço(s) realizado(s) — isso calcula o valor e já registra no financeiro. O admin acompanha todos os atendimentos em andamento.
+- **Painel administrativo** (`/admin`): cadastro de serviços e preços, cadastro de barbeiros (com login próprio, comissão e foto), histórico de clientes e relatório financeiro (hoje / semana / mês, total e por barbeiro).
 
 ## Tecnologias
 
@@ -69,6 +69,7 @@ SESSION_SECRET="troque-esta-chave-em-producao-para-um-valor-secreto-longo"
    npm run db:push
    npm run db:seed
    ```
-6. Acesse a URL gerada pela Vercel — `/totem` para o totem do cliente e `/login` para a equipe.
+6. **Foto dos barbeiros**: no projeto na Vercel, vá em **Storage → Create Database → Blob** para habilitar o armazenamento de imagens. A Vercel injeta a variável `BLOB_READ_WRITE_TOKEN` automaticamente — não precisa copiar nada manualmente. Sem isso, o upload de foto no cadastro de barbeiros não funciona.
+7. Acesse a URL gerada pela Vercel — `/totem` para o totem do cliente e `/login` para a equipe.
 
 > Troque as senhas do seed (`admin123`, `barbeiro123`) assim que possível pelo painel de barbeiros/admin.
