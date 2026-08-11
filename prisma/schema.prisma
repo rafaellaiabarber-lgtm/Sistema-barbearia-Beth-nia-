@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  BARBEIRO
+}
+
+enum StatusAtendimento {
+  AGUARDANDO
+  EM_ATENDIMENTO
+  CONCLUIDO
+  CANCELADO
+}
+
+model Usuario {
+  id        String   @id @default(cuid())
+  nome      String
+  login     String   @unique
+  senhaHash String
+  role      Role
+  barbeiroId String?  @unique
+  barbeiro  Barbeiro? @relation(fields: [barbeiroId], references: [id])
+  criadoEm  DateTime @default(now())
+}
+
+model Barbeiro {
+  id                 String        @id @default(cuid())
+  nome               String
+  telefone           String?
+  ativo              Boolean       @default(true)
+  comissaoPercentual Int           @default(50)
+  usuario            Usuario?
+  atendimentos       Atendimento[]
+  criadoEm           DateTime      @default(now())
+}
+
+model Cliente {
+  id           String        @id @default(cuid())
+  nome         String
+  telefone     String        @unique
+  criadoEm     DateTime      @default(now())
+  atendimentos Atendimento[]
+}
+
+model Servico {
+  id                  String                @id @default(cuid())
+  nome                String
+  precoCentavos       Int
+  duracaoMinutos      Int                   @default(30)
+  ativo               Boolean               @default(true)
+  criadoEm            DateTime              @default(now())
+  atendimentoServicos AtendimentoServico[]
+}
+
+model Atendimento {
+  id                 String                @id @default(cuid())
+  cliente            Cliente               @relation(fields: [clienteId], references: [id])
+  clienteId          String
+  barbeiro           Barbeiro?             @relation(fields: [barbeiroId], references: [id])
+  barbeiroId         String?
+  status             StatusAtendimento     @default(AGUARDANDO)
+  servicos           AtendimentoServico[]
+  precoTotalCentavos Int                   @default(0)
+  criadoEm           DateTime              @default(now())
+  chamadoEm          DateTime?
+  concluidoEm        DateTime?
+  observacao         String?
+}
+
+model AtendimentoServico {
+  id             String      @id @default(cuid())
+  atendimento    Atendimento @relation(fields: [atendimentoId], references: [id], onDelete: Cascade)
+  atendimentoId  String
+  servico        Servico     @relation(fields: [servicoId], references: [id])
+  servicoId      String
+  nomeSnapshot   String
+  precoCentavos  Int
+}
