@@ -1,19 +1,20 @@
 import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { chamarProximo, concluirAtendimento, cancelarAtendimento } from "@/lib/actions/fila";
+import { chamarProximo, cancelarAtendimento } from "@/lib/actions/fila";
 import { logout } from "@/lib/actions/auth";
 import { formatarReais } from "@/lib/format";
 import { AutoRefresh } from "./auto-refresh";
+import { ConcluirForm } from "./concluir-form";
 
 export default async function FilaPage() {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
 
-  const [aguardando, emAtendimento, barbeirosAtivos] = await Promise.all([
+  const [aguardando, emAtendimento, barbeirosAtivos, servicosAtivos] = await Promise.all([
     prisma.atendimento.findMany({
       where: { status: "AGUARDANDO" },
       orderBy: { criadoEm: "asc" },
-      include: { cliente: true, servicos: true },
+      include: { cliente: true, barbeiroPreferido: true },
     }),
     prisma.atendimento.findMany({
       where: { status: "EM_ATENDIMENTO" },
@@ -21,6 +22,7 @@ export default async function FilaPage() {
       include: { cliente: true, servicos: true, barbeiro: true },
     }),
     prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.servico.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
   ]);
 
   const meuAtendimento =
@@ -52,29 +54,13 @@ export default async function FilaPage() {
           {meuAtendimento ? (
             <div className="bg-neutral-900 border border-amber-600/40 rounded-2xl p-5">
               <p className="text-xl font-bold">{meuAtendimento.cliente.nome}</p>
-              <p className="text-neutral-400 text-sm mb-2">{meuAtendimento.cliente.telefone}</p>
-              <ul className="text-neutral-300 text-sm mb-3 list-disc list-inside">
-                {meuAtendimento.servicos.map((s) => (
-                  <li key={s.id}>
-                    {s.nomeSnapshot} — {formatarReais(s.precoCentavos)}
-                  </li>
-                ))}
-              </ul>
-              <p className="text-amber-400 font-semibold mb-4">
-                Total: {formatarReais(meuAtendimento.precoTotalCentavos)}
-              </p>
-              <div className="flex gap-3">
-                <form action={concluirAtendimento.bind(null, meuAtendimento.id)}>
-                  <button className="rounded-lg bg-green-600 hover:bg-green-500 px-4 py-2 font-semibold">
-                    Concluir atendimento
-                  </button>
-                </form>
-                <form action={cancelarAtendimento.bind(null, meuAtendimento.id)}>
-                  <button className="rounded-lg bg-red-900 hover:bg-red-800 px-4 py-2 font-semibold">
-                    Cancelar
-                  </button>
-                </form>
-              </div>
+              <p className="text-neutral-400 text-sm mb-4">{meuAtendimento.cliente.telefone}</p>
+              <ConcluirForm atendimentoId={meuAtendimento.id} servicos={servicosAtivos} />
+              <form action={cancelarAtendimento.bind(null, meuAtendimento.id)} className="mt-3">
+                <button className="rounded-lg bg-red-900 hover:bg-red-800 px-4 py-2 font-semibold text-sm">
+                  Cancelar atendimento
+                </button>
+              </form>
             </div>
           ) : (
             <form action={chamarProximo.bind(null, undefined)}>
@@ -140,12 +126,11 @@ export default async function FilaPage() {
                   <div>
                     <p className="font-semibold">{a.cliente.nome}</p>
                     <p className="text-neutral-400 text-sm">
-                      {a.servicos.map((s) => s.nomeSnapshot).join(", ")}
+                      {a.barbeiroPreferido ? `Pediu: ${a.barbeiroPreferido.nome}` : "Sem preferência de barbeiro"}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-amber-400 font-semibold">{formatarReais(a.precoTotalCentavos)}</span>
                   <form action={cancelarAtendimento.bind(null, a.id)}>
                     <button className="text-neutral-500 hover:text-red-400 text-sm">Cancelar</button>
                   </form>

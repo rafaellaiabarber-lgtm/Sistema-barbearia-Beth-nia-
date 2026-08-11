@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { alternarAtivoBarbeiro } from "@/lib/actions/barbeiros";
 import { NovoBarbeiroForm } from "./novo-barbeiro-form";
+import { FotoBarbeiroForm } from "./foto-barbeiro-form";
 
 export default async function BarbeirosPage() {
   const barbeiros = await prisma.barbeiro.findMany({
@@ -22,11 +23,14 @@ export default async function BarbeirosPage() {
               !b.ativo ? "opacity-50" : ""
             }`}
           >
-            <div>
-              <p className="font-semibold">{b.nome}</p>
-              <p className="text-neutral-400 text-sm">
-                {b.telefone ?? "sem telefone"} · comissão {b.comissaoPercentual}% · login: {b.usuario?.login}
-              </p>
+            <div className="flex items-center gap-4">
+              <FotoBarbeiroForm barbeiroId={b.id} nome={b.nome} fotoUrl={b.fotoUrl} />
+              <div>
+                <p className="font-semibold">{b.nome}</p>
+                <p className="text-neutral-400 text-sm">
+                  {b.telefone ?? "sem telefone"} · comissão {b.comissaoPercentual}% · login: {b.usuario?.login}
+                </p>
+              </div>
             </div>
             <form action={alternarAtivoBarbeiro.bind(null, b.id, !b.ativo)}>
               <button className="text-sm text-neutral-300 hover:text-amber-400">

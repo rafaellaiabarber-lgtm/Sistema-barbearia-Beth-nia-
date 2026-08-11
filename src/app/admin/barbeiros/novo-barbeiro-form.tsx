@@ -51,6 +51,15 @@ export function NovoBarbeiroForm() {
           className="rounded-lg bg-neutral-800 border border-neutral-700 px-3 py-2 text-sm w-32"
         />
       </div>
+      <div>
+        <label className="block text-xs text-neutral-400 mb-1">Foto (opcional)</label>
+        <input
+          name="foto"
+          type="file"
+          accept="image/*"
+          className="text-xs text-neutral-300 file:mr-2 file:rounded-lg file:border-0 file:bg-neutral-800 file:px-2 file:py-1.5 file:text-neutral-300 w-40"
+        />
+      </div>
       <button
         type="submit"
         disabled={pendente}

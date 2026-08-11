@@ -20,25 +20,27 @@ enum StatusAtendimento {
 }
 
 model Usuario {
-  id        String   @id @default(cuid())
-  nome      String
-  login     String   @unique
-  senhaHash String
-  role      Role
-  barbeiroId String?  @unique
-  barbeiro  Barbeiro? @relation(fields: [barbeiroId], references: [id])
-  criadoEm  DateTime @default(now())
+  id         String    @id @default(cuid())
+  nome       String
+  login      String    @unique
+  senhaHash  String
+  role       Role
+  barbeiroId String?   @unique
+  barbeiro   Barbeiro? @relation(fields: [barbeiroId], references: [id])
+  criadoEm   DateTime  @default(now())
 }
 
 model Barbeiro {
-  id                 String        @id @default(cuid())
-  nome               String
-  telefone           String?
-  ativo              Boolean       @default(true)
-  comissaoPercentual Int           @default(50)
-  usuario            Usuario?
-  atendimentos       Atendimento[]
-  criadoEm           DateTime      @default(now())
+  id                     String        @id @default(cuid())
+  nome                   String
+  telefone               String?
+  fotoUrl                String?
+  ativo                  Boolean       @default(true)
+  comissaoPercentual     Int           @default(50)
+  usuario                Usuario?
+  atendimentos           Atendimento[] @relation("BarbeiroAtendeu")
+  atendimentosPreferidos Atendimento[] @relation("BarbeiroPreferido")
+  criadoEm               DateTime      @default(now())
 }
 
 model Cliente {
@@ -50,36 +52,38 @@ model Cliente {
 }
 
 model Servico {
-  id                  String                @id @default(cuid())
+  id                  String               @id @default(cuid())
   nome                String
   precoCentavos       Int
-  duracaoMinutos      Int                   @default(30)
-  ativo               Boolean               @default(true)
-  criadoEm            DateTime              @default(now())
+  duracaoMinutos      Int                  @default(30)
+  ativo               Boolean              @default(true)
+  criadoEm            DateTime             @default(now())
   atendimentoServicos AtendimentoServico[]
 }
 
 model Atendimento {
-  id                 String                @id @default(cuid())
-  cliente            Cliente               @relation(fields: [clienteId], references: [id])
-  clienteId          String
-  barbeiro           Barbeiro?             @relation(fields: [barbeiroId], references: [id])
-  barbeiroId         String?
-  status             StatusAtendimento     @default(AGUARDANDO)
-  servicos           AtendimentoServico[]
-  precoTotalCentavos Int                   @default(0)
-  criadoEm           DateTime              @default(now())
-  chamadoEm          DateTime?
-  concluidoEm        DateTime?
-  observacao         String?
+  id                  String               @id @default(cuid())
+  cliente             Cliente              @relation(fields: [clienteId], references: [id])
+  clienteId           String
+  barbeiro            Barbeiro?            @relation("BarbeiroAtendeu", fields: [barbeiroId], references: [id])
+  barbeiroId          String?
+  barbeiroPreferido   Barbeiro?            @relation("BarbeiroPreferido", fields: [barbeiroPreferidoId], references: [id])
+  barbeiroPreferidoId String?
+  status              StatusAtendimento    @default(AGUARDANDO)
+  servicos            AtendimentoServico[]
+  precoTotalCentavos  Int                  @default(0)
+  criadoEm            DateTime             @default(now())
+  chamadoEm           DateTime?
+  concluidoEm         DateTime?
+  observacao          String?
 }
 
 model AtendimentoServico {
-  id             String      @id @default(cuid())
-  atendimento    Atendimento @relation(fields: [atendimentoId], references: [id], onDelete: Cascade)
-  atendimentoId  String
-  servico        Servico     @relation(fields: [servicoId], references: [id])
-  servicoId      String
-  nomeSnapshot   String
-  precoCentavos  Int
+  id            String      @id @default(cuid())
+  atendimento   Atendimento @relation(fields: [atendimentoId], references: [id], onDelete: Cascade)
+  atendimentoId String
+  servico       Servico     @relation(fields: [servicoId], references: [id])
+  servicoId     String
+  nomeSnapshot  String
+  precoCentavos Int
 }

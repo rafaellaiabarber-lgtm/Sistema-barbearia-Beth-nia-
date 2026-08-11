@@ -1,11 +1,29 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { put } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { hashSenha } from "@/lib/auth";
 
 export type BarbeiroState = { erro?: string };
+
+const TAMANHO_MAXIMO_FOTO = 5 * 1024 * 1024;
+
+async function enviarFoto(barbeiroId: string, foto: FormDataEntryValue | null): Promise<string | undefined> {
+  if (!(foto instanceof File) || foto.size === 0) return undefined;
+  if (!foto.type.startsWith("image/")) {
+    throw new Error("O arquivo precisa ser uma imagem.");
+  }
+  if (foto.size > TAMANHO_MAXIMO_FOTO) {
+    throw new Error("A imagem deve ter no máximo 5MB.");
+  }
+  const blob = await put(`barbeiros/${barbeiroId}-${Date.now()}-${foto.name}`, foto, {
+    access: "public",
+    addRandomSuffix: true,
+  });
+  return blob.url;
+}
 
 export async function criarBarbeiro(_prevState: BarbeiroState, formData: FormData): Promise<BarbeiroState> {
   await requireSession(["ADMIN"]);
@@ -31,6 +49,15 @@ export async function criarBarbeiro(_prevState: BarbeiroState, formData: FormDat
     },
   });
 
+  try {
+    const fotoUrl = await enviarFoto(barbeiro.id, formData.get("foto"));
+    if (fotoUrl) {
+      await prisma.barbeiro.update({ where: { id: barbeiro.id }, data: { fotoUrl } });
+    }
+  } catch (e) {
+    return { erro: e instanceof Error ? e.message : "Falha ao enviar a foto." };
+  }
+
   await prisma.usuario.create({
     data: {
       nome,
@@ -42,6 +69,7 @@ export async function criarBarbeiro(_prevState: BarbeiroState, formData: FormDat
   });
 
   revalidatePath("/admin/barbeiros");
+  revalidatePath("/totem");
   return {};
 }
 
@@ -49,4 +77,25 @@ export async function alternarAtivoBarbeiro(id: string, ativo: boolean) {
   await requireSession(["ADMIN"]);
   await prisma.barbeiro.update({ where: { id }, data: { ativo } });
   revalidatePath("/admin/barbeiros");
+  revalidatePath("/totem");
+}
+
+export async function atualizarFotoBarbeiro(
+  barbeiroId: string,
+  _prevState: BarbeiroState,
+  formData: FormData
+): Promise<BarbeiroState> {
+  await requireSession(["ADMIN"]);
+
+  try {
+    const fotoUrl = await enviarFoto(barbeiroId, formData.get("foto"));
+    if (!fotoUrl) return { erro: "Escolha uma imagem." };
+    await prisma.barbeiro.update({ where: { id: barbeiroId }, data: { fotoUrl } });
+  } catch (e) {
+    return { erro: e instanceof Error ? e.message : "Falha ao enviar a foto." };
+  }
+
+  revalidatePath("/admin/barbeiros");
+  revalidatePath("/totem");
+  return {};
 }
