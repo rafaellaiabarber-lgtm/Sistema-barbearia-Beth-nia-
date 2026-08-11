@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { TotemForm } from "./totem-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function TotemPage() {
   const servicos = await prisma.servico.findMany({
     where: { ativo: true },
