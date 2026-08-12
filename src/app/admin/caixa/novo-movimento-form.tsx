@@ -2,6 +2,8 @@
 
 import { useActionState, useRef, useEffect, useState } from "react";
 import { criarMovimentoCaixa, type MovimentoCaixaState } from "@/lib/actions/caixa";
+import { SeletorFormaPagamento } from "../../forma-pagamento-selector";
+import { LABEL_CATEGORIA_DESPESA } from "@/lib/format";
 
 const estadoInicial: MovimentoCaixaState = {};
 
@@ -21,50 +23,80 @@ export function NovoMovimentoForm() {
     <form
       ref={formRef}
       action={formAction}
-      className="bg-white border border-slate-200 rounded-xl p-4 mb-6 flex flex-wrap items-end gap-3 shadow-sm"
+      className="bg-white border border-slate-200 rounded-xl p-4 mb-6 shadow-sm"
     >
-      <div>
-        <label className="block text-xs text-slate-500 mb-1">Tipo</label>
-        <div className="flex rounded-lg overflow-hidden border border-slate-300">
-          <button
-            type="button"
-            onClick={() => setTipo("SAIDA")}
-            className={`px-3 py-2 text-sm font-medium ${
-              tipo === "SAIDA" ? "bg-red-600 text-white" : "bg-slate-100 text-slate-500"
-            }`}
-          >
-            Saída
-          </button>
-          <button
-            type="button"
-            onClick={() => setTipo("ENTRADA")}
-            className={`px-3 py-2 text-sm font-medium ${
-              tipo === "ENTRADA" ? "bg-green-600 text-white" : "bg-slate-100 text-slate-500"
-            }`}
-          >
-            Entrada
-          </button>
+      <div className="flex flex-wrap items-end gap-3 mb-3">
+        <div>
+          <label className="block text-xs text-slate-500 mb-1">Tipo</label>
+          <div className="flex rounded-lg overflow-hidden border border-slate-300">
+            <button
+              type="button"
+              onClick={() => setTipo("SAIDA")}
+              className={`px-3 py-2 text-sm font-medium ${
+                tipo === "SAIDA" ? "bg-red-600 text-white" : "bg-slate-100 text-slate-500"
+              }`}
+            >
+              Saída
+            </button>
+            <button
+              type="button"
+              onClick={() => setTipo("ENTRADA")}
+              className={`px-3 py-2 text-sm font-medium ${
+                tipo === "ENTRADA" ? "bg-green-600 text-white" : "bg-slate-100 text-slate-500"
+              }`}
+            >
+              Entrada
+            </button>
+          </div>
+          <input type="hidden" name="tipo" value={tipo} />
         </div>
-        <input type="hidden" name="tipo" value={tipo} />
+        <div>
+          <label className="block text-xs text-slate-500 mb-1">Descrição</label>
+          <input
+            name="descricao"
+            required
+            placeholder="Ex: compra de material, troco..."
+            className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-56"
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-slate-500 mb-1">Valor (R$)</label>
+          <input
+            name="valor"
+            required
+            placeholder="20,00"
+            className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-28"
+          />
+        </div>
+        {tipo === "SAIDA" && (
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">Categoria</label>
+            <select
+              name="categoria"
+              required
+              defaultValue=""
+              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm"
+            >
+              <option value="" disabled>
+                Escolha
+              </option>
+              {Object.entries(LABEL_CATEGORIA_DESPESA).map(([valor, label]) => (
+                <option key={valor} value={valor}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
-      <div>
-        <label className="block text-xs text-slate-500 mb-1">Descrição</label>
-        <input
-          name="descricao"
-          required
-          placeholder="Ex: compra de material, troco..."
-          className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-56"
-        />
+
+      <div className="mb-3">
+        <label className="block text-xs text-slate-500 mb-1">Forma de pagamento</label>
+        <div className="max-w-sm">
+          <SeletorFormaPagamento />
+        </div>
       </div>
-      <div>
-        <label className="block text-xs text-slate-500 mb-1">Valor (R$)</label>
-        <input
-          name="valor"
-          required
-          placeholder="20,00"
-          className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-28"
-        />
-      </div>
+
       <button
         type="submit"
         disabled={pendente}
@@ -72,7 +104,7 @@ export function NovoMovimentoForm() {
       >
         {pendente ? "Lançando..." : "Lançar"}
       </button>
-      {estado.erro && <p className="text-red-600 text-sm w-full">{estado.erro}</p>}
+      {estado.erro && <p className="text-red-600 text-sm mt-2">{estado.erro}</p>}
     </form>
   );
 }

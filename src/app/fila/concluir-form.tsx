@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import type { Servico } from "@prisma/client";
 import { concluirAtendimento, type ConcluirState } from "@/lib/actions/fila";
 import { formatarReais } from "@/lib/format";
+import { SeletorFormaPagamento } from "../forma-pagamento-selector";
 
 const estadoInicial: ConcluirState = {};
 
@@ -56,6 +57,11 @@ export function ConcluirForm({
       {totalCentavos > 0 && (
         <p className="text-blue-600 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
       )}
+
+      <p className="text-slate-700 text-sm font-semibold mb-2">Forma de pagamento:</p>
+      <div className="mb-3">
+        <SeletorFormaPagamento />
+      </div>
 
       {estado.erro && <p className="text-red-600 text-sm mb-3">{estado.erro}</p>}
 

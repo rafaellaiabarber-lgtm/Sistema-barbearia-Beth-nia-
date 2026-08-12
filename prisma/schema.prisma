@@ -35,6 +35,21 @@ enum StatusAssinatura {
   CANCELADA
 }
 
+enum FormaPagamento {
+  DINHEIRO
+  PIX
+  CARTAO
+}
+
+enum CategoriaDespesa {
+  FIXA
+  VARIAVEL
+  TAXA_CARTAO
+  PRO_LABORE
+  IMPOSTO
+  OUTRA
+}
+
 model Usuario {
   id         String    @id @default(cuid())
   nome       String
@@ -94,6 +109,7 @@ model Atendimento {
   status              StatusAtendimento    @default(AGUARDANDO)
   servicos            AtendimentoServico[]
   precoTotalCentavos  Int                  @default(0)
+  formaPagamento      FormaPagamento?
   criadoEm            DateTime             @default(now())
   chamadoEm           DateTime?
   concluidoEm         DateTime?
@@ -101,11 +117,13 @@ model Atendimento {
 }
 
 model MovimentoCaixa {
-  id            String             @id @default(cuid())
-  tipo          TipoMovimentoCaixa
-  descricao     String
-  valorCentavos Int
-  criadoEm      DateTime           @default(now())
+  id             String             @id @default(cuid())
+  tipo           TipoMovimentoCaixa
+  descricao      String
+  valorCentavos  Int
+  formaPagamento FormaPagamento?
+  categoria      CategoriaDespesa?
+  criadoEm       DateTime           @default(now())
 }
 
 model PagamentoComissao {
