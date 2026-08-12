@@ -17,11 +17,13 @@ import {
   Target,
   Package,
   UserPlus,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 
 export const ICONES_NAV: Record<string, LucideIcon> = {
   dashboard: LayoutDashboard,
+  gerenteVirtual: Sparkles,
   clientes: Users,
   barbeiros: Scissors,
   servicos: Tag,

@@ -73,3 +73,25 @@ export async function atualizarTaxaCartao(
   revalidatePath("/admin/financeiro");
   return { sucesso: true };
 }
+
+export async function atualizarMetaFaturamentoMensal(
+  _prevState: ConfiguracaoFinanceiraState,
+  formData: FormData
+): Promise<ConfiguracaoFinanceiraState> {
+  await requireSession(["ADMIN"]);
+
+  const meta = String(formData.get("meta") ?? "").trim();
+  const metaFaturamentoMensalCentavos = meta ? reaisParaCentavos(meta) : null;
+  if (metaFaturamentoMensalCentavos !== null && metaFaturamentoMensalCentavos <= 0) {
+    return { erro: "Informe uma meta válida." };
+  }
+
+  await prisma.configuracaoFinanceira.upsert({
+    where: { id: "singleton" },
+    create: { id: "singleton", metaFaturamentoMensalCentavos },
+    update: { metaFaturamentoMensalCentavos },
+  });
+
+  revalidatePath("/admin/gerente-virtual");
+  return { sucesso: true };
+}
