@@ -10,6 +10,7 @@ import {
   HandCoins,
   TrendingUp,
   Gauge,
+  Image,
   type LucideIcon,
 } from "lucide-react";
 
@@ -25,4 +26,5 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   comissoes: HandCoins,
   financeiro: TrendingUp,
   eficiencia: Gauge,
+  totem: Image,
 };

@@ -51,6 +51,11 @@ export const gruposNav: NavGrupo[] = [
       { href: "/admin/eficiencia", label: "Eficiência", icone: "eficiencia" },
     ],
   },
+  {
+    titulo: "Configurações",
+    icone: "totem",
+    links: [{ href: "/admin/totem", label: "Totem", icone: "totem" }],
+  },
 ];
 
 export const gruposNavFlat: NavLink[] = gruposNav.flatMap((g) => g.links);

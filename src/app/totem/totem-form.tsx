@@ -9,7 +9,7 @@ const estadoInicial: EntrarFilaState = {};
 
 type Etapa = "telefone" | "nome" | "barbeiro";
 
-export function TotemForm({ barbeiros }: { barbeiros: Barbeiro[] }) {
+export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoUrl: string | null }) {
   const [estado, formAction, pendente] = useActionState(entrarNaFila, estadoInicial);
   const [etapa, setEtapa] = useState<Etapa>("telefone");
   const [telefone, setTelefone] = useState("");
@@ -22,6 +22,10 @@ export function TotemForm({ barbeiros }: { barbeiros: Barbeiro[] }) {
   if (estado.sucesso) {
     return (
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-10 border border-slate-200 text-center">
+        {logoUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={logoUrl} alt="Logo" className="h-14 mx-auto mb-4 object-contain" />
+        )}
         <p className="text-slate-500 text-lg mb-2">Você entrou na fila!</p>
         <p className="text-7xl font-black text-blue-600 mb-4">{estado.posicao}º</p>
         <p className="text-slate-700 mb-8">
@@ -43,7 +47,12 @@ export function TotemForm({ barbeiros }: { barbeiros: Barbeiro[] }) {
         etapa === "barbeiro" ? "max-w-3xl" : "max-w-xl"
       }`}
     >
-      <h1 className="text-3xl font-black text-slate-900 text-center mb-1">Barbearia Bethânia</h1>
+      {logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={logoUrl} alt="Barbearia Bethânia" className="h-16 mx-auto mb-2 object-contain" />
+      ) : (
+        <h1 className="text-3xl font-black text-slate-900 text-center mb-1">Barbearia Bethânia</h1>
+      )}
       <p className="text-slate-500 text-center mb-8">Toque para entrar na fila</p>
 
       {etapa === "telefone" && (
