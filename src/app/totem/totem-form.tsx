@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import type { Barbeiro } from "@prisma/client";
 import { entrarNaFila, type EntrarFilaState } from "@/lib/actions/fila";
+import { TecladoNumerico } from "./teclado-numerico";
 
 const estadoInicial: EntrarFilaState = {};
 
@@ -44,26 +45,19 @@ export function TotemForm({ barbeiros }: { barbeiros: Barbeiro[] }) {
           <p className="text-slate-800 text-xl font-semibold mb-4 text-center">
             Qual é o seu telefone?
           </p>
-          <input
-            type="tel"
-            inputMode="numeric"
-            autoFocus
-            placeholder="(11) 99999-9999"
-            value={telefone}
-            onChange={(e) => setTelefone(e.target.value)}
-            className="w-full rounded-xl bg-white border border-slate-300 text-slate-900 text-2xl text-center px-4 py-4 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <TecladoNumerico valor={telefone} onChange={setTelefone} />
+          {erroLocal && <p className="text-red-600 text-sm mb-4 text-center">{erroLocal}</p>}
           <button
             type="button"
             onClick={() => {
-              if (!telefone.trim()) {
-                setErroLocal("Informe seu telefone.");
+              if (telefone.length < 10) {
+                setErroLocal("Informe um telefone válido.");
                 return;
               }
               setErroLocal("");
               setEtapa("nome");
             }}
-            className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-4 transition-colors"
+            className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-4 transition-colors mt-6"
           >
             Continuar
           </button>
