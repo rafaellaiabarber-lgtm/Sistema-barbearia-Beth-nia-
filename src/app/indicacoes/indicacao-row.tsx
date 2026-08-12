@@ -1,0 +1,64 @@
+"use client";
+
+import { MessageCircle } from "lucide-react";
+import { alternarContatada, excluirIndicacao } from "@/lib/actions/indicacoes";
+import { formatarTelefone, linkWhatsApp } from "@/lib/format";
+
+export function IndicacaoRow({
+  id,
+  nome,
+  telefone,
+  contatada,
+  barbeiroNome,
+  criadoEm,
+}: {
+  id: string;
+  nome: string;
+  telefone: string;
+  contatada: boolean;
+  barbeiroNome: string | null;
+  criadoEm: Date;
+}) {
+  return (
+    <div
+      className={`flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl p-4 shadow-sm ${
+        contatada ? "opacity-60" : ""
+      }`}
+    >
+      <div>
+        <p className="font-semibold">{nome}</p>
+        <p className="text-slate-500 text-sm">
+          {formatarTelefone(telefone)}
+          {barbeiroNome && ` · ${barbeiroNome}`} ·{" "}
+          {criadoEm.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}
+        </p>
+        <span
+          className={`inline-block mt-1 rounded-full text-xs px-2 py-0.5 ${
+            contatada ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+          }`}
+        >
+          {contatada ? "Já contatada" : "Pendente"}
+        </span>
+      </div>
+      <div className="flex items-center gap-3">
+        <a
+          href={linkWhatsApp(telefone)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-3 py-2"
+        >
+          <MessageCircle className="w-4 h-4" />
+          WhatsApp
+        </a>
+        <form action={alternarContatada.bind(null, id, !contatada)}>
+          <button className="text-sm text-slate-500 hover:text-blue-600">
+            {contatada ? "Marcar pendente" : "Marcar contatada"}
+          </button>
+        </form>
+        <form action={excluirIndicacao.bind(null, id)}>
+          <button className="text-sm text-slate-400 hover:text-red-600">Excluir</button>
+        </form>
+      </div>
+    </div>
+  );
+}

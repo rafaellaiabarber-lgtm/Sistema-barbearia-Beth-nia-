@@ -94,7 +94,19 @@ model Barbeiro {
   pagamentosComissao      PagamentoComissao[]
   metas                   Meta[]
   vendasProduto           VendaProduto[]
+  indicacoes              Indicacao[]
   criadoEm                DateTime            @default(now())
+}
+
+model Indicacao {
+  id          String    @id @default(cuid())
+  barbeiro    Barbeiro  @relation(fields: [barbeiroId], references: [id])
+  barbeiroId  String
+  nome        String
+  telefone    String
+  contatada   Boolean   @default(false)
+  contatadaEm DateTime?
+  criadoEm    DateTime  @default(now())
 }
 
 // Sem @@unique de (barbeiroId, tipo): agora um barbeiro pode ter várias metas do

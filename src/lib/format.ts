@@ -38,3 +38,16 @@ export function valorParaPercentualX100(valor: string) {
   if (Number.isNaN(numero)) return 0;
   return Math.round(numero * 100);
 }
+
+export function formatarTelefone(telefone: string) {
+  const digitos = telefone.replace(/\D/g, "");
+  if (digitos.length === 11) return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`;
+  if (digitos.length === 10) return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 6)}-${digitos.slice(6)}`;
+  return telefone;
+}
+
+export function linkWhatsApp(telefone: string) {
+  const digitos = telefone.replace(/\D/g, "");
+  const comDdi = digitos.startsWith("55") ? digitos : `55${digitos}`;
+  return `https://wa.me/${comDdi}`;
+}

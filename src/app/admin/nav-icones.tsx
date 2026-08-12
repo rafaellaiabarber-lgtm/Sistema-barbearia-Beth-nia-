@@ -16,6 +16,7 @@ import {
   ClipboardList,
   Target,
   Package,
+  UserPlus,
   type LucideIcon,
 } from "lucide-react";
 
@@ -26,6 +27,7 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   servicos: Tag,
   produtos: Package,
   atendimentos: Clock,
+  indicacoes: UserPlus,
   assinaturas: CreditCard,
   planos: Layers,
   caixa: Wallet,
