@@ -24,20 +24,20 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
 
   if (estado.sucesso) {
     return (
-      <div className="w-full max-w-md bg-white/90 rounded-3xl shadow-xl p-10 border border-slate-200 text-center">
+      <div className="w-full max-w-md bg-black/70 rounded-3xl shadow-xl p-10 border border-white/10 text-center">
         {logoUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={logoUrl} alt="Logo" className="h-14 mx-auto mb-4 object-contain" />
         )}
-        <p className="text-slate-500 text-lg mb-2">Você entrou na fila!</p>
-        <p className="text-7xl font-black text-blue-600 mb-4">{estado.posicao}º</p>
+        <p className="text-slate-300 text-lg mb-2">Você entrou na fila!</p>
+        <p className="text-7xl font-black text-blue-400 mb-4">{estado.posicao}º</p>
         {estado.acompanhanteNome && estado.acompanhantePosicao && (
-          <p className="text-slate-600 mb-2">
+          <p className="text-slate-300 mb-2">
             {estado.acompanhanteNome} também entrou na fila, na posição{" "}
-            <span className="font-bold text-blue-600">{estado.acompanhantePosicao}º</span>.
+            <span className="font-bold text-blue-400">{estado.acompanhantePosicao}º</span>.
           </p>
         )}
-        <p className="text-slate-700 mb-8">
+        <p className="text-slate-200 mb-8">
           É só aguardar, o profissional já vai te chamar.
         </p>
         <a
@@ -52,7 +52,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
 
   return (
     <div
-      className={`w-full bg-white/90 rounded-3xl shadow-xl p-8 border border-slate-200 ${
+      className={`w-full bg-black/70 rounded-3xl shadow-xl p-8 border border-white/10 ${
         etapa === "barbeiro" ? "max-w-3xl" : "max-w-xl"
       }`}
     >
@@ -60,17 +60,17 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
         // eslint-disable-next-line @next/next/no-img-element
         <img src={logoUrl} alt="Barbearia Bethânia" className="h-16 mx-auto mb-2 object-contain" />
       ) : (
-        <h1 className="text-3xl font-black text-slate-900 text-center mb-1">Barbearia Bethânia</h1>
+        <h1 className="text-3xl font-black text-white text-center mb-1">Barbearia Bethânia</h1>
       )}
-      <p className="text-slate-500 text-center mb-8">Toque para entrar na fila</p>
+      <p className="text-slate-300 text-center mb-8">Toque para entrar na fila</p>
 
       {etapa === "telefone" && (
         <div>
-          <p className="text-slate-800 text-xl font-semibold mb-4 text-center">
+          <p className="text-white text-xl font-semibold mb-4 text-center">
             Qual é o seu telefone?
           </p>
           <TecladoNumerico valor={telefone} onChange={setTelefone} />
-          {erroLocal && <p className="text-red-600 text-sm mb-4 text-center">{erroLocal}</p>}
+          {erroLocal && <p className="text-red-400 text-sm mb-4 text-center">{erroLocal}</p>}
           <button
             type="button"
             disabled={buscandoNome}
@@ -101,11 +101,11 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
 
       {etapa === "nome" && (
         <div>
-          <p className="text-slate-800 text-xl font-semibold mb-1 text-center">
+          <p className="text-white text-xl font-semibold mb-1 text-center">
             Como te chamamos?
           </p>
           {boasVindas && (
-            <p className="text-blue-600 text-sm mb-3 text-center">
+            <p className="text-blue-400 text-sm mb-3 text-center">
               Bem-vindo(a) de volta! Confirme ou edite seu nome abaixo.
             </p>
           )}
@@ -150,7 +150,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
 
       {etapa === "barbeiro" && (
         <div>
-          <p className="text-slate-800 text-xl font-semibold mb-4 text-center">
+          <p className="text-white text-xl font-semibold mb-4 text-center">
             Escolha seu barbeiro
           </p>
 
@@ -214,10 +214,10 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
             <input type="hidden" name="barbeiroPreferidoId" value={barbeiroPreferidoId} />
           )}
 
-          <p className="text-slate-800 text-xl font-semibold mb-1 text-center">
+          <p className="text-white text-xl font-semibold mb-1 text-center">
             Tem alguém com você?
           </p>
-          <p className="text-slate-500 text-sm mb-4 text-center">
+          <p className="text-slate-300 text-sm mb-4 text-center">
             Se tiver alguém que também vai cortar o cabelo (mesmo sem celular), pode cadastrar aqui.
           </p>
 
@@ -231,8 +231,8 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               }}
               className={`flex-1 rounded-xl border-2 py-4 font-semibold transition-colors ${
                 temAcompanhante === false
-                  ? "border-blue-600 bg-blue-50 text-blue-700"
-                  : "border-slate-200 text-slate-700 hover:border-slate-300"
+                  ? "border-blue-500 bg-blue-50 text-blue-700"
+                  : "border-white/20 text-slate-200 hover:border-white/40"
               }`}
             >
               Não, só eu
@@ -242,8 +242,8 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               onClick={() => setTemAcompanhante(true)}
               className={`flex-1 rounded-xl border-2 py-4 font-semibold transition-colors ${
                 temAcompanhante === true
-                  ? "border-blue-600 bg-blue-50 text-blue-700"
-                  : "border-slate-200 text-slate-700 hover:border-slate-300"
+                  ? "border-blue-500 bg-blue-50 text-blue-700"
+                  : "border-white/20 text-slate-200 hover:border-white/40"
               }`}
             >
               Sim, tem alguém
@@ -272,7 +272,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
           )}
 
           {(erroLocal || estado.erro) && (
-            <p className="text-red-600 text-sm mb-4 text-center">{erroLocal || estado.erro}</p>
+            <p className="text-red-400 text-sm mb-4 text-center">{erroLocal || estado.erro}</p>
           )}
 
           <div className="flex gap-3">
