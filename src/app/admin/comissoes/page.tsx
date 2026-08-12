@@ -5,6 +5,13 @@ import { marcarComissaoPaga, desmarcarComissaoPaga } from "@/lib/actions/comisso
 import { comissaoServicos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 
+function inicioDoMes() {
+  const d = new Date();
+  d.setDate(1);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 export default async function ComissoesPage({
   searchParams,
 }: {
@@ -25,7 +32,7 @@ export default async function ComissoesPage({
   const podeMarcarPago = periodo !== "personalizado";
   const chave = podeMarcarPago ? chavePeriodo(periodo) : "";
 
-  const [atendimentos, servicos, barbeiros] = await Promise.all([
+  const [atendimentos, servicos, barbeiros, atendimentosMes] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
         status: "CONCLUIDO",
@@ -38,7 +45,20 @@ export default async function ComissoesPage({
     }),
     prisma.servico.findMany({ orderBy: { nome: "asc" } }),
     prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
+    prisma.atendimento.findMany({
+      where: { status: "CONCLUIDO", concluidoEm: { gte: inicioDoMes() }, barbeiroId: { not: null } },
+      select: { barbeiroId: true, precoTotalCentavos: true },
+    }),
   ]);
+
+  const faturamentoMesPorBarbeiro = new Map<string, number>();
+  for (const a of atendimentosMes) {
+    faturamentoMesPorBarbeiro.set(
+      a.barbeiroId!,
+      (faturamentoMesPorBarbeiro.get(a.barbeiroId!) ?? 0) + a.precoTotalCentavos
+    );
+  }
+  const barbeirosPorId = new Map(barbeiros.map((b) => [b.id, b]));
 
   const porBarbeiro = new Map<
     string,
@@ -108,42 +128,69 @@ export default async function ComissoesPage({
       <div className="space-y-2 mb-8">
         {[...porBarbeiro.entries()].map(([id, b]) => {
           const pago = pagosPorBarbeiro.get(id);
+          const metaCentavos = barbeirosPorId.get(id)?.metaFaturamentoCentavos ?? null;
+          const faturamentoMesCentavos = faturamentoMesPorBarbeiro.get(id) ?? 0;
+          const percentualMeta =
+            metaCentavos && metaCentavos > 0
+              ? Math.min((faturamentoMesCentavos / metaCentavos) * 100, 999)
+              : null;
           return (
             <div
               key={id}
-              className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
+              className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
             >
-              <div>
-                <p className="font-semibold">{b.nome}</p>
-                <p className="text-slate-500 text-sm">
-                  {b.qtd} atendimento(s) · faturamento {formatarReais(b.totalCentavos)}
-                </p>
-              </div>
-              <div className="text-right flex items-center gap-3">
-                <p className="text-blue-600 font-bold text-lg">{formatarReais(b.comissaoCentavos)}</p>
-                {podeMarcarPago &&
-                  (pago ? (
-                    <form action={desmarcarComissaoPaga.bind(null, id, periodo as "hoje" | "semana" | "mes", chave)}>
-                      <button className="rounded-lg bg-green-50 text-green-700 border border-green-200 px-3 py-1.5 text-sm font-medium">
-                        ✓ Pago — desmarcar
-                      </button>
-                    </form>
-                  ) : (
-                    <form
-                      action={marcarComissaoPaga.bind(
-                        null,
-                        id,
-                        periodo as "hoje" | "semana" | "mes",
-                        chave,
-                        b.comissaoCentavos
-                      )}
-                    >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold">{b.nome}</p>
+                  <p className="text-slate-500 text-sm">
+                    {b.qtd} atendimento(s) · faturamento {formatarReais(b.totalCentavos)}
+                  </p>
+                </div>
+                <div className="text-right flex items-center gap-3">
+                  <p className="text-blue-600 font-bold text-lg">{formatarReais(b.comissaoCentavos)}</p>
+                  {podeMarcarPago &&
+                    (pago ? (
+                      <form action={desmarcarComissaoPaga.bind(null, id, periodo as "hoje" | "semana" | "mes", chave)}>
+                        <button className="rounded-lg bg-green-50 text-green-700 border border-green-200 px-3 py-1.5 text-sm font-medium">
+                          ✓ Pago — desmarcar
+                        </button>
+                      </form>
+                    ) : (
+                      <form
+                        action={marcarComissaoPaga.bind(
+                          null,
+                          id,
+                          periodo as "hoje" | "semana" | "mes",
+                          chave,
+                          b.comissaoCentavos
+                        )}
+                      >
                       <button className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-sm font-medium">
                         Marcar como pago
                       </button>
                     </form>
                   ))}
+                </div>
               </div>
+
+              {percentualMeta !== null && (
+                <div className="mt-3 pt-3 border-t border-slate-100">
+                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                    <span>
+                      Meta do mês: {formatarReais(faturamentoMesCentavos)} de {formatarReais(metaCentavos!)}
+                    </span>
+                    <span className={`font-semibold ${percentualMeta >= 100 ? "text-green-600" : "text-slate-500"}`}>
+                      {percentualMeta.toFixed(0)}% {percentualMeta >= 100 ? "— meta batida!" : ""}
+                    </span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${percentualMeta >= 100 ? "bg-green-500" : "bg-blue-500"}`}
+                      style={{ width: `${Math.min(percentualMeta, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
