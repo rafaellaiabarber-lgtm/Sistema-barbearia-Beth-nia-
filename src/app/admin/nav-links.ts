@@ -1,31 +1,54 @@
-export type NavLink = { href: string; label: string };
-export type NavGrupo = { titulo: string | null; links: NavLink[] };
+export type NavLink = { href: string; label: string; icone: string };
+export type NavGrupo = { titulo: string | null; icone: string; links: NavLink[] };
 
 export const gruposNav: NavGrupo[] = [
-  { titulo: null, links: [{ href: "/admin", label: "Visão geral" }] },
-  { titulo: "Clientes", links: [{ href: "/admin/clientes", label: "Clientes" }] },
-  { titulo: "Barbeiros", links: [{ href: "/admin/barbeiros", label: "Barbeiros" }] },
-  { titulo: "Serviços", links: [{ href: "/admin/servicos", label: "Serviços" }] },
-  { titulo: "Atendimentos", links: [{ href: "/fila", label: "Fila de atendimento" }] },
+  {
+    titulo: null,
+    icone: "dashboard",
+    links: [{ href: "/admin", label: "Visão geral", icone: "dashboard" }],
+  },
+  {
+    titulo: "Clientes",
+    icone: "clientes",
+    links: [{ href: "/admin/clientes", label: "Clientes", icone: "clientes" }],
+  },
+  {
+    titulo: "Barbeiros",
+    icone: "barbeiros",
+    links: [{ href: "/admin/barbeiros", label: "Barbeiros", icone: "barbeiros" }],
+  },
+  {
+    titulo: "Serviços",
+    icone: "servicos",
+    links: [{ href: "/admin/servicos", label: "Serviços", icone: "servicos" }],
+  },
+  {
+    titulo: "Atendimentos",
+    icone: "atendimentos",
+    links: [{ href: "/fila", label: "Fila de atendimento", icone: "atendimentos" }],
+  },
   {
     titulo: "Assinaturas",
+    icone: "assinaturas",
     links: [
-      { href: "/admin/assinaturas", label: "Assinaturas" },
-      { href: "/admin/planos", label: "Planos" },
+      { href: "/admin/assinaturas", label: "Assinaturas", icone: "assinaturas" },
+      { href: "/admin/planos", label: "Planos", icone: "planos" },
     ],
   },
   {
     titulo: "Financeiro",
+    icone: "caixa",
     links: [
-      { href: "/admin/caixa", label: "Caixa" },
-      { href: "/admin/comissoes", label: "Comissões" },
+      { href: "/admin/caixa", label: "Caixa", icone: "caixa" },
+      { href: "/admin/comissoes", label: "Comissões", icone: "comissoes" },
     ],
   },
   {
     titulo: "Relatórios",
+    icone: "financeiro",
     links: [
-      { href: "/admin/financeiro", label: "Financeiro" },
-      { href: "/admin/eficiencia", label: "Eficiência" },
+      { href: "/admin/financeiro", label: "Financeiro", icone: "financeiro" },
+      { href: "/admin/eficiencia", label: "Eficiência", icone: "eficiencia" },
     ],
   },
 ];
