@@ -134,6 +134,26 @@ export async function alternarAtivoBarbeiro(id: string, ativo: boolean) {
   revalidatePath("/totem");
 }
 
+export async function excluirBarbeiro(id: string) {
+  await requireSession(["ADMIN"]);
+
+  const [temAtendimento, temPreferido, temComissao] = await Promise.all([
+    prisma.atendimento.findFirst({ where: { barbeiroId: id } }),
+    prisma.atendimento.findFirst({ where: { barbeiroPreferidoId: id } }),
+    prisma.pagamentoComissao.findFirst({ where: { barbeiroId: id } }),
+  ]);
+
+  if (temAtendimento || temPreferido || temComissao) {
+    await prisma.barbeiro.update({ where: { id }, data: { ativo: false } });
+  } else {
+    await prisma.usuario.deleteMany({ where: { barbeiroId: id } });
+    await prisma.barbeiro.delete({ where: { id } });
+  }
+
+  revalidatePath("/admin/barbeiros");
+  revalidatePath("/totem");
+}
+
 export async function atualizarFotoBarbeiro(
   barbeiroId: string,
   _prevState: BarbeiroState,

@@ -66,9 +66,10 @@ export default async function BarbeirosPage() {
     };
   });
 
-  const ranking = barbeirosComMetricas
-    .filter((m) => m.barbeiro.ativo)
-    .sort((a, b) => b.faturamentoCentavos - a.faturamentoCentavos);
+  const ativos = barbeirosComMetricas.filter((m) => m.barbeiro.ativo);
+  const inativos = barbeirosComMetricas.filter((m) => !m.barbeiro.ativo);
+
+  const ranking = [...ativos].sort((a, b) => b.faturamentoCentavos - a.faturamentoCentavos);
 
   return (
     <div>
@@ -106,7 +107,7 @@ export default async function BarbeirosPage() {
       <NovoBarbeiroForm />
 
       <div className="space-y-2">
-        {barbeirosComMetricas.map((m) => (
+        {ativos.map((m) => (
           <div key={m.barbeiro.id} className="space-y-2">
             <BarbeiroRow barbeiro={m.barbeiro} />
 
@@ -179,8 +180,21 @@ export default async function BarbeirosPage() {
             </div>
           </div>
         ))}
-        {barbeirosComMetricas.length === 0 && <p className="text-slate-400">Nenhum barbeiro cadastrado ainda.</p>}
+        {ativos.length === 0 && <p className="text-slate-400">Nenhum barbeiro ativo no momento.</p>}
       </div>
+
+      {inativos.length > 0 && (
+        <details className="mt-8">
+          <summary className="cursor-pointer text-sm text-slate-500 hover:text-slate-800 select-none">
+            Barbeiros inativos ({inativos.length})
+          </summary>
+          <div className="space-y-2 mt-3">
+            {inativos.map((m) => (
+              <BarbeiroRow key={m.barbeiro.id} barbeiro={m.barbeiro} />
+            ))}
+          </div>
+        </details>
+      )}
     </div>
   );
 }
