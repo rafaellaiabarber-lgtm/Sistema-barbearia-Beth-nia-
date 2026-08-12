@@ -7,7 +7,7 @@ import { TecladoNumerico } from "./teclado-numerico";
 
 const estadoInicial: EntrarFilaState = {};
 
-type Etapa = "telefone" | "nome" | "barbeiro";
+type Etapa = "telefone" | "nome" | "barbeiro" | "acompanhante";
 
 export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoUrl: string | null }) {
   const [estado, formAction, pendente] = useActionState(entrarNaFila, estadoInicial);
@@ -18,6 +18,9 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
   const [erroLocal, setErroLocal] = useState("");
   const [buscandoNome, setBuscandoNome] = useState(false);
   const [boasVindas, setBoasVindas] = useState(false);
+  const [temAcompanhante, setTemAcompanhante] = useState<boolean | null>(null);
+  const [acompanhanteNome, setAcompanhanteNome] = useState("");
+  const [acompanhanteTelefone, setAcompanhanteTelefone] = useState("");
 
   if (estado.sucesso) {
     return (
@@ -28,6 +31,12 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
         )}
         <p className="text-slate-500 text-lg mb-2">Você entrou na fila!</p>
         <p className="text-7xl font-black text-blue-600 mb-4">{estado.posicao}º</p>
+        {estado.acompanhanteNome && estado.acompanhantePosicao && (
+          <p className="text-slate-600 mb-2">
+            {estado.acompanhanteNome} também entrou na fila, na posição{" "}
+            <span className="font-bold text-blue-600">{estado.acompanhantePosicao}º</span>.
+          </p>
+        )}
         <p className="text-slate-700 mb-8">
           É só aguardar, o profissional já vai te chamar.
         </p>
@@ -140,13 +149,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
       )}
 
       {etapa === "barbeiro" && (
-        <form action={formAction}>
-          <input type="hidden" name="telefone" value={telefone} />
-          <input type="hidden" name="nome" value={nome} />
-          {barbeiroPreferidoId && (
-            <input type="hidden" name="barbeiroPreferidoId" value={barbeiroPreferidoId} />
-          )}
-
+        <div>
           <p className="text-slate-800 text-xl font-semibold mb-4 text-center">
             Escolha seu barbeiro
           </p>
@@ -195,9 +198,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
             ))}
           </div>
 
-          {(erroLocal || estado.erro) && (
-            <p className="text-red-600 text-sm mb-4 text-center">{erroLocal || estado.erro}</p>
-          )}
+          {erroLocal && <p className="text-red-600 text-sm mb-4 text-center">{erroLocal}</p>}
 
           <div className="flex gap-3">
             <button
@@ -208,8 +209,105 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               Voltar
             </button>
             <button
+              type="button"
+              onClick={() => {
+                setErroLocal("");
+                setEtapa("acompanhante");
+              }}
+              className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-4 transition-colors"
+            >
+              Continuar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {etapa === "acompanhante" && (
+        <form action={formAction}>
+          <input type="hidden" name="telefone" value={telefone} />
+          <input type="hidden" name="nome" value={nome} />
+          {barbeiroPreferidoId && (
+            <input type="hidden" name="barbeiroPreferidoId" value={barbeiroPreferidoId} />
+          )}
+
+          <p className="text-slate-800 text-xl font-semibold mb-1 text-center">
+            Tem alguém com você?
+          </p>
+          <p className="text-slate-500 text-sm mb-4 text-center">
+            Se tiver alguém que também vai cortar o cabelo (mesmo sem celular), pode cadastrar aqui.
+          </p>
+
+          <div className="flex gap-3 mb-4">
+            <button
+              type="button"
+              onClick={() => {
+                setTemAcompanhante(false);
+                setAcompanhanteNome("");
+                setAcompanhanteTelefone("");
+              }}
+              className={`flex-1 rounded-xl border-2 py-4 font-semibold transition-colors ${
+                temAcompanhante === false
+                  ? "border-blue-600 bg-blue-50 text-blue-700"
+                  : "border-slate-200 text-slate-700 hover:border-slate-300"
+              }`}
+            >
+              Não, só eu
+            </button>
+            <button
+              type="button"
+              onClick={() => setTemAcompanhante(true)}
+              className={`flex-1 rounded-xl border-2 py-4 font-semibold transition-colors ${
+                temAcompanhante === true
+                  ? "border-blue-600 bg-blue-50 text-blue-700"
+                  : "border-slate-200 text-slate-700 hover:border-slate-300"
+              }`}
+            >
+              Sim, tem alguém
+            </button>
+          </div>
+
+          {temAcompanhante && (
+            <div className="mb-4">
+              <input
+                type="text"
+                name="acompanhanteNome"
+                placeholder="Nome da pessoa"
+                value={acompanhanteNome}
+                onChange={(e) => setAcompanhanteNome(e.target.value)}
+                className="w-full rounded-xl bg-white border border-slate-300 text-slate-900 text-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="tel"
+                name="acompanhanteTelefone"
+                placeholder="Celular (opcional)"
+                value={acompanhanteTelefone}
+                onChange={(e) => setAcompanhanteTelefone(e.target.value)}
+                className="w-full rounded-xl bg-white border border-slate-300 text-slate-900 text-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
+
+          {(erroLocal || estado.erro) && (
+            <p className="text-red-600 text-sm mb-4 text-center">{erroLocal || estado.erro}</p>
+          )}
+
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setEtapa("barbeiro")}
+              className="rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-semibold px-6 py-4"
+            >
+              Voltar
+            </button>
+            <button
               type="submit"
               disabled={pendente}
+              onClick={(e) => {
+                if (temAcompanhante && !acompanhanteNome.trim()) {
+                  e.preventDefault();
+                  setErroLocal("Informe o nome da pessoa que está com você.");
+                }
+              }}
               className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-bold text-lg py-4 transition-colors"
             >
               {pendente ? "Entrando na fila..." : "Entrar na fila"}

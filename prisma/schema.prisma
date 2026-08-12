@@ -65,7 +65,7 @@ model Barbeiro {
 model Cliente {
   id           String        @id @default(cuid())
   nome         String
-  telefone     String        @unique
+  telefone     String?       @unique
   criadoEm     DateTime      @default(now())
   atendimentos Atendimento[]
   assinaturas  Assinatura[]

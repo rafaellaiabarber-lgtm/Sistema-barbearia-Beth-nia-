@@ -25,7 +25,7 @@ export default async function ClientesPage() {
               <summary className="cursor-pointer flex items-center justify-between">
                 <span>
                   <span className="font-semibold">{c.nome}</span>{" "}
-                  <span className="text-slate-500 text-sm">{c.telefone}</span>
+                  <span className="text-slate-500 text-sm">{c.telefone ?? "sem telefone"}</span>
                 </span>
                 <span className="text-slate-500 text-sm">
                   {c.atendimentos.length} atendimento(s) · {formatarReais(totalGasto)}

@@ -84,9 +84,9 @@ export async function buscarClientesPorNome(query: string): Promise<SugestaoClie
   if (termo.length < 2) return [];
 
   const clientes = await prisma.cliente.findMany({
-    where: { nome: { contains: termo, mode: "insensitive" } },
+    where: { nome: { contains: termo, mode: "insensitive" }, telefone: { not: null } },
     orderBy: { nome: "asc" },
     take: 5,
   });
-  return clientes.map((c) => ({ nome: c.nome, telefone: c.telefone }));
+  return clientes.map((c) => ({ nome: c.nome, telefone: c.telefone as string }));
 }

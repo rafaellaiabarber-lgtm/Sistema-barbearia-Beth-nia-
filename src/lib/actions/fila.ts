@@ -10,7 +10,13 @@ export async function buscarNomePorTelefone(telefone: string): Promise<string | 
   return cliente?.nome ?? null;
 }
 
-export type EntrarFilaState = { erro?: string; sucesso?: boolean; posicao?: number };
+export type EntrarFilaState = {
+  erro?: string;
+  sucesso?: boolean;
+  posicao?: number;
+  acompanhanteNome?: string;
+  acompanhantePosicao?: number;
+};
 
 export async function entrarNaFila(
   _prevState: EntrarFilaState,
@@ -19,6 +25,8 @@ export async function entrarNaFila(
   const nome = String(formData.get("nome") ?? "").trim();
   const telefone = String(formData.get("telefone") ?? "").trim();
   const barbeiroPreferidoId = String(formData.get("barbeiroPreferidoId") ?? "").trim() || null;
+  const acompanhanteNome = String(formData.get("acompanhanteNome") ?? "").trim();
+  const acompanhanteTelefone = String(formData.get("acompanhanteTelefone") ?? "").trim();
 
   if (!telefone) return { erro: "Informe seu telefone." };
   if (!nome) return { erro: "Informe seu nome." };
@@ -46,8 +54,34 @@ export async function entrarNaFila(
 
   const posicao = await prisma.atendimento.count({ where: { status: "AGUARDANDO" } });
 
+  let acompanhantePosicao: number | undefined;
+  if (acompanhanteNome) {
+    const acompanhanteCliente = acompanhanteTelefone
+      ? await prisma.cliente.upsert({
+          where: { telefone: acompanhanteTelefone },
+          update: { nome: acompanhanteNome },
+          create: { nome: acompanhanteNome, telefone: acompanhanteTelefone },
+        })
+      : await prisma.cliente.create({ data: { nome: acompanhanteNome, telefone: null } });
+
+    await prisma.atendimento.create({
+      data: {
+        clienteId: acompanhanteCliente.id,
+        status: "AGUARDANDO",
+        barbeiroPreferidoId,
+      },
+    });
+
+    acompanhantePosicao = await prisma.atendimento.count({ where: { status: "AGUARDANDO" } });
+  }
+
   revalidatePath("/fila");
-  return { sucesso: true, posicao };
+  return {
+    sucesso: true,
+    posicao,
+    acompanhanteNome: acompanhanteNome || undefined,
+    acompanhantePosicao,
+  };
 }
 
 export async function chamarProximo(barbeiroIdSelecionado?: string) {
