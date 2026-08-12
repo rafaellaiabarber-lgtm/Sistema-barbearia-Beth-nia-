@@ -39,6 +39,14 @@ export function NovoServicoForm() {
         />
       </div>
       <div>
+        <label className="block text-xs text-slate-500 mb-1">Custo (R$, opcional)</label>
+        <input
+          name="custo"
+          placeholder="0,00"
+          className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-28"
+        />
+      </div>
+      <div>
         <label className="block text-xs text-slate-500 mb-1">Duração (min)</label>
         <input
           name="duracao"
