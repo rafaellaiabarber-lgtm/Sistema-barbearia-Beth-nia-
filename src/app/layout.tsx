@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Barbearia Beth Nia",
-  description: "Sistema de fila, clientes e financeiro da Barbearia Beth Nia",
+  title: "Barbearia Bethânia",
+  description: "Sistema de fila, clientes e financeiro da Barbearia Bethânia",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
