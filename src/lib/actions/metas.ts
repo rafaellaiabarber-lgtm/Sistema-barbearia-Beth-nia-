@@ -5,11 +5,17 @@ import type { TipoMeta } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { reaisParaCentavos } from "@/lib/format";
+import { TIPOS_META_EM_CENTAVOS } from "@/lib/metas";
 
 export type MetaState = { erro?: string };
 
-const TIPOS_VALIDOS: TipoMeta[] = ["FATURAMENTO", "ATENDIMENTOS", "TICKET_MEDIO", "CLIENTES_NOVOS"];
-const TIPOS_EM_CENTAVOS: TipoMeta[] = ["FATURAMENTO", "TICKET_MEDIO"];
+const TIPOS_VALIDOS: TipoMeta[] = [
+  "FATURAMENTO",
+  "ATENDIMENTOS",
+  "TICKET_MEDIO",
+  "CLIENTES_NOVOS",
+  "VENDAS_PRODUTO",
+];
 
 function revalidar() {
   revalidatePath("/admin/metas");
@@ -21,13 +27,29 @@ function revalidar() {
 export async function salvarMeta(_prevState: MetaState, formData: FormData): Promise<MetaState> {
   await requireSession(["ADMIN"]);
 
+  const metaId = String(formData.get("metaId") ?? "").trim();
+
   const barbeiroId = String(formData.get("barbeiroId") ?? "").trim();
   if (!barbeiroId) return { erro: "Escolha o barbeiro." };
 
   const tipoRaw = String(formData.get("tipo") ?? "");
   if (!TIPOS_VALIDOS.includes(tipoRaw as TipoMeta)) return { erro: "Tipo de meta inválido." };
   const tipo = tipoRaw as TipoMeta;
-  const emCentavos = TIPOS_EM_CENTAVOS.includes(tipo);
+  const emCentavos = TIPOS_META_EM_CENTAVOS.has(tipo);
+
+  const dataInicioRaw = String(formData.get("dataInicio") ?? "").trim();
+  const dataFimRaw = String(formData.get("dataFim") ?? "").trim();
+  if ((dataInicioRaw && !dataFimRaw) || (!dataInicioRaw && dataFimRaw)) {
+    return { erro: "Informe as duas datas do período (início e fim), ou deixe as duas em branco pra usar o mês atual." };
+  }
+  const dataInicio = dataInicioRaw ? new Date(`${dataInicioRaw}T00:00:00`) : null;
+  const dataFim = dataFimRaw ? new Date(`${dataFimRaw}T23:59:59.999`) : null;
+  if (dataInicio && dataFim && dataFim < dataInicio) {
+    return { erro: "A data final do período não pode ser antes da data inicial." };
+  }
+
+  const servicoId = tipo !== "VENDAS_PRODUTO" ? String(formData.get("servicoId") ?? "").trim() || null : null;
+  const produtoId = tipo === "VENDAS_PRODUTO" ? String(formData.get("produtoId") ?? "").trim() || null : null;
 
   const nomes = formData.getAll("nivelNome").map(String);
   const valores = formData.getAll("nivelValor").map(String);
@@ -55,12 +77,12 @@ export async function salvarMeta(_prevState: MetaState, formData: FormData): Pro
     }
   }
 
+  const dadosMeta = { barbeiroId, tipo, dataInicio, dataFim, servicoId, produtoId };
+
   await prisma.$transaction(async (tx) => {
-    const meta = await tx.meta.upsert({
-      where: { barbeiroId_tipo: { barbeiroId, tipo } },
-      create: { barbeiroId, tipo },
-      update: {},
-    });
+    const meta = metaId
+      ? await tx.meta.update({ where: { id: metaId }, data: dadosMeta })
+      : await tx.meta.create({ data: dadosMeta });
     await tx.nivelMeta.deleteMany({ where: { metaId: meta.id } });
     await tx.nivelMeta.createMany({
       data: niveis.map((n) => ({ ...n, metaId: meta.id })),

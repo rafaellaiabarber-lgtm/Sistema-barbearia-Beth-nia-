@@ -65,6 +65,7 @@ enum TipoMeta {
   ATENDIMENTOS
   TICKET_MEDIO
   CLIENTES_NOVOS
+  VENDAS_PRODUTO
 }
 
 model Usuario {
@@ -92,19 +93,31 @@ model Barbeiro {
   atendimentosPreferidos  Atendimento[]       @relation("BarbeiroPreferido")
   pagamentosComissao      PagamentoComissao[]
   metas                   Meta[]
+  vendasProduto           VendaProduto[]
   criadoEm                DateTime            @default(now())
 }
 
+// Sem @@unique de (barbeiroId, tipo): agora um barbeiro pode ter várias metas do
+// mesmo tipo, desde que com escopo diferente (ex.: "Faturamento" geral e
+// "Faturamento" só de um serviço). Edição identifica a meta pelo id, não pela
+// combinação (barbeiroId, tipo).
 model Meta {
   id         String      @id @default(cuid())
   barbeiro   Barbeiro    @relation(fields: [barbeiroId], references: [id])
   barbeiroId String
   tipo       TipoMeta
+  // Se null, o período considerado é sempre o mês atual.
+  dataInicio DateTime?
+  dataFim    DateTime?
+  // Escopo opcional: restringe a meta a um serviço específico (tipos baseados em
+  // atendimento) ou a um produto específico (tipo VENDAS_PRODUTO).
+  servico    Servico?    @relation(fields: [servicoId], references: [id])
+  servicoId  String?
+  produto    Produto?    @relation(fields: [produtoId], references: [id])
+  produtoId  String?
   ativa      Boolean     @default(true)
   criadoEm   DateTime    @default(now())
   niveis     NivelMeta[]
-
-  @@unique([barbeiroId, tipo])
 }
 
 // valorAlvo está em centavos para FATURAMENTO/TICKET_MEDIO, e em unidades inteiras para ATENDIMENTOS/CLIENTES_NOVOS.
@@ -139,6 +152,31 @@ model Servico {
   ativo               Boolean              @default(true)
   criadoEm            DateTime             @default(now())
   atendimentoServicos AtendimentoServico[]
+  metas               Meta[]
+}
+
+model Produto {
+  id            String         @id @default(cuid())
+  nome          String
+  precoCentavos Int
+  custoCentavos Int            @default(0)
+  ativo         Boolean        @default(true)
+  criadoEm      DateTime       @default(now())
+  vendas        VendaProduto[]
+  metas         Meta[]
+}
+
+model VendaProduto {
+  id                    String          @id @default(cuid())
+  produto               Produto         @relation(fields: [produtoId], references: [id])
+  produtoId             String
+  barbeiro              Barbeiro?       @relation(fields: [barbeiroId], references: [id])
+  barbeiroId            String?
+  quantidade            Int             @default(1)
+  precoUnitarioCentavos Int
+  totalCentavos         Int
+  formaPagamento        FormaPagamento?
+  criadoEm              DateTime        @default(now())
 }
 
 model Atendimento {

@@ -3,6 +3,7 @@ import { formatarReais, LABEL_FORMA_PAGAMENTO, LABEL_CATEGORIA_DESPESA } from "@
 import { excluirMovimentoCaixa } from "@/lib/actions/caixa";
 import { NovoMovimentoForm } from "./novo-movimento-form";
 import { NovoAtendimentoForm } from "./novo-atendimento-form";
+import { NovaVendaProdutoForm } from "./nova-venda-produto-form";
 import { BotaoExcluirAtendimento } from "../excluir-atendimento-button";
 
 function inicioDoDia() {
@@ -24,7 +25,7 @@ type Lancamento = {
 export default async function CaixaPage() {
   const inicio = inicioDoDia();
 
-  const [atendimentosHoje, movimentosHoje, barbeiros, servicos] = await Promise.all([
+  const [atendimentosHoje, movimentosHoje, barbeiros, servicos, produtos] = await Promise.all([
     prisma.atendimento.findMany({
       where: { status: "CONCLUIDO", concluidoEm: { gte: inicio } },
       include: { cliente: true, barbeiro: true },
@@ -36,6 +37,7 @@ export default async function CaixaPage() {
     }),
     prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
     prisma.servico.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.produto.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
   ]);
 
   const lancamentos: Lancamento[] = [
@@ -78,6 +80,7 @@ export default async function CaixaPage() {
       <h1 className="text-2xl font-bold mb-6">Caixa do dia</h1>
 
       <NovoAtendimentoForm barbeiros={barbeiros} servicos={servicos} />
+      <NovaVendaProdutoForm barbeiros={barbeiros} produtos={produtos} />
       <NovoMovimentoForm />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">

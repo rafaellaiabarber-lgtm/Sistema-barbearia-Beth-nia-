@@ -5,9 +5,10 @@ export const LABEL_TIPO_META: Record<string, string> = {
   ATENDIMENTOS: "Nº de atendimentos",
   TICKET_MEDIO: "Ticket médio",
   CLIENTES_NOVOS: "Clientes novos",
+  VENDAS_PRODUTO: "Vendas de produto",
 };
 
-export const TIPOS_META_EM_CENTAVOS = new Set(["FATURAMENTO", "TICKET_MEDIO"]);
+export const TIPOS_META_EM_CENTAVOS = new Set(["FATURAMENTO", "TICKET_MEDIO", "VENDAS_PRODUTO"]);
 
 export function formatarValorMeta(tipo: string, valor: number) {
   if (TIPOS_META_EM_CENTAVOS.has(tipo)) return formatarReais(valor);
@@ -25,6 +26,7 @@ export type ProgressoBarbeiro = {
   faturamentoCentavos: number;
   qtdAtendimentos: number;
   clientesNovos: number;
+  vendasProdutoCentavos: number;
 };
 
 export function valorAtualPorTipo(tipo: string, progresso: ProgressoBarbeiro): number {
@@ -39,6 +41,8 @@ export function valorAtualPorTipo(tipo: string, progresso: ProgressoBarbeiro): n
         : 0;
     case "CLIENTES_NOVOS":
       return progresso.clientesNovos;
+    case "VENDAS_PRODUTO":
+      return progresso.vendasProdutoCentavos;
     default:
       return 0;
   }
