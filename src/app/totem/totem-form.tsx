@@ -29,7 +29,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
         <p className="text-slate-500 text-lg mb-2">Você entrou na fila!</p>
         <p className="text-7xl font-black text-blue-600 mb-4">{estado.posicao}º</p>
         <p className="text-slate-700 mb-8">
-          Aguarde ser chamado. Fique de olho no painel da barbearia.
+          É só aguardar, o profissional já vai te chamar.
         </p>
         <a
           href="/totem"
