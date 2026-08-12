@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Wallet, Target } from "lucide-react";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { chamarProximo, chamarCliente, cancelarAtendimento } from "@/lib/actions/fila";
@@ -39,13 +40,25 @@ export default async function FilaPage() {
     : null;
 
   let comissaoHoje: { comissaoCentavos: number; totalCentavos: number; qtd: number } | null = null;
+  let metaInfo: {
+    faturamentoMesCentavos: number;
+    metaFaturamentoCentavos: number;
+    percentualMeta: number;
+    bateuMeta: boolean;
+    bonificacaoCentavos: number | null;
+  } | null = null;
+
   if (session.barbeiroId) {
-    const { inicio, fim } = calcularIntervalo("hoje");
-    const [barbeiro, atendimentosHoje] = await Promise.all([
+    const hoje = calcularIntervalo("hoje");
+    const mes = calcularIntervalo("mes", new Date());
+    const [barbeiro, atendimentosHoje, atendimentosMes] = await Promise.all([
       prisma.barbeiro.findUnique({ where: { id: session.barbeiroId } }),
       prisma.atendimento.findMany({
-        where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim } },
+        where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: hoje.inicio, lte: hoje.fim } },
         include: { servicos: true },
+      }),
+      prisma.atendimento.findMany({
+        where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim } },
       }),
     ]);
     const totalCentavos = atendimentosHoje.reduce((s, a) => s + a.precoTotalCentavos, 0);
@@ -54,6 +67,18 @@ export default async function FilaPage() {
       0
     );
     comissaoHoje = { totalCentavos, qtd: atendimentosHoje.length, comissaoCentavos };
+
+    if (barbeiro?.metaFaturamentoCentavos && barbeiro.metaFaturamentoCentavos > 0) {
+      const faturamentoMesCentavos = atendimentosMes.reduce((s, a) => s + a.precoTotalCentavos, 0);
+      const percentualMeta = Math.min((faturamentoMesCentavos / barbeiro.metaFaturamentoCentavos) * 100, 999);
+      metaInfo = {
+        faturamentoMesCentavos,
+        metaFaturamentoCentavos: barbeiro.metaFaturamentoCentavos,
+        percentualMeta,
+        bateuMeta: percentualMeta >= 100,
+        bonificacaoCentavos: barbeiro.bonificacaoCentavos,
+      };
+    }
   }
 
   return (
@@ -85,15 +110,55 @@ export default async function FilaPage() {
         />
       ) : (
         <>
-          {session.barbeiroId && comissaoHoje && (
-            <div className="bg-white border border-slate-200 rounded-xl p-4 mb-6 shadow-sm flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 text-sm">Sua comissão hoje</p>
-                <p className="text-slate-400 text-xs">
-                  {comissaoHoje.qtd} atendimento(s) · faturamento {formatarReais(comissaoHoje.totalCentavos)}
-                </p>
-              </div>
-              <p className="text-2xl font-bold text-blue-600">{formatarReais(comissaoHoje.comissaoCentavos)}</p>
+          {session.barbeiroId && (comissaoHoje || metaInfo) && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              {comissaoHoje && (
+                <div className="rounded-xl p-5 shadow-sm bg-green-600 text-white flex items-start justify-between">
+                  <div>
+                    <p className="text-3xl font-bold mb-1">{formatarReais(comissaoHoje.comissaoCentavos)}</p>
+                    <p className="text-green-100 text-sm">Sua comissão hoje</p>
+                    <p className="text-green-100 text-xs mt-1">
+                      {comissaoHoje.qtd} atendimento(s) · faturamento {formatarReais(comissaoHoje.totalCentavos)}
+                    </p>
+                  </div>
+                  <Wallet className="w-8 h-8 text-green-200 shrink-0" />
+                </div>
+              )}
+
+              {metaInfo && (
+                <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target className="w-4 h-4 text-blue-600" />
+                    <p className="text-sm font-semibold text-slate-700">Minha meta do mês</p>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                    <span>
+                      {formatarReais(metaInfo.faturamentoMesCentavos)} de {formatarReais(metaInfo.metaFaturamentoCentavos)}
+                    </span>
+                    <span className={`font-semibold ${metaInfo.bateuMeta ? "text-green-600" : "text-slate-500"}`}>
+                      {metaInfo.percentualMeta.toFixed(0)}%
+                    </span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${metaInfo.bateuMeta ? "bg-green-500" : "bg-blue-500"}`}
+                      style={{ width: `${Math.min(metaInfo.percentualMeta, 100)}%` }}
+                    />
+                  </div>
+                  {metaInfo.bateuMeta ? (
+                    <p className="text-green-600 text-xs mt-2 font-medium">
+                      🎉 Meta batida!
+                      {metaInfo.bonificacaoCentavos ? ` Bônus: ${formatarReais(metaInfo.bonificacaoCentavos)}` : ""}
+                    </p>
+                  ) : (
+                    <p className="text-slate-500 text-xs mt-2">
+                      Faltam {(100 - metaInfo.percentualMeta).toFixed(0)}% (
+                      {formatarReais(Math.max(metaInfo.metaFaturamentoCentavos - metaInfo.faturamentoMesCentavos, 0))}) para
+                      bater a meta
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
