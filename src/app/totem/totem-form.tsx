@@ -157,17 +157,16 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
           <div className="grid grid-cols-2 gap-3 mb-6">
             <button
               type="button"
-              onClick={() => setBarbeiroPreferidoId(null)}
-              className={`rounded-2xl border-2 overflow-hidden transition-colors ${
-                barbeiroPreferidoId === null
-                  ? "border-blue-600"
-                  : "border-slate-200 hover:border-slate-300"
-              }`}
+              onClick={() => {
+                setBarbeiroPreferidoId(null);
+                setEtapa("acompanhante");
+              }}
+              className="rounded-2xl border-2 border-slate-200 hover:border-slate-300 overflow-hidden transition-colors"
             >
               <div className="w-full aspect-square bg-slate-100 flex items-center justify-center text-6xl">
                 🤝
               </div>
-              <div className={`py-2 ${barbeiroPreferidoId === null ? "bg-blue-50" : "bg-white"}`}>
+              <div className="py-2 bg-white">
                 <span className="text-slate-900 font-semibold text-sm">Sem preferência</span>
               </div>
             </button>
@@ -176,12 +175,11 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               <button
                 type="button"
                 key={b.id}
-                onClick={() => setBarbeiroPreferidoId(b.id)}
-                className={`rounded-2xl border-2 overflow-hidden transition-colors ${
-                  barbeiroPreferidoId === b.id
-                    ? "border-blue-600"
-                    : "border-slate-200 hover:border-slate-300"
-                }`}
+                onClick={() => {
+                  setBarbeiroPreferidoId(b.id);
+                  setEtapa("acompanhante");
+                }}
+                className="rounded-2xl border-2 border-slate-200 hover:border-slate-300 overflow-hidden transition-colors"
               >
                 {b.fotoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -191,34 +189,20 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
                     💈
                   </div>
                 )}
-                <div className={`py-2 ${barbeiroPreferidoId === b.id ? "bg-blue-50" : "bg-white"}`}>
+                <div className="py-2 bg-white">
                   <span className="text-slate-900 font-semibold text-sm">{b.nome}</span>
                 </div>
               </button>
             ))}
           </div>
 
-          {erroLocal && <p className="text-red-600 text-sm mb-4 text-center">{erroLocal}</p>}
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => setEtapa("nome")}
-              className="rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-semibold px-6 py-4"
-            >
-              Voltar
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setErroLocal("");
-                setEtapa("acompanhante");
-              }}
-              className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-4 transition-colors"
-            >
-              Continuar
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setEtapa("nome")}
+            className="rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-semibold px-6 py-4"
+          >
+            Voltar
+          </button>
         </div>
       )}
 
