@@ -68,6 +68,7 @@ model Servico {
   nome                String
   precoCentavos       Int
   duracaoMinutos      Int                  @default(30)
+  comissaoPercentual  Int?
   ativo               Boolean              @default(true)
   criadoEm            DateTime             @default(now())
   atendimentoServicos AtendimentoServico[]
@@ -111,11 +112,12 @@ model PagamentoComissao {
 }
 
 model AtendimentoServico {
-  id            String      @id @default(cuid())
-  atendimento   Atendimento @relation(fields: [atendimentoId], references: [id], onDelete: Cascade)
-  atendimentoId String
-  servico       Servico     @relation(fields: [servicoId], references: [id])
-  servicoId     String
-  nomeSnapshot  String
-  precoCentavos Int
+  id                 String      @id @default(cuid())
+  atendimento        Atendimento @relation(fields: [atendimentoId], references: [id], onDelete: Cascade)
+  atendimentoId      String
+  servico            Servico     @relation(fields: [servicoId], references: [id])
+  servicoId          String
+  nomeSnapshot       String
+  precoCentavos      Int
+  comissaoPercentual Int?
 }

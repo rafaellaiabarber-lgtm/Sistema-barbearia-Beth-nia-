@@ -105,11 +105,13 @@ export async function concluirAtendimento(
     return { erro: "Escolha ao menos um serviço realizado." };
   }
 
-  const servicos = await prisma.servico.findMany({
-    where: { id: { in: servicoIds } },
-  });
+  const [servicos, atendimento] = await Promise.all([
+    prisma.servico.findMany({ where: { id: { in: servicoIds } } }),
+    prisma.atendimento.findUnique({ where: { id: atendimentoId }, include: { barbeiro: true } }),
+  ]);
   if (servicos.length === 0) return { erro: "Serviços inválidos." };
 
+  const comissaoPadrao = atendimento?.barbeiro?.comissaoPercentual ?? 0;
   const precoTotalCentavos = servicos.reduce((soma, s) => soma + s.precoCentavos, 0);
 
   await prisma.atendimento.update({
@@ -123,6 +125,7 @@ export async function concluirAtendimento(
           servicoId: s.id,
           nomeSnapshot: s.nome,
           precoCentavos: s.precoCentavos,
+          comissaoPercentual: s.comissaoPercentual ?? comissaoPadrao,
         })),
       },
     },
