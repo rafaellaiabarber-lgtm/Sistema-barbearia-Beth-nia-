@@ -151,3 +151,19 @@ export async function cancelarAtendimento(atendimentoId: string) {
   });
   revalidatePath("/fila");
 }
+
+export async function desfazerInicioAtendimento(atendimentoId: string) {
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
+
+  const atendimento = await prisma.atendimento.findFirst({
+    where: { id: atendimentoId, status: "EM_ATENDIMENTO" },
+  });
+  if (!atendimento) return;
+  if (session.role === "BARBEIRO" && atendimento.barbeiroId !== session.barbeiroId) return;
+
+  await prisma.atendimento.update({
+    where: { id: atendimentoId },
+    data: { status: "AGUARDANDO", barbeiroId: null, chamadoEm: null },
+  });
+  revalidatePath("/fila");
+}
