@@ -68,6 +68,29 @@ export async function chamarProximo(barbeiroIdSelecionado?: string) {
   revalidatePath("/fila");
 }
 
+export async function chamarCliente(atendimentoId: string) {
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
+  if (session.role !== "BARBEIRO" || !session.barbeiroId) return;
+  const barbeiroId = session.barbeiroId;
+
+  const emAndamento = await prisma.atendimento.findFirst({
+    where: { barbeiroId, status: "EM_ATENDIMENTO" },
+  });
+  if (emAndamento) return;
+
+  const atendimento = await prisma.atendimento.findFirst({
+    where: { id: atendimentoId, status: "AGUARDANDO" },
+  });
+  if (!atendimento) return;
+
+  await prisma.atendimento.update({
+    where: { id: atendimentoId },
+    data: { status: "EM_ATENDIMENTO", barbeiroId, chamadoEm: new Date() },
+  });
+
+  revalidatePath("/fila");
+}
+
 export type ConcluirState = { erro?: string };
 
 export async function concluirAtendimento(
