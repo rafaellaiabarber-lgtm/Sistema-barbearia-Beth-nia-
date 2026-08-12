@@ -18,7 +18,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-screen bg-neutral-950 text-white flex">
       <aside className="w-56 shrink-0 border-r border-neutral-800 p-5 flex flex-col">
         <div className="mb-8">
-          <p className="font-bold text-lg">Barbearia Beth Nia</p>
+          <p className="font-bold text-lg">Barbearia Bethânia</p>
           <p className="text-neutral-500 text-sm">Olá, {session.nome}</p>
         </div>
         <nav className="flex flex-col gap-1 flex-1">

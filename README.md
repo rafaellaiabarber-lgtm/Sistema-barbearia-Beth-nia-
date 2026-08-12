@@ -1,4 +1,4 @@
-# Barbearia Beth Nia
+# Barbearia Bethânia
 
 Sistema web para barbearia que atende por **ordem de chegada** (fila), com:
 

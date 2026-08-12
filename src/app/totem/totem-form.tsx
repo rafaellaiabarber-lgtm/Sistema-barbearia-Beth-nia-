@@ -36,7 +36,7 @@ export function TotemForm({ barbeiros }: { barbeiros: Barbeiro[] }) {
 
   return (
     <div className="w-full max-w-xl bg-neutral-900 rounded-3xl shadow-xl p-8 border border-neutral-800">
-      <h1 className="text-3xl font-black text-white text-center mb-1">Barbearia Beth Nia</h1>
+      <h1 className="text-3xl font-black text-white text-center mb-1">Barbearia Bethânia</h1>
       <p className="text-neutral-400 text-center mb-8">Toque para entrar na fila</p>
 
       {etapa === "telefone" && (

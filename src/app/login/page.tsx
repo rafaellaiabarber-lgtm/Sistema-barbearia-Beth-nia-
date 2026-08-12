@@ -12,7 +12,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-950 px-4">
       <div className="w-full max-w-sm bg-neutral-900 rounded-2xl shadow-xl p-8 border border-neutral-800">
-        <h1 className="text-2xl font-bold text-white mb-1">Barbearia Beth Nia</h1>
+        <h1 className="text-2xl font-bold text-white mb-1">Barbearia Bethânia</h1>
         <p className="text-neutral-400 mb-6">Entrar como equipe</p>
 
         <form action={formAction} className="space-y-4">
