@@ -120,7 +120,7 @@ export default async function ComissoesPage({
       />
 
       {!podeMarcarPago && (
-        <p className="text-slate-400 text-xs mb-4">
+        <p className="text-slate-400 dark:text-slate-500 text-xs mb-4">
           Período personalizado: marcar comissão como paga fica disponível só em Hoje/Semana/Mês.
         </p>
       )}
@@ -137,12 +137,12 @@ export default async function ComissoesPage({
           return (
             <div
               key={id}
-              className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
             >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold">{b.nome}</p>
-                  <p className="text-slate-500 text-sm">
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">
                     {b.qtd} atendimento(s) · faturamento {formatarReais(b.totalCentavos)}
                   </p>
                 </div>
@@ -151,7 +151,7 @@ export default async function ComissoesPage({
                   {podeMarcarPago &&
                     (pago ? (
                       <form action={desmarcarComissaoPaga.bind(null, id, periodo as "hoje" | "semana" | "mes", chave)}>
-                        <button className="rounded-lg bg-green-50 text-green-700 border border-green-200 px-3 py-1.5 text-sm font-medium">
+                        <button className="rounded-lg bg-green-50 dark:bg-green-950 text-green-700 border border-green-200 px-3 py-1.5 text-sm font-medium">
                           ✓ Pago — desmarcar
                         </button>
                       </form>
@@ -174,16 +174,16 @@ export default async function ComissoesPage({
               </div>
 
               {percentualMeta !== null && (
-                <div className="mt-3 pt-3 border-t border-slate-100">
-                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
                     <span>
                       Meta do mês: {formatarReais(faturamentoMesCentavos)} de {formatarReais(metaCentavos!)}
                     </span>
-                    <span className={`font-semibold ${percentualMeta >= 100 ? "text-green-600" : "text-slate-500"}`}>
+                    <span className={`font-semibold ${percentualMeta >= 100 ? "text-green-600" : "text-slate-500 dark:text-slate-400"}`}>
                       {percentualMeta.toFixed(0)}% {percentualMeta >= 100 ? "— meta batida!" : ""}
                     </span>
                   </div>
-                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full ${percentualMeta >= 100 ? "bg-green-500" : "bg-blue-500"}`}
                       style={{ width: `${Math.min(percentualMeta, 100)}%` }}
@@ -194,7 +194,7 @@ export default async function ComissoesPage({
             </div>
           );
         })}
-        {porBarbeiro.size === 0 && <p className="text-slate-400">Nenhum atendimento no período.</p>}
+        {porBarbeiro.size === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum atendimento no período.</p>}
       </div>
 
       <h2 className="text-lg font-semibold mb-3">Serviços mais vendidos no período</h2>
@@ -202,7 +202,7 @@ export default async function ComissoesPage({
         {ranking.map((r, i) => (
           <div
             key={r.nome}
-            className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-3 text-sm shadow-sm"
+            className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm shadow-sm"
           >
             <div className="flex items-center gap-3">
               <span className="text-blue-600 font-bold w-6 text-center">{i + 1}º</span>
@@ -210,11 +210,11 @@ export default async function ComissoesPage({
             </div>
             <div className="text-right">
               <p className="font-semibold">{r.qtd}x</p>
-              <p className="text-slate-400 text-xs">{formatarReais(r.totalCentavos)}</p>
+              <p className="text-slate-400 dark:text-slate-500 text-xs">{formatarReais(r.totalCentavos)}</p>
             </div>
           </div>
         ))}
-        {ranking.length === 0 && <p className="text-slate-400">Nenhum serviço vendido no período.</p>}
+        {ranking.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum serviço vendido no período.</p>}
       </div>
     </div>
   );

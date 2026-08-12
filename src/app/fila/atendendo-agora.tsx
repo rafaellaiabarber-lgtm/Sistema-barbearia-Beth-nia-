@@ -37,16 +37,16 @@ export function AtendendoAgora({
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-md">
-          <p className="text-slate-500 text-center mb-4">
-            Finalizando atendimento de <span className="font-semibold text-slate-900">{clienteNome}</span>
+          <p className="text-slate-500 dark:text-slate-400 text-center mb-4">
+            Finalizando atendimento de <span className="font-semibold text-slate-900 dark:text-white">{clienteNome}</span>
           </p>
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
             <ConcluirForm atendimentoId={atendimentoId} servicos={servicos} />
           </div>
           <button
             type="button"
             onClick={() => setFinalizando(false)}
-            className="mt-4 w-full text-center text-slate-500 hover:text-slate-800 text-sm"
+            className="mt-4 w-full text-center text-slate-500 dark:text-slate-400 hover:text-slate-800 text-sm"
           >
             Voltar
           </button>
@@ -57,9 +57,9 @@ export function AtendendoAgora({
 
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
-      <p className="text-slate-500 text-lg mb-2">Atendendo agora</p>
-      <p className="text-4xl font-black text-slate-900 mb-4">{clienteNome}</p>
-      <p className="text-slate-500 text-sm mb-1">Iniciado às {horaInicio}</p>
+      <p className="text-slate-500 dark:text-slate-400 text-lg mb-2">Atendendo agora</p>
+      <p className="text-4xl font-black text-slate-900 dark:text-white mb-4">{clienteNome}</p>
+      <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Iniciado às {horaInicio}</p>
       <p className="text-3xl font-bold text-blue-600 mb-8 tabular-nums">{formatarDuracao(segundos)}</p>
 
       <button
@@ -71,7 +71,7 @@ export function AtendendoAgora({
       </button>
 
       <form action={desfazerInicioAtendimento.bind(null, atendimentoId)}>
-        <button type="submit" className="text-slate-400 hover:text-red-600 text-sm">
+        <button type="submit" className="text-slate-400 dark:text-slate-500 hover:text-red-600 text-sm">
           Desfazer início
         </button>
       </form>

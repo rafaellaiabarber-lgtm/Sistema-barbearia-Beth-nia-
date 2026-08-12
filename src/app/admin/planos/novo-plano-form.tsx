@@ -19,35 +19,35 @@ export function NovoPlanoForm() {
     <form
       ref={formRef}
       action={formAction}
-      className="bg-white border border-slate-200 rounded-xl p-4 mb-6 flex flex-wrap items-end gap-3 shadow-sm"
+      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-6 flex flex-wrap items-end gap-3 shadow-sm"
     >
       <div>
-        <label className="block text-xs text-slate-500 mb-1">Nome do plano</label>
+        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Nome do plano</label>
         <input
           name="nome"
           required
           placeholder="Ex: Plano Mensal"
-          className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-48"
+          className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-48"
         />
       </div>
       <div>
-        <label className="block text-xs text-slate-500 mb-1">Preço mensal (R$)</label>
+        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Preço mensal (R$)</label>
         <input
           name="preco"
           required
           placeholder="99,00"
-          className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-28"
+          className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-28"
         />
       </div>
       <div>
-        <label className="block text-xs text-slate-500 mb-1">Serviços incluídos/mês</label>
+        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Serviços incluídos/mês</label>
         <input
           name="cota"
           type="number"
           min={1}
           required
           placeholder="4"
-          className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-32"
+          className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-32"
         />
       </div>
       <button

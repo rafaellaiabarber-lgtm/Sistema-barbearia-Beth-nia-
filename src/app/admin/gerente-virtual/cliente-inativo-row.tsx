@@ -19,10 +19,10 @@ export function ClienteInativoRow({
   );
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+    <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
       <div>
         <p className="font-semibold">{nome}</p>
-        <p className="text-slate-500 text-sm">
+        <p className="text-slate-500 dark:text-slate-400 text-sm">
           {formatarTelefone(telefone)} · sem voltar há {diasSemVoltar} dias · {qtdVisitas} visita(s) no total
         </p>
       </div>

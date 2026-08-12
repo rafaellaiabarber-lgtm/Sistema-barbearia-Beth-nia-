@@ -29,7 +29,7 @@ export function ConcluirForm({
 
   return (
     <form action={formAction}>
-      <p className="text-slate-700 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
+      <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
       <div className="grid grid-cols-2 gap-2 mb-3">
         {servicos.map((s) => {
           const ativo = selecionados.includes(s.id);
@@ -40,11 +40,11 @@ export function ConcluirForm({
               onClick={() => alternarServico(s.id)}
               className={`rounded-lg border-2 px-3 py-2 text-left text-sm transition-colors ${
                 ativo
-                  ? "border-blue-600 bg-blue-50"
-                  : "border-slate-200 bg-white hover:border-slate-300"
+                  ? "border-blue-600 bg-blue-50 dark:bg-blue-950"
+                  : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300"
               }`}
             >
-              <span className="block text-slate-900 font-medium">{s.nome}</span>
+              <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
               <span className="block text-blue-600 text-xs">{formatarReais(s.precoCentavos)}</span>
             </button>
           );
@@ -58,7 +58,7 @@ export function ConcluirForm({
         <p className="text-blue-600 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
       )}
 
-      <p className="text-slate-700 text-sm font-semibold mb-2">Forma de pagamento:</p>
+      <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Forma de pagamento:</p>
       <div className="mb-3">
         <SeletorFormaPagamento />
       </div>

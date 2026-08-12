@@ -130,22 +130,22 @@ export default async function PlanosPage() {
       <h1 className="text-2xl font-bold mb-6">Planos de assinatura</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Receita recorrente (MRR)</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Receita recorrente (MRR)</p>
           <p className="text-2xl font-bold text-blue-600">{formatarReais(mrrTotalCentavos)}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Assinantes ativos</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Assinantes ativos</p>
           <p className="text-2xl font-bold text-blue-600">{ativosTotal}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Inadimplentes</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Inadimplentes</p>
           <p className={`text-2xl font-bold ${inadimplentesTotal > 0 ? "text-red-600" : "text-green-600"}`}>
             {inadimplentesTotal}
           </p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Churn (mês)</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Churn (mês)</p>
           <p className="text-2xl font-bold text-blue-600">{formatarPercentual(churnGeral)}</p>
         </div>
       </div>
@@ -158,43 +158,43 @@ export default async function PlanosPage() {
             <PlanoRow plano={m.plano} />
 
             <div
-              className={`bg-white border border-slate-200 rounded-xl p-4 shadow-sm ${
+              className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm ${
                 !m.plano.ativo ? "opacity-50" : ""
               }`}
             >
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-3">
                 <div>
-                  <p className="text-slate-400 text-xs">Clientes ativos</p>
+                  <p className="text-slate-400 dark:text-slate-500 text-xs">Clientes ativos</p>
                   <p className="font-semibold">{m.ativosQtd}</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 text-xs">Clientes cancelados</p>
+                  <p className="text-slate-400 dark:text-slate-500 text-xs">Clientes cancelados</p>
                   <p className="font-semibold">{m.canceladasTotal}</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 text-xs">Novas assinaturas (mês)</p>
+                  <p className="text-slate-400 dark:text-slate-500 text-xs">Novas assinaturas (mês)</p>
                   <p className="font-semibold">{m.novasNoMes}</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 text-xs">Churn (mês)</p>
+                  <p className="text-slate-400 dark:text-slate-500 text-xs">Churn (mês)</p>
                   <p className="font-semibold">{formatarPercentual(m.churn)}</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 text-xs">Receita recorrente (MRR)</p>
+                  <p className="text-slate-400 dark:text-slate-500 text-xs">Receita recorrente (MRR)</p>
                   <p className="font-semibold text-blue-600">{formatarReais(m.mrrCentavos)}</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 text-xs">Inadimplência</p>
+                  <p className="text-slate-400 dark:text-slate-500 text-xs">Inadimplência</p>
                   <p className={`font-semibold ${m.inadimplentesQtd > 0 ? "text-red-600" : "text-green-600"}`}>
                     {m.inadimplentesQtd}
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-400 text-xs">Custo médio/assinante (mês)</p>
+                  <p className="text-slate-400 dark:text-slate-500 text-xs">Custo médio/assinante (mês)</p>
                   <p className="font-semibold">{formatarReais(m.custoMedioPorAssinante)}</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 text-xs">Rentabilidade (mês)</p>
+                  <p className="text-slate-400 dark:text-slate-500 text-xs">Rentabilidade (mês)</p>
                   <p className={`font-semibold ${m.rentabilidadeCentavos < 0 ? "text-red-600" : "text-green-600"}`}>
                     {formatarReais(m.rentabilidadeCentavos)}
                   </p>
@@ -210,20 +210,20 @@ export default async function PlanosPage() {
                   {m.assinantesDetalhe.map((s, i) => (
                     <div key={`${s.nome}-${i}`} className="flex items-center justify-between text-sm py-1">
                       <span>{s.nome}</span>
-                      <span className="text-slate-500">
+                      <span className="text-slate-500 dark:text-slate-400">
                         {s.qtd} de {m.plano.servicosIncluidosPorMes} serviço(s) usados
                       </span>
                     </div>
                   ))}
                   {m.assinantesDetalhe.length === 0 && (
-                    <p className="text-slate-400 text-sm">Nenhum assinante ativo neste plano.</p>
+                    <p className="text-slate-400 dark:text-slate-500 text-sm">Nenhum assinante ativo neste plano.</p>
                   )}
                 </div>
               </details>
             </div>
           </div>
         ))}
-        {planosComMetricas.length === 0 && <p className="text-slate-400">Nenhum plano cadastrado ainda.</p>}
+        {planosComMetricas.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum plano cadastrado ainda.</p>}
       </div>
     </div>
   );

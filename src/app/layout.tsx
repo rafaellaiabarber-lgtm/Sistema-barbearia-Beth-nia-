@@ -14,8 +14,26 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans bg-slate-50 text-slate-900">{children}</body>
+    <html lang="pt-BR" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <script
+          // Roda antes da hidratação pra evitar o "flash" da tela clara antes de aplicar o tema escuro salvo.
+          dangerouslySetInnerHTML={{
+            __html: `try {
+              var tema = localStorage.getItem('tema');
+              if (tema === 'escuro' || (!tema && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+              }
+            } catch (e) {}`,
+          }}
+        />
+      </head>
+      <body
+        className="min-h-full flex flex-col font-sans bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100"
+        suppressHydrationWarning
+      >
+        {children}
+      </body>
     </html>
   );
 }

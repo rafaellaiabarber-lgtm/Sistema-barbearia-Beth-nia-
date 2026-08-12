@@ -191,12 +191,12 @@ export default async function AdminHomePage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-700 mb-4">Faturamento (últimos 14 dias)</h2>
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Faturamento (últimos 14 dias)</h2>
           <GraficoBarras dados={dadosGrafico} />
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-700 mb-3">Serviços mais vendidos (mês)</h2>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">Serviços mais vendidos (mês)</h2>
           <div className="space-y-2">
             {rankingServicos.map((r, i) => (
               <div key={r.nome} className="flex items-center justify-between text-sm">
@@ -210,7 +210,7 @@ export default async function AdminHomePage() {
               </div>
             ))}
             {rankingServicos.length === 0 && (
-              <p className="text-slate-400 text-sm">Nenhum serviço vendido no mês.</p>
+              <p className="text-slate-400 dark:text-slate-500 text-sm">Nenhum serviço vendido no mês.</p>
             )}
           </div>
         </div>
@@ -218,45 +218,45 @@ export default async function AdminHomePage() {
 
       <h2 className="text-lg font-semibold mb-3">Este mês</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Faturamento da semana</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Faturamento da semana</p>
           <p className="text-2xl font-bold text-blue-600 mb-1">{formatarReais(faturamentoSemana)}</p>
           <Variacao atual={faturamentoSemana} anterior={faturamentoSemanaAnterior} />
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Lucro estimado</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Lucro estimado</p>
           <p className={`text-2xl font-bold mb-1 ${lucroMes < 0 ? "text-red-600" : "text-green-600"}`}>
             {formatarReais(lucroMes)}
           </p>
           <Variacao atual={lucroMes} anterior={lucroMesAnterior} />
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Atendimentos</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Atendimentos</p>
           <p className="text-2xl font-bold text-blue-600 mb-1">{qtdAtendimentosMes}</p>
           <Variacao atual={qtdAtendimentosMes} anterior={qtdAtendimentosMesAnterior} />
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Ticket médio</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Ticket médio</p>
           <p className="text-2xl font-bold text-blue-600 mb-1">{formatarReais(ticketMedioMes)}</p>
           <Variacao atual={ticketMedioMes} anterior={ticketMedioMesAnterior} />
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Na fila agora</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Na fila agora</p>
           <p className="text-2xl font-bold text-blue-600">{aguardando}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Em atendimento</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Em atendimento</p>
           <p className="text-2xl font-bold text-blue-600">{emAtendimento}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Clientes novos (mês)</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Clientes novos (mês)</p>
           <p className="text-2xl font-bold text-blue-600">{clientesNovos}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Clientes recorrentes (mês)</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Clientes recorrentes (mês)</p>
           <p className="text-2xl font-bold text-blue-600">{clientesRecorrentes}</p>
         </div>
       </div>
@@ -267,17 +267,17 @@ export default async function AdminHomePage() {
           {rankingBarbeiros.map((b) => (
             <div
               key={b.nome}
-              className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-3 text-sm shadow-sm"
+              className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm shadow-sm"
             >
               <span className="font-medium">{b.nome}</span>
               <div className="text-right">
                 <p className="font-semibold text-blue-600">{formatarReais(b.totalCentavos)}</p>
-                <p className="text-slate-400 text-xs">{b.qtd} atendimento(s)</p>
+                <p className="text-slate-400 dark:text-slate-500 text-xs">{b.qtd} atendimento(s)</p>
               </div>
             </div>
           ))}
           {rankingBarbeiros.length === 0 && (
-            <p className="text-slate-400 text-sm">Nenhum atendimento no mês.</p>
+            <p className="text-slate-400 dark:text-slate-500 text-sm">Nenhum atendimento no mês.</p>
           )}
         </div>
       </div>

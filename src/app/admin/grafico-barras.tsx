@@ -24,7 +24,7 @@ export function GraficoBarras({ dados }: { dados: { label: string; valor: number
       </div>
       <div className="flex gap-1 mt-1">
         {dados.map((d, i) => (
-          <div key={i} className="flex-1 text-center text-[10px] text-slate-400 truncate">
+          <div key={i} className="flex-1 text-center text-[10px] text-slate-400 dark:text-slate-500 truncate">
             {d.label}
           </div>
         ))}

@@ -33,9 +33,9 @@ export function ImagemTotemForm({
   }, [estado, pendente]);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
       <h2 className="font-semibold mb-1">{label}</h2>
-      <p className="text-slate-500 text-sm mb-4">{descricao}</p>
+      <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">{descricao}</p>
 
       {imagemUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -44,12 +44,12 @@ export function ImagemTotemForm({
           alt={label}
           className={
             aspecto === "logo"
-              ? "h-24 object-contain bg-slate-50 rounded-lg border border-slate-200 p-2 mb-4"
-              : "w-full h-40 object-cover rounded-lg border border-slate-200 mb-4"
+              ? "h-24 object-contain bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-2 mb-4"
+              : "w-full h-40 object-cover rounded-lg border border-slate-200 dark:border-slate-800 mb-4"
           }
         />
       ) : (
-        <div className="w-full h-24 rounded-lg border border-dashed border-slate-300 flex items-center justify-center text-slate-400 text-sm mb-4">
+        <div className="w-full h-24 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 dark:text-slate-500 text-sm mb-4">
           Nenhuma imagem definida
         </div>
       )}
@@ -68,7 +68,7 @@ export function ImagemTotemForm({
           <button
             type="button"
             onClick={() => acaoRemover()}
-            className="text-sm text-slate-500 hover:text-red-600"
+            className="text-sm text-slate-500 dark:text-slate-400 hover:text-red-600"
           >
             Remover
           </button>

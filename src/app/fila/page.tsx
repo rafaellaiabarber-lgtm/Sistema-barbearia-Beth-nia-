@@ -9,6 +9,7 @@ import { calcularIntervalo } from "@/lib/periodo";
 import { comissaoServicos } from "@/lib/comissao";
 import { AutoRefresh } from "./auto-refresh";
 import { AtendendoAgora } from "./atendendo-agora";
+import { ThemeToggle } from "../theme-toggle";
 
 function tempoEspera(desde: Date) {
   const minutos = Math.max(0, Math.floor((Date.now() - desde.getTime()) / 60000));
@@ -82,24 +83,25 @@ export default async function FilaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-6">
       <AutoRefresh />
-      <header className="flex items-center justify-between mb-8">
+      <header className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="text-2xl font-bold">Fila de atendimento</h1>
-          <p className="text-slate-500 text-sm">Olá, {session.nome}</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Olá, {session.nome}</p>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/indicacoes" className="text-blue-600 hover:underline text-sm">
+          <ThemeToggle className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800" />
+          <Link href="/indicacoes" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
             Indicações
           </Link>
           {session.role === "ADMIN" && (
-            <Link href="/admin" className="text-blue-600 hover:underline text-sm">
+            <Link href="/admin" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
               Painel admin
             </Link>
           )}
           <form action={logout}>
-            <button className="text-slate-500 hover:text-slate-900 text-sm">Sair</button>
+            <button className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-sm">Sair</button>
           </form>
         </div>
       </header>
@@ -129,20 +131,20 @@ export default async function FilaPage() {
               )}
 
               {metaInfo && (
-                <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
                   <div className="flex items-center gap-2 mb-3">
                     <Target className="w-4 h-4 text-blue-600" />
-                    <p className="text-sm font-semibold text-slate-700">Minha meta do mês</p>
+                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Minha meta do mês</p>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
                     <span>
                       {formatarReais(metaInfo.faturamentoMesCentavos)} de {formatarReais(metaInfo.metaFaturamentoCentavos)}
                     </span>
-                    <span className={`font-semibold ${metaInfo.bateuMeta ? "text-green-600" : "text-slate-500"}`}>
+                    <span className={`font-semibold ${metaInfo.bateuMeta ? "text-green-600" : "text-slate-500 dark:text-slate-400"}`}>
                       {metaInfo.percentualMeta.toFixed(0)}%
                     </span>
                   </div>
-                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full ${metaInfo.bateuMeta ? "bg-green-500" : "bg-blue-500"}`}
                       style={{ width: `${Math.min(metaInfo.percentualMeta, 100)}%` }}
@@ -154,7 +156,7 @@ export default async function FilaPage() {
                       {metaInfo.bonificacaoCentavos ? ` Bônus: ${formatarReais(metaInfo.bonificacaoCentavos)}` : ""}
                     </p>
                   ) : (
-                    <p className="text-slate-500 text-xs mt-2">
+                    <p className="text-slate-500 dark:text-slate-400 text-xs mt-2">
                       Faltam {(100 - metaInfo.percentualMeta).toFixed(0)}% (
                       {formatarReais(Math.max(metaInfo.metaFaturamentoCentavos - metaInfo.faturamentoMesCentavos, 0))}) para
                       bater a meta
@@ -183,13 +185,13 @@ export default async function FilaPage() {
             <section className="mb-8">
               <h2 className="text-lg font-semibold mb-3">Em atendimento</h2>
               {emAtendimento.length === 0 ? (
-                <p className="text-slate-400">Ninguém sendo atendido no momento.</p>
+                <p className="text-slate-400 dark:text-slate-500">Ninguém sendo atendido no momento.</p>
               ) : (
                 <div className="grid gap-3 md:grid-cols-2">
                   {emAtendimento.map((a) => (
-                    <div key={a.id} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                    <div key={a.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
                       <p className="font-semibold">
-                        {a.cliente.nome} <span className="text-slate-500 text-sm">com {a.barbeiro?.nome}</span>
+                        {a.cliente.nome} <span className="text-slate-500 dark:text-slate-400 text-sm">com {a.barbeiro?.nome}</span>
                       </p>
                       <p className="text-blue-600 text-sm">{formatarReais(a.precoTotalCentavos)}</p>
                     </div>
@@ -197,13 +199,13 @@ export default async function FilaPage() {
                 </div>
               )}
               <div className="mt-4">
-                <p className="text-slate-500 text-sm mb-2">Chamar próximo em nome de:</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">Chamar próximo em nome de:</p>
                 <div className="flex flex-wrap gap-2">
                   {barbeirosAtivos.map((b) => (
                     <form key={b.id} action={chamarProximo.bind(null, b.id)}>
                       <button
                         disabled={aguardando.length === 0}
-                        className="rounded-lg bg-white hover:bg-slate-100 disabled:opacity-40 border border-slate-300 px-4 py-2 text-sm"
+                        className="rounded-lg bg-white dark:bg-slate-900 hover:bg-slate-100 disabled:opacity-40 border border-slate-300 dark:border-slate-600 px-4 py-2 text-sm"
                       >
                         {b.nome}
                       </button>
@@ -217,19 +219,19 @@ export default async function FilaPage() {
           <section>
             <h2 className="text-lg font-semibold mb-3">Aguardando ({aguardando.length})</h2>
             {aguardando.length === 0 ? (
-              <p className="text-slate-400">Fila vazia.</p>
+              <p className="text-slate-400 dark:text-slate-500">Fila vazia.</p>
             ) : (
               <ol className="space-y-2">
                 {aguardando.map((a, i) => (
                   <li
                     key={a.id}
-                    className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
+                    className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
                   >
                     <div className="flex items-center gap-4">
                       <span className="text-2xl font-black text-blue-600 w-10 text-center">{i + 1}º</span>
                       <div>
                         <p className="font-semibold">{a.cliente.nome}</p>
-                        <p className="text-slate-500 text-sm">
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">
                           {a.barbeiroPreferido ? `Pediu: ${a.barbeiroPreferido.nome}` : "Sem preferência de barbeiro"}
                           {" · "}
                           {tempoEspera(a.criadoEm)}
@@ -245,7 +247,7 @@ export default async function FilaPage() {
                         </form>
                       )}
                       <form action={cancelarAtendimento.bind(null, a.id)}>
-                        <button className="text-slate-400 hover:text-red-600 text-sm">Cancelar</button>
+                        <button className="text-slate-400 dark:text-slate-500 hover:text-red-600 text-sm">Cancelar</button>
                       </form>
                     </div>
                   </li>

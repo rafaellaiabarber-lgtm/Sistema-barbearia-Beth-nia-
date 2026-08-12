@@ -53,11 +53,11 @@ export default async function ContasPage() {
         {pagar.pendentes.map((c) => (
           <ContaRow key={c.id} conta={c} atrasada={c.vencimento < hoje} />
         ))}
-        {pagar.pendentes.length === 0 && <p className="text-slate-400">Nenhuma conta a pagar pendente.</p>}
+        {pagar.pendentes.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhuma conta a pagar pendente.</p>}
       </div>
       {pagar.pagas.length > 0 && (
         <details className="mb-8">
-          <summary className="cursor-pointer text-sm text-slate-500 hover:text-slate-800 select-none">
+          <summary className="cursor-pointer text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 select-none">
             Contas a pagar já pagas ({pagar.pagas.length})
           </summary>
           <div className="space-y-2 mt-3">
@@ -74,11 +74,11 @@ export default async function ContasPage() {
         {receber.pendentes.map((c) => (
           <ContaRow key={c.id} conta={c} atrasada={c.vencimento < hoje} />
         ))}
-        {receber.pendentes.length === 0 && <p className="text-slate-400">Nenhuma conta a receber pendente.</p>}
+        {receber.pendentes.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhuma conta a receber pendente.</p>}
       </div>
       {receber.pagas.length > 0 && (
         <details>
-          <summary className="cursor-pointer text-sm text-slate-500 hover:text-slate-800 select-none">
+          <summary className="cursor-pointer text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 select-none">
             Contas a receber já recebidas ({receber.pagas.length})
           </summary>
           <div className="space-y-2 mt-3">

@@ -26,37 +26,37 @@ export function NovaIndicacaoForm({ barbeiros, souAdmin }: { barbeiros: Barbeiro
   }, [estado, pendente]);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 mb-6 shadow-sm">
-      <p className="font-semibold text-slate-800 mb-3">Nova indicação</p>
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm">
+      <p className="font-semibold text-slate-800 dark:text-slate-100 mb-3">Nova indicação</p>
       <form ref={formRef} action={formAction} className="flex flex-wrap items-end gap-3">
         <div>
-          <label className="block text-xs text-slate-500 mb-1">Nome</label>
+          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Nome</label>
           <input
             name="nome"
             required
             placeholder="Nome da pessoa indicada"
-            className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-48"
+            className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-48"
           />
         </div>
         <div>
-          <label className="block text-xs text-slate-500 mb-1">Telefone (com DDD)</label>
+          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Telefone (com DDD)</label>
           <input
             name="telefone"
             required
             placeholder="11999999999"
-            className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-40"
+            className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-40"
           />
         </div>
         {souAdmin && (
           <div>
-            <label className="block text-xs text-slate-500 mb-1">Barbeiro responsável</label>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Barbeiro responsável</label>
             <select
               ref={barbeiroSelectRef}
               name="barbeiroId"
               required
               value={barbeiroId}
               onChange={(e) => setBarbeiroId(e.target.value)}
-              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm"
+              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
             >
               <option value="" disabled>
                 Escolha

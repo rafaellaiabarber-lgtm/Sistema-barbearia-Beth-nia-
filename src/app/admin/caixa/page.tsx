@@ -84,21 +84,21 @@ export default async function CaixaPage() {
       <NovoMovimentoForm />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Total no caixa hoje</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Total no caixa hoje</p>
           <p className={`text-3xl font-bold ${totalDoDia < 0 ? "text-red-600" : "text-blue-600"}`}>
             {formatarReais(totalDoDia)}
           </p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm mb-2">Entradas por forma de pagamento</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">Entradas por forma de pagamento</p>
           {porFormaPagamento.size === 0 ? (
-            <p className="text-slate-400 text-sm">Nenhuma entrada com forma de pagamento hoje.</p>
+            <p className="text-slate-400 dark:text-slate-500 text-sm">Nenhuma entrada com forma de pagamento hoje.</p>
           ) : (
             <div className="space-y-1">
               {[...porFormaPagamento.entries()].map(([forma, valor]) => (
                 <div key={forma} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600">{LABEL_FORMA_PAGAMENTO[forma] ?? forma}</span>
+                  <span className="text-slate-600 dark:text-slate-300">{LABEL_FORMA_PAGAMENTO[forma] ?? forma}</span>
                   <span className="font-semibold text-blue-600">{formatarReais(valor)}</span>
                 </div>
               ))}
@@ -108,28 +108,28 @@ export default async function CaixaPage() {
       </div>
 
       {linhas.length === 0 ? (
-        <p className="text-slate-400">Nenhum lançamento hoje ainda.</p>
+        <p className="text-slate-400 dark:text-slate-500">Nenhum lançamento hoje ainda.</p>
       ) : (
         <div className="space-y-2">
           {linhas.map((l) => (
             <div
               key={`${l.tipo}-${l.id}`}
-              className="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
+              className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
             >
               <div>
                 <p className="font-medium">{l.descricao}</p>
-                <p className="text-slate-400 text-xs">
+                <p className="text-slate-400 dark:text-slate-500 text-xs">
                   {l.horario.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })} · saldo:{" "}
                   {formatarReais(l.saldo)}
                 </p>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {l.formaPagamento && (
-                    <span className="inline-block rounded-full bg-slate-100 text-slate-600 text-xs px-2 py-0.5">
+                    <span className="inline-block rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs px-2 py-0.5">
                       {LABEL_FORMA_PAGAMENTO[l.formaPagamento] ?? l.formaPagamento}
                     </span>
                   )}
                   {l.categoria && (
-                    <span className="inline-block rounded-full bg-amber-100 text-amber-700 text-xs px-2 py-0.5">
+                    <span className="inline-block rounded-full bg-amber-100 dark:bg-amber-900 text-amber-700 text-xs px-2 py-0.5">
                       {LABEL_CATEGORIA_DESPESA[l.categoria] ?? l.categoria}
                     </span>
                   )}
@@ -144,7 +144,7 @@ export default async function CaixaPage() {
                   <BotaoExcluirAtendimento atendimentoId={l.id} />
                 ) : (
                   <form action={excluirMovimentoCaixa.bind(null, l.id)}>
-                    <button className="text-slate-400 hover:text-red-600 text-sm">Excluir</button>
+                    <button className="text-slate-400 dark:text-slate-500 hover:text-red-600 text-sm">Excluir</button>
                   </form>
                 )}
               </div>
