@@ -28,7 +28,10 @@ export const gruposNav: NavGrupo[] = [
   {
     titulo: "Atendimentos",
     icone: "atendimentos",
-    links: [{ href: "/fila", label: "Fila de atendimento", icone: "atendimentos" }],
+    links: [
+      { href: "/fila", label: "Fila de atendimento", icone: "atendimentos" },
+      { href: "/indicacoes", label: "Indicações", icone: "indicacoes" },
+    ],
   },
   {
     titulo: "Assinaturas",

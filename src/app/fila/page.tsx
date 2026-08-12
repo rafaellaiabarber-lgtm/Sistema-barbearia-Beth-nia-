@@ -90,6 +90,9 @@ export default async function FilaPage() {
           <p className="text-slate-500 text-sm">Olá, {session.nome}</p>
         </div>
         <div className="flex items-center gap-4">
+          <Link href="/indicacoes" className="text-blue-600 hover:underline text-sm">
+            Indicações
+          </Link>
           {session.role === "ADMIN" && (
             <Link href="/admin" className="text-blue-600 hover:underline text-sm">
               Painel admin
