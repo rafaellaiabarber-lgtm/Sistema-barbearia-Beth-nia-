@@ -101,40 +101,40 @@ export default async function EficienciaPage({
         mostrarServico={false}
       />
 
-      <p className="text-slate-400 text-xs mb-6">
+      <p className="text-slate-400 dark:text-slate-500 text-xs mb-6">
         Tempo de atendimento = do início ao fim do corte. Tempo de espera = da chegada na fila até
         ser chamado. Considera só atendimentos concluídos que passaram pela fila.
       </p>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-xs uppercase tracking-wide">Média da equipe — atendimento</p>
-          <p className="text-2xl font-bold text-slate-900">{mediaEquipeAtendimento.toFixed(1)} min</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wide">Média da equipe — atendimento</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{mediaEquipeAtendimento.toFixed(1)} min</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-xs uppercase tracking-wide">Média da equipe — espera</p>
-          <p className="text-2xl font-bold text-slate-900">{mediaEquipeEspera.toFixed(1)} min</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wide">Média da equipe — espera</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{mediaEquipeEspera.toFixed(1)} min</p>
         </div>
       </div>
 
       {maisRapido && (
-        <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-4 mb-3 text-sm">
+        <div className="bg-green-50 dark:bg-green-950 border border-green-200 text-green-800 rounded-xl p-4 mb-3 text-sm">
           {maisRapido.nome} é o mais rápido da equipe, com média de {maisRapido.mediaAtendimento.toFixed(1)} min.
         </div>
       )}
 
       {maisLentoAlerta && (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-4 mb-6 text-sm">
+        <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 text-amber-800 rounded-xl p-4 mb-6 text-sm">
           {maisLento.nome} está com tempo médio{" "}
           {(((maisLento.mediaAtendimento - mediaEquipeAtendimento) / mediaEquipeAtendimento) * 100).toFixed(1)}%
           acima da equipe — vale conversar sobre carga de trabalho ou complexidade dos atendimentos dele(a).
         </div>
       )}
 
-      <div className="overflow-x-auto bg-white border border-slate-200 rounded-xl shadow-sm">
+      <div className="overflow-x-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-200 text-left text-slate-500">
+            <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-slate-500 dark:text-slate-400">
               <th className="p-3 font-medium">Barbeiro</th>
               <th className="p-3 font-medium">Atendimentos</th>
               <th className="p-3 font-medium">Tempo médio de atendimento</th>
@@ -143,7 +143,7 @@ export default async function EficienciaPage({
           </thead>
           <tbody>
             {linhas.map((l) => (
-              <tr key={l.id} className="border-b border-slate-100 last:border-0">
+              <tr key={l.id} className="border-b border-slate-100 dark:border-slate-800 last:border-0">
                 <td className="p-3 font-semibold">{l.nome}</td>
                 <td className="p-3">{l.qtd}</td>
                 <td className="p-3">{l.mediaAtendimento.toFixed(1)} min</td>
@@ -152,7 +152,7 @@ export default async function EficienciaPage({
             ))}
             {linhas.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-4 text-center text-slate-400">
+                <td colSpan={4} className="p-4 text-center text-slate-400 dark:text-slate-500">
                   Nenhum atendimento concluído no período.
                 </td>
               </tr>

@@ -94,25 +94,25 @@ export function NovaAssinaturaForm({ planos }: { planos: Plano[] }) {
   }
 
   return (
-    <details className="bg-white border border-slate-200 rounded-xl p-4 mb-6 shadow-sm">
-      <summary className="cursor-pointer font-semibold text-slate-800 select-none">
+    <details className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm">
+      <summary className="cursor-pointer font-semibold text-slate-800 dark:text-slate-100 select-none">
         Nova assinatura
       </summary>
       <form ref={formRef} action={formAction} className="mt-4">
         <div className="flex flex-wrap items-end gap-3 mb-1">
           <div>
-            <label className="block text-xs text-slate-500 mb-1">Telefone</label>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Telefone</label>
             <input
               name="telefone"
               required
               placeholder="11999999999"
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
-              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-40"
+              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-40"
             />
           </div>
           <div className="relative">
-            <label className="block text-xs text-slate-500 mb-1">Nome do cliente</label>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Nome do cliente</label>
             <input
               name="nome"
               required
@@ -126,10 +126,10 @@ export function NovaAssinaturaForm({ planos }: { planos: Plano[] }) {
               }}
               onFocus={() => setSugestoesAbertas(true)}
               onBlur={() => setTimeout(() => setSugestoesAbertas(false), 150)}
-              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-48"
+              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-48"
             />
             {sugestoesAbertas && sugestoes.length > 0 && (
-              <div className="absolute z-10 mt-1 w-56 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden">
+              <div className="absolute z-10 mt-1 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg overflow-hidden">
                 {sugestoes.map((s) => (
                   <button
                     type="button"
@@ -138,20 +138,20 @@ export function NovaAssinaturaForm({ planos }: { planos: Plano[] }) {
                     onClick={() => selecionarSugestao(s)}
                     className="block w-full text-left px-3 py-2 text-sm hover:bg-blue-50"
                   >
-                    <span className="block text-slate-900 font-medium">{s.nome}</span>
-                    <span className="block text-slate-400 text-xs">{s.telefone}</span>
+                    <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
+                    <span className="block text-slate-400 dark:text-slate-500 text-xs">{s.telefone}</span>
                   </button>
                 ))}
               </div>
             )}
           </div>
           <div>
-            <label className="block text-xs text-slate-500 mb-1">Plano</label>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Plano</label>
             <select
               name="planoId"
               required
               defaultValue=""
-              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm"
+              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
             >
               <option value="" disabled>
                 Escolha
@@ -164,7 +164,7 @@ export function NovaAssinaturaForm({ planos }: { planos: Plano[] }) {
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-500 mb-1">Dia de vencimento</label>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Dia de vencimento</label>
             <input
               name="diaVencimento"
               type="number"
@@ -172,7 +172,7 @@ export function NovaAssinaturaForm({ planos }: { planos: Plano[] }) {
               max={28}
               defaultValue={5}
               required
-              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-20"
+              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-20"
             />
           </div>
         </div>

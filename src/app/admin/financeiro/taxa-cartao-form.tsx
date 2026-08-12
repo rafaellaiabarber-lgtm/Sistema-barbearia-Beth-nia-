@@ -12,12 +12,12 @@ export function TaxaCartaoForm({ taxaCartaoPercentualX100 }: { taxaCartaoPercent
   return (
     <form action={formAction} className="flex flex-wrap items-end gap-3">
       <div>
-        <label className="block text-xs text-slate-400 mb-1">Taxa da maquininha (%)</label>
+        <label className="block text-xs text-slate-400 dark:text-slate-500 mb-1">Taxa da maquininha (%)</label>
         <input
           name="taxaCartao"
           placeholder="sem taxa definida"
           defaultValue={taxaCartaoPercentualX100 !== null ? percentualX100ParaValor(taxaCartaoPercentualX100) : ""}
-          className="w-40 rounded-lg bg-white border border-slate-300 px-2 py-1.5 text-sm"
+          className="w-40 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1.5 text-sm"
         />
       </div>
       <button

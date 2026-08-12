@@ -6,26 +6,30 @@ import { Menu } from "lucide-react";
 import { logout } from "@/lib/actions/auth";
 import type { NavGrupo } from "./nav-links";
 import { ICONES_NAV } from "./nav-icones";
+import { ThemeToggle } from "../theme-toggle";
 
 export function MobileNav({ grupos, nome }: { grupos: NavGrupo[]; nome: string }) {
   const [aberto, setAberto] = useState(false);
 
   return (
     <div className="md:hidden border-b border-blue-900 bg-blue-950 relative">
-      <div className="flex items-center gap-3 p-4">
-        <button
-          type="button"
-          onClick={() => setAberto((v) => !v)}
-          aria-label="Abrir menu"
-          aria-expanded={aberto}
-          className="text-blue-200 hover:text-white p-1"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
-        <div>
-          <p className="font-bold text-lg text-white">Barbearia Bethânia</p>
-          <p className="text-blue-300 text-sm">Olá, {nome}</p>
+      <div className="flex items-center justify-between gap-3 p-4">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setAberto((v) => !v)}
+            aria-label="Abrir menu"
+            aria-expanded={aberto}
+            className="text-blue-200 hover:text-white p-1"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          <div>
+            <p className="font-bold text-lg text-white">Barbearia Bethânia</p>
+            <p className="text-blue-300 text-sm">Olá, {nome}</p>
+          </div>
         </div>
+        <ThemeToggle className="text-blue-300 hover:text-white hover:bg-blue-800/60 shrink-0" />
       </div>
 
       {aberto && (

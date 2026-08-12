@@ -25,9 +25,9 @@ export function ComissaoServicoForm({
         max={100}
         defaultValue={comissaoPercentual ?? undefined}
         placeholder="padrão"
-        className="w-16 rounded-lg bg-white border border-slate-300 px-2 py-1 text-xs"
+        className="w-16 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1 text-xs"
       />
-      <span className="text-xs text-slate-400">%</span>
+      <span className="text-xs text-slate-400 dark:text-slate-500">%</span>
       <button
         type="submit"
         disabled={pendente}

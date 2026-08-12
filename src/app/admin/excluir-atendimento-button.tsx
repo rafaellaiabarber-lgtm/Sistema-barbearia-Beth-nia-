@@ -12,7 +12,7 @@ export function BotaoExcluirAtendimento({ atendimentoId }: { atendimentoId: stri
         }
       }}
     >
-      <button type="submit" className="text-slate-400 hover:text-red-600 text-sm">
+      <button type="submit" className="text-slate-400 dark:text-slate-500 hover:text-red-600 text-sm">
         Excluir
       </button>
     </form>

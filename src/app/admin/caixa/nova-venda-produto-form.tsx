@@ -34,19 +34,19 @@ export function NovaVendaProdutoForm({ barbeiros, produtos }: { barbeiros: Barbe
   if (produtos.length === 0) return null;
 
   return (
-    <details className="bg-white border border-slate-200 rounded-xl p-4 mb-6 shadow-sm">
-      <summary className="cursor-pointer font-semibold text-slate-800 select-none">Nova venda de produto</summary>
+    <details className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm">
+      <summary className="cursor-pointer font-semibold text-slate-800 dark:text-slate-100 select-none">Nova venda de produto</summary>
       <form ref={formRef} action={formAction} className="mt-4">
         <div className="flex flex-wrap items-end gap-3 mb-4">
           <div>
-            <label className="block text-xs text-slate-500 mb-1">Produto</label>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Produto</label>
             <select
               ref={produtoSelectRef}
               name="produtoId"
               required
               value={produtoId}
               onChange={(e) => setProdutoId(e.target.value)}
-              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-48"
+              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-48"
             >
               <option value="" disabled>
                 Escolha
@@ -59,12 +59,12 @@ export function NovaVendaProdutoForm({ barbeiros, produtos }: { barbeiros: Barbe
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-500 mb-1">Barbeiro</label>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Barbeiro</label>
             <select
               name="barbeiroId"
               required
               defaultValue=""
-              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm"
+              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
             >
               <option value="" disabled>
                 Escolha
@@ -77,13 +77,13 @@ export function NovaVendaProdutoForm({ barbeiros, produtos }: { barbeiros: Barbe
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-500 mb-1">Quantidade</label>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Quantidade</label>
             <input
               name="quantidade"
               type="number"
               min={1}
               defaultValue={1}
-              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-20"
+              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-20"
             />
           </div>
         </div>
@@ -94,7 +94,7 @@ export function NovaVendaProdutoForm({ barbeiros, produtos }: { barbeiros: Barbe
           </p>
         )}
 
-        <p className="text-slate-700 text-sm font-semibold mb-2">Forma de pagamento:</p>
+        <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Forma de pagamento:</p>
         <div className="mb-3 max-w-sm">
           <SeletorFormaPagamento />
         </div>

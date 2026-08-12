@@ -21,20 +21,20 @@ export function IndicacaoRow({
 }) {
   return (
     <div
-      className={`flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl p-4 shadow-sm ${
+      className={`flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm ${
         contatada ? "opacity-60" : ""
       }`}
     >
       <div>
         <p className="font-semibold">{nome}</p>
-        <p className="text-slate-500 text-sm">
+        <p className="text-slate-500 dark:text-slate-400 text-sm">
           {formatarTelefone(telefone)}
           {barbeiroNome && ` · ${barbeiroNome}`} ·{" "}
           {criadoEm.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}
         </p>
         <span
           className={`inline-block mt-1 rounded-full text-xs px-2 py-0.5 ${
-            contatada ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+            contatada ? "bg-green-100 dark:bg-green-900 text-green-700" : "bg-amber-100 dark:bg-amber-900 text-amber-700"
           }`}
         >
           {contatada ? "Já contatada" : "Pendente"}
@@ -51,12 +51,12 @@ export function IndicacaoRow({
           WhatsApp
         </a>
         <form action={alternarContatada.bind(null, id, !contatada)}>
-          <button className="text-sm text-slate-500 hover:text-blue-600">
+          <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600">
             {contatada ? "Marcar pendente" : "Marcar contatada"}
           </button>
         </form>
         <form action={excluirIndicacao.bind(null, id)}>
-          <button className="text-sm text-slate-400 hover:text-red-600">Excluir</button>
+          <button className="text-sm text-slate-400 dark:text-slate-500 hover:text-red-600">Excluir</button>
         </form>
       </div>
     </div>

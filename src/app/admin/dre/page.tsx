@@ -121,17 +121,17 @@ export default async function DrePage({
         mostrarServico={false}
       />
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden mb-6">
         {linhas.map((l) => (
           <div
             key={l.label}
             className={`flex items-center justify-between px-5 py-3 text-sm ${
-              l.subtotal ? "bg-slate-50 font-semibold border-t border-b border-slate-200" : ""
-            } ${l.destaque ? "bg-blue-50 font-bold text-base" : ""} ${
-              !l.subtotal && !l.destaque ? "border-b border-slate-100 last:border-b-0" : ""
+              l.subtotal ? "bg-slate-50 dark:bg-slate-950 font-semibold border-t border-b border-slate-200 dark:border-slate-800" : ""
+            } ${l.destaque ? "bg-blue-50 dark:bg-blue-950 font-bold text-base" : ""} ${
+              !l.subtotal && !l.destaque ? "border-b border-slate-100 dark:border-slate-800 last:border-b-0" : ""
             }`}
           >
-            <span className={l.destaque ? "text-blue-900" : "text-slate-700"}>{l.label}</span>
+            <span className={l.destaque ? "text-blue-900 dark:text-blue-200" : "text-slate-700 dark:text-slate-200"}>{l.label}</span>
             <span
               className={
                 l.destaque
@@ -140,7 +140,7 @@ export default async function DrePage({
                     : "text-blue-700"
                   : l.valorCentavos < 0
                     ? "text-red-500"
-                    : "text-slate-800"
+                    : "text-slate-800 dark:text-slate-100"
               }
             >
               {formatarReais(l.valorCentavos)}
@@ -149,14 +149,14 @@ export default async function DrePage({
         ))}
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-        <p className="text-slate-500 text-sm">Margem líquida no período</p>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+        <p className="text-slate-500 dark:text-slate-400 text-sm">Margem líquida no período</p>
         <p className={`text-2xl font-bold ${lucroLiquidoCentavos < 0 ? "text-red-600" : "text-blue-600"}`}>
           {margemPercentual}%
         </p>
       </div>
 
-      <p className="text-slate-400 text-xs mt-6">
+      <p className="text-slate-400 dark:text-slate-500 text-xs mt-6">
         Custo dos serviços e comissões são calculados sobre os atendimentos concluídos no período.
         {taxaCartaoPercentualX100 !== null
           ? ` Taxa de cartão é uma estimativa (${(taxaCartaoPercentualX100 / 100).toFixed(2).replace(".", ",")}% sobre o faturamento pago no cartão), configurável em Financeiro.`

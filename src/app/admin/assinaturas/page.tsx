@@ -32,12 +32,12 @@ export default async function AssinaturasPage() {
       <h1 className="text-2xl font-bold mb-6">Assinaturas</h1>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Assinaturas ativas</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Assinaturas ativas</p>
           <p className="text-2xl font-bold text-blue-600">{ativas.length}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 text-sm">Inadimplentes ({formatarCompetencia(competencia)})</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Inadimplentes ({formatarCompetencia(competencia)})</p>
           <p className={`text-2xl font-bold ${inadimplentes.length > 0 ? "text-red-600" : "text-green-600"}`}>
             {inadimplentes.length}
           </p>
@@ -53,16 +53,16 @@ export default async function AssinaturasPage() {
           return (
             <div
               key={a.id}
-              className={`flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl p-4 shadow-sm ${
+              className={`flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm ${
                 a.status === "CANCELADA" ? "opacity-50" : ""
               }`}
             >
               <div>
                 <p className="font-semibold">{a.cliente.nome}</p>
-                <p className="text-slate-500 text-sm">
+                <p className="text-slate-500 dark:text-slate-400 text-sm">
                   {a.plano.nome} — {formatarReais(a.plano.precoCentavos)}/mês · vence dia {a.diaVencimento} ·{" "}
                   {a.status === "CANCELADA" ? (
-                    <span className="text-slate-400">cancelada</span>
+                    <span className="text-slate-400 dark:text-slate-500">cancelada</span>
                   ) : pago ? (
                     <span className="text-green-600 font-medium">
                       pago em {formatarCompetencia(competencia)}
@@ -72,7 +72,7 @@ export default async function AssinaturasPage() {
                       inadimplente ({formatarCompetencia(competencia)})
                     </span>
                   ) : (
-                    <span className="text-slate-500">aguardando pagamento de {formatarCompetencia(competencia)}</span>
+                    <span className="text-slate-500 dark:text-slate-400">aguardando pagamento de {formatarCompetencia(competencia)}</span>
                   )}
                 </p>
               </div>
@@ -81,7 +81,7 @@ export default async function AssinaturasPage() {
                   <>
                     {pago ? (
                       <form action={desmarcarPagamentoAssinatura.bind(null, a.id)}>
-                        <button className="rounded-lg bg-green-50 text-green-700 border border-green-200 px-3 py-1.5 text-sm font-medium">
+                        <button className="rounded-lg bg-green-50 dark:bg-green-950 text-green-700 border border-green-200 px-3 py-1.5 text-sm font-medium">
                           ✓ Pago — desmarcar
                         </button>
                       </form>
@@ -93,7 +93,7 @@ export default async function AssinaturasPage() {
                       </form>
                     )}
                     <form action={cancelarAssinatura.bind(null, a.id)}>
-                      <button className="text-sm text-slate-400 hover:text-red-600">Cancelar</button>
+                      <button className="text-sm text-slate-400 dark:text-slate-500 hover:text-red-600">Cancelar</button>
                     </form>
                   </>
                 )}
@@ -106,7 +106,7 @@ export default async function AssinaturasPage() {
             </div>
           );
         })}
-        {assinaturas.length === 0 && <p className="text-slate-400">Nenhuma assinatura cadastrada ainda.</p>}
+        {assinaturas.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhuma assinatura cadastrada ainda.</p>}
       </div>
     </div>
   );
