@@ -24,7 +24,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
 
   if (estado.sucesso) {
     return (
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-10 border border-slate-200 text-center">
+      <div className="w-full max-w-md bg-white/90 rounded-3xl shadow-xl p-10 border border-slate-200 text-center">
         {logoUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={logoUrl} alt="Logo" className="h-14 mx-auto mb-4 object-contain" />
@@ -52,7 +52,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
 
   return (
     <div
-      className={`w-full bg-white rounded-3xl shadow-xl p-8 border border-slate-200 ${
+      className={`w-full bg-white/90 rounded-3xl shadow-xl p-8 border border-slate-200 ${
         etapa === "barbeiro" ? "max-w-3xl" : "max-w-xl"
       }`}
     >
@@ -92,7 +92,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               }
               setEtapa("nome");
             }}
-            className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-bold text-lg py-4 transition-colors mt-6"
+            className="w-full rounded-xl bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-bold text-lg py-4 transition-colors mt-6"
           >
             {buscandoNome ? "Verificando..." : "Continuar"}
           </button>
@@ -140,7 +140,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
                 setErroLocal("");
                 setEtapa("barbeiro");
               }}
-              className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-4 transition-colors"
+              className="flex-1 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-lg py-4 transition-colors"
             >
               Continuar
             </button>
@@ -292,7 +292,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
                   setErroLocal("Informe o nome da pessoa que está com você.");
                 }
               }}
-              className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-bold text-lg py-4 transition-colors"
+              className="flex-1 rounded-xl bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-bold text-lg py-4 transition-colors"
             >
               {pendente ? "Entrando na fila..." : "Entrar na fila"}
             </button>
