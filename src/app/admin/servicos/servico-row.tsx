@@ -103,7 +103,7 @@ export function ServicoRow({ servico }: { servico: Servico }) {
                 : "comissão: padrão do barbeiro"}
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
             <div className="flex flex-col items-start gap-1">
               <span className="text-xs text-slate-400">Custo</span>
               <CustoServicoForm servicoId={servico.id} custoCentavos={servico.custoCentavos} />
@@ -112,21 +112,23 @@ export function ServicoRow({ servico }: { servico: Servico }) {
               <span className="text-xs text-slate-400">Comissão</span>
               <ComissaoServicoForm servicoId={servico.id} comissaoPercentual={servico.comissaoPercentual} />
             </div>
-            <button
-              type="button"
-              onClick={() => setEditando(true)}
-              className="text-sm text-slate-600 hover:text-blue-600"
-            >
-              Editar
-            </button>
-            <form action={alternarAtivoServico.bind(null, servico.id, !servico.ativo)}>
-              <button className="text-sm text-slate-600 hover:text-blue-600">
-                {servico.ativo ? "Desativar" : "Ativar"}
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setEditando(true)}
+                className="text-sm text-slate-600 hover:text-blue-600"
+              >
+                Editar
               </button>
-            </form>
-            <form action={excluirServico.bind(null, servico.id)}>
-              <button className="text-sm text-slate-400 hover:text-red-600">Excluir</button>
-            </form>
+              <form action={alternarAtivoServico.bind(null, servico.id, !servico.ativo)}>
+                <button className="text-sm text-slate-600 hover:text-blue-600">
+                  {servico.ativo ? "Desativar" : "Ativar"}
+                </button>
+              </form>
+              <form action={excluirServico.bind(null, servico.id)}>
+                <button className="text-sm text-slate-400 hover:text-red-600">Excluir</button>
+              </form>
+            </div>
           </div>
         </>
       )}
