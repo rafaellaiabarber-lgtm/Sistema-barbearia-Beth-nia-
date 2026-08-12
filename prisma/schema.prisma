@@ -19,6 +19,11 @@ enum StatusAtendimento {
   CANCELADO
 }
 
+enum TipoMovimentoCaixa {
+  ENTRADA
+  SAIDA
+}
+
 model Usuario {
   id         String    @id @default(cuid())
   nome       String
@@ -76,6 +81,14 @@ model Atendimento {
   chamadoEm           DateTime?
   concluidoEm         DateTime?
   observacao          String?
+}
+
+model MovimentoCaixa {
+  id            String             @id @default(cuid())
+  tipo          TipoMovimentoCaixa
+  descricao     String
+  valorCentavos Int
+  criadoEm      DateTime           @default(now())
 }
 
 model AtendimentoServico {

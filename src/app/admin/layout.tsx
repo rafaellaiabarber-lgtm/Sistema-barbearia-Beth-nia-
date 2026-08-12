@@ -4,6 +4,7 @@ import { logout } from "@/lib/actions/auth";
 
 const links = [
   { href: "/admin", label: "Visão geral" },
+  { href: "/admin/caixa", label: "Caixa" },
   { href: "/admin/financeiro", label: "Financeiro" },
   { href: "/admin/servicos", label: "Serviços" },
   { href: "/admin/barbeiros", label: "Barbeiros" },
