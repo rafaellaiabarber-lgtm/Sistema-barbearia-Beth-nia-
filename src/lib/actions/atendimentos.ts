@@ -1,0 +1,76 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
+
+function revalidarRelatorios() {
+  revalidatePath("/admin/caixa");
+  revalidatePath("/admin/financeiro");
+  revalidatePath("/admin/comissoes");
+  revalidatePath("/admin/eficiencia");
+  revalidatePath("/fila");
+}
+
+export type LancarAtendimentoState = { erro?: string; sucesso?: boolean };
+
+export async function lancarAtendimentoManual(
+  _prevState: LancarAtendimentoState,
+  formData: FormData
+): Promise<LancarAtendimentoState> {
+  await requireSession(["ADMIN"]);
+
+  const nome = String(formData.get("nome") ?? "").trim();
+  const telefone = String(formData.get("telefone") ?? "").trim();
+  const barbeiroId = String(formData.get("barbeiroId") ?? "").trim();
+  const servicoIds = formData.getAll("servicoIds").map(String);
+
+  if (!nome) return { erro: "Informe o nome do cliente." };
+  if (!telefone) return { erro: "Informe o telefone do cliente." };
+  if (!barbeiroId) return { erro: "Escolha o barbeiro." };
+  if (servicoIds.length === 0) return { erro: "Escolha ao menos um serviço." };
+
+  const [barbeiro, servicos] = await Promise.all([
+    prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true } }),
+    prisma.servico.findMany({ where: { id: { in: servicoIds } } }),
+  ]);
+  if (!barbeiro) return { erro: "Barbeiro inválido." };
+  if (servicos.length === 0) return { erro: "Serviços inválidos." };
+
+  const cliente = await prisma.cliente.upsert({
+    where: { telefone },
+    update: { nome },
+    create: { nome, telefone },
+  });
+
+  const precoTotalCentavos = servicos.reduce((soma, s) => soma + s.precoCentavos, 0);
+  const agora = new Date();
+
+  await prisma.atendimento.create({
+    data: {
+      clienteId: cliente.id,
+      barbeiroId: barbeiro.id,
+      status: "CONCLUIDO",
+      criadoEm: agora,
+      concluidoEm: agora,
+      precoTotalCentavos,
+      servicos: {
+        create: servicos.map((s) => ({
+          servicoId: s.id,
+          nomeSnapshot: s.nome,
+          precoCentavos: s.precoCentavos,
+          comissaoPercentual: s.comissaoPercentual ?? barbeiro.comissaoPercentual,
+        })),
+      },
+    },
+  });
+
+  revalidarRelatorios();
+  return { sucesso: true };
+}
+
+export async function excluirAtendimento(atendimentoId: string) {
+  await requireSession(["ADMIN"]);
+  await prisma.atendimento.deleteMany({ where: { id: atendimentoId, status: "CONCLUIDO" } });
+  revalidarRelatorios();
+}
