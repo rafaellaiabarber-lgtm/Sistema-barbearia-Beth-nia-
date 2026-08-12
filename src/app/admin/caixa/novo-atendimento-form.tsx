@@ -2,7 +2,11 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import type { Barbeiro, Servico } from "@prisma/client";
-import { lancarAtendimentoManual, type LancarAtendimentoState } from "@/lib/actions/atendimentos";
+import {
+  lancarAtendimentoManual,
+  type LancarAtendimentoState,
+} from "@/lib/actions/atendimentos";
+import { buscarNomePorTelefone } from "@/lib/actions/fila";
 import { formatarReais } from "@/lib/format";
 
 const estadoInicial: LancarAtendimentoState = {};
@@ -16,14 +20,35 @@ export function NovoAtendimentoForm({
 }) {
   const [estado, formAction, pendente] = useActionState(lancarAtendimentoManual, estadoInicial);
   const [selecionados, setSelecionados] = useState<string[]>([]);
+  const [nome, setNome] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [buscandoNome, setBuscandoNome] = useState(false);
+  const [clienteEncontrado, setClienteEncontrado] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (estado.sucesso) {
       formRef.current?.reset();
       setSelecionados([]);
+      setNome("");
+      setTelefone("");
+      setClienteEncontrado(false);
     }
   }, [estado]);
+
+  async function buscarPorTelefone() {
+    const digitos = telefone.replace(/\D/g, "");
+    if (digitos.length < 10) return;
+    setBuscandoNome(true);
+    const nomeExistente = await buscarNomePorTelefone(digitos);
+    setBuscandoNome(false);
+    if (nomeExistente) {
+      setClienteEncontrado(true);
+      if (!nome.trim()) setNome(nomeExistente);
+    } else {
+      setClienteEncontrado(false);
+    }
+  }
 
   function alternarServico(id: string) {
     setSelecionados((atual) => (atual.includes(id) ? atual.filter((s) => s !== id) : [...atual, id]));
@@ -41,21 +66,26 @@ export function NovoAtendimentoForm({
       <form ref={formRef} action={formAction} className="mt-4">
         <div className="flex flex-wrap items-end gap-3 mb-4">
           <div>
-            <label className="block text-xs text-slate-500 mb-1">Nome do cliente</label>
-            <input
-              name="nome"
-              required
-              placeholder="Nome"
-              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-48"
-            />
-          </div>
-          <div>
             <label className="block text-xs text-slate-500 mb-1">Telefone</label>
             <input
               name="telefone"
               required
               placeholder="11999999999"
+              value={telefone}
+              onChange={(e) => setTelefone(e.target.value)}
+              onBlur={buscarPorTelefone}
               className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-40"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">Nome do cliente</label>
+            <input
+              name="nome"
+              required
+              placeholder={buscandoNome ? "Verificando..." : "Nome"}
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-48"
             />
           </div>
           <div>
@@ -77,6 +107,10 @@ export function NovoAtendimentoForm({
             </select>
           </div>
         </div>
+
+        {clienteEncontrado && (
+          <p className="text-blue-600 text-xs mb-3">Cliente já cadastrado — nome preenchido automaticamente.</p>
+        )}
 
         <p className="text-slate-700 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
