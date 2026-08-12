@@ -49,6 +49,8 @@ export const gruposNav: NavGrupo[] = [
     icone: "financeiro",
     links: [
       { href: "/admin/financeiro", label: "Financeiro", icone: "financeiro" },
+      { href: "/admin/fluxo-caixa", label: "Fluxo de caixa", icone: "fluxoCaixa" },
+      { href: "/admin/dre", label: "DRE simplificada", icone: "dre" },
       { href: "/admin/eficiencia", label: "Eficiência", icone: "eficiencia" },
     ],
   },
