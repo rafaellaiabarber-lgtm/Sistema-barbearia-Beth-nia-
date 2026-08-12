@@ -47,17 +47,19 @@ model Usuario {
 }
 
 model Barbeiro {
-  id                     String              @id @default(cuid())
-  nome                   String
-  telefone               String?
-  fotoUrl                String?
-  ativo                  Boolean             @default(true)
-  comissaoPercentual     Int                 @default(50)
-  usuario                Usuario?
-  atendimentos           Atendimento[]       @relation("BarbeiroAtendeu")
-  atendimentosPreferidos Atendimento[]       @relation("BarbeiroPreferido")
-  pagamentosComissao     PagamentoComissao[]
-  criadoEm               DateTime            @default(now())
+  id                      String              @id @default(cuid())
+  nome                    String
+  telefone                String?
+  fotoUrl                 String?
+  ativo                   Boolean             @default(true)
+  comissaoPercentual      Int                 @default(50)
+  metaFaturamentoCentavos Int?
+  bonificacaoCentavos     Int?
+  usuario                 Usuario?
+  atendimentos            Atendimento[]       @relation("BarbeiroAtendeu")
+  atendimentosPreferidos  Atendimento[]       @relation("BarbeiroPreferido")
+  pagamentosComissao      PagamentoComissao[]
+  criadoEm                DateTime            @default(now())
 }
 
 model Cliente {

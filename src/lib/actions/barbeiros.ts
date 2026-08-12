@@ -5,8 +5,9 @@ import { put } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { hashSenha } from "@/lib/auth";
+import { reaisParaCentavos } from "@/lib/format";
 
-export type BarbeiroState = { erro?: string };
+export type BarbeiroState = { erro?: string; sucesso?: boolean };
 
 const TAMANHO_MAXIMO_FOTO = 5 * 1024 * 1024;
 
@@ -71,6 +72,59 @@ export async function criarBarbeiro(_prevState: BarbeiroState, formData: FormDat
   revalidatePath("/admin/barbeiros");
   revalidatePath("/totem");
   return {};
+}
+
+export async function atualizarBarbeiro(
+  id: string,
+  _prevState: BarbeiroState,
+  formData: FormData
+): Promise<BarbeiroState> {
+  await requireSession(["ADMIN"]);
+
+  const nome = String(formData.get("nome") ?? "").trim();
+  const telefone = String(formData.get("telefone") ?? "").trim();
+  const comissao = Number(formData.get("comissao") ?? 50);
+
+  if (!nome) return { erro: "Informe o nome do barbeiro." };
+  if (Number.isNaN(comissao) || comissao < 0 || comissao > 100) {
+    return { erro: "Comissão deve ser um número entre 0 e 100." };
+  }
+
+  await prisma.barbeiro.update({
+    where: { id },
+    data: { nome, telefone: telefone || null, comissaoPercentual: comissao },
+  });
+
+  revalidatePath("/admin/barbeiros");
+  revalidatePath("/totem");
+  return { sucesso: true };
+}
+
+export async function atualizarMetaBonificacao(
+  id: string,
+  _prevState: BarbeiroState,
+  formData: FormData
+): Promise<BarbeiroState> {
+  await requireSession(["ADMIN"]);
+
+  const meta = String(formData.get("meta") ?? "").trim();
+  const bonificacao = String(formData.get("bonificacao") ?? "").trim();
+
+  const metaCentavos = meta ? reaisParaCentavos(meta) : null;
+  if (metaCentavos !== null && metaCentavos < 0) return { erro: "Informe uma meta válida." };
+
+  const bonificacaoCentavos = bonificacao ? reaisParaCentavos(bonificacao) : null;
+  if (bonificacaoCentavos !== null && bonificacaoCentavos < 0) {
+    return { erro: "Informe uma bonificação válida." };
+  }
+
+  await prisma.barbeiro.update({
+    where: { id },
+    data: { metaFaturamentoCentavos: metaCentavos, bonificacaoCentavos },
+  });
+
+  revalidatePath("/admin/barbeiros");
+  return { sucesso: true };
 }
 
 export async function alternarAtivoBarbeiro(id: string, ativo: boolean) {
