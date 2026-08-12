@@ -52,7 +52,8 @@ export async function entrarNaFila(
 
 export async function chamarProximo(barbeiroIdSelecionado?: string) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
-  const barbeiroId = session.role === "BARBEIRO" ? session.barbeiroId : barbeiroIdSelecionado;
+  if (barbeiroIdSelecionado && session.role !== "ADMIN") return;
+  const barbeiroId = barbeiroIdSelecionado ?? session.barbeiroId;
   if (!barbeiroId) return;
 
   const emAndamento = await prisma.atendimento.findFirst({
@@ -76,7 +77,7 @@ export async function chamarProximo(barbeiroIdSelecionado?: string) {
 
 export async function chamarCliente(atendimentoId: string) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
-  if (session.role !== "BARBEIRO" || !session.barbeiroId) return;
+  if (!session.barbeiroId) return;
   const barbeiroId = session.barbeiroId;
 
   const emAndamento = await prisma.atendimento.findFirst({
