@@ -21,7 +21,7 @@ export default async function DrePage({
       : "mes";
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
 
-  const [atendimentos, movimentos, servicos, barbeiros] = await Promise.all([
+  const [atendimentos, movimentos, servicos, barbeiros, configuracaoFinanceira] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
         status: "CONCLUIDO",
@@ -33,6 +33,7 @@ export default async function DrePage({
     prisma.movimentoCaixa.findMany({ where: { criadoEm: { gte: inicio, lte: fim } } }),
     prisma.servico.findMany({ orderBy: { nome: "asc" } }),
     prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
+    prisma.configuracaoFinanceira.findUnique({ where: { id: "singleton" } }),
   ]);
 
   const faturamentoAtendimentosCentavos = atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
@@ -56,8 +57,22 @@ export default async function DrePage({
     const chave = m.categoria ?? "OUTRA";
     despesasPorCategoria.set(chave, (despesasPorCategoria.get(chave) ?? 0) + m.valorCentavos);
   }
+  // Taxa de cartão: se houver um percentual configurado, deduz automaticamente uma estimativa
+  // sobre o faturamento pago no cartão no período — não depende de lançar manualmente cada
+  // taxa cobrada pela maquininha. Sem percentual configurado, usa as saídas manuais categorizadas
+  // como "Taxa de cartão" (comportamento anterior).
+  const cartaoTotalCentavos =
+    atendimentos.filter((a) => a.formaPagamento === "CARTAO").reduce((s, a) => s + a.precoTotalCentavos, 0) +
+    movimentos
+      .filter((m) => m.tipo === "ENTRADA" && m.formaPagamento === "CARTAO")
+      .reduce((s, m) => s + m.valorCentavos, 0);
+  const taxaCartaoPercentualX100 = configuracaoFinanceira?.taxaCartaoPercentualX100 ?? null;
+
   const impostosCentavos = despesasPorCategoria.get("IMPOSTO") ?? 0;
-  const taxaCartaoCentavos = despesasPorCategoria.get("TAXA_CARTAO") ?? 0;
+  const taxaCartaoCentavos =
+    taxaCartaoPercentualX100 !== null
+      ? Math.round((cartaoTotalCentavos * taxaCartaoPercentualX100) / 10000)
+      : (despesasPorCategoria.get("TAXA_CARTAO") ?? 0);
   const despesasFixasCentavos = despesasPorCategoria.get("FIXA") ?? 0;
   const despesasVariaveisCentavos = despesasPorCategoria.get("VARIAVEL") ?? 0;
   const proLaboreCentavos = despesasPorCategoria.get("PRO_LABORE") ?? 0;
@@ -142,9 +157,12 @@ export default async function DrePage({
       </div>
 
       <p className="text-slate-400 text-xs mt-6">
-        Custo dos serviços e comissões são calculados sobre os atendimentos concluídos no período. As demais
-        categorias vêm dos lançamentos de saída registrados no Caixa (manuais ou de contas a pagar marcadas como
-        pagas).
+        Custo dos serviços e comissões são calculados sobre os atendimentos concluídos no período.
+        {taxaCartaoPercentualX100 !== null
+          ? ` Taxa de cartão é uma estimativa (${(taxaCartaoPercentualX100 / 100).toFixed(2).replace(".", ",")}% sobre o faturamento pago no cartão), configurável em Financeiro.`
+          : " Configure o percentual da taxa de cartão em Financeiro pra ela ser descontada automaticamente aqui."}{" "}
+        As demais categorias vêm dos lançamentos de saída registrados no Caixa (manuais ou de contas a pagar
+        marcadas como pagas — uma conta pendente não entra nessa conta até ser paga).
       </p>
     </div>
   );
