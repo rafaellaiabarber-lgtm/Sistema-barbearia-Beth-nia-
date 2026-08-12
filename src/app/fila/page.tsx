@@ -1,11 +1,18 @@
 import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { chamarProximo, cancelarAtendimento } from "@/lib/actions/fila";
+import { chamarProximo, chamarCliente, cancelarAtendimento } from "@/lib/actions/fila";
 import { logout } from "@/lib/actions/auth";
 import { formatarReais } from "@/lib/format";
 import { AutoRefresh } from "./auto-refresh";
 import { ConcluirForm } from "./concluir-form";
+
+function tempoEspera(desde: Date) {
+  const minutos = Math.max(0, Math.floor((Date.now() - desde.getTime()) / 60000));
+  if (minutos === 0) return "agora mesmo";
+  if (minutos === 1) return "há 1 min";
+  return `há ${minutos} min`;
+}
 
 export default async function FilaPage() {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
@@ -127,10 +134,19 @@ export default async function FilaPage() {
                     <p className="font-semibold">{a.cliente.nome}</p>
                     <p className="text-neutral-400 text-sm">
                       {a.barbeiroPreferido ? `Pediu: ${a.barbeiroPreferido.nome}` : "Sem preferência de barbeiro"}
+                      {" · "}
+                      {tempoEspera(a.criadoEm)}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
+                  {session.role === "BARBEIRO" && !meuAtendimento && (
+                    <form action={chamarCliente.bind(null, a.id)}>
+                      <button className="rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 font-semibold text-sm px-3 py-1.5">
+                        Atender
+                      </button>
+                    </form>
+                  )}
                   <form action={cancelarAtendimento.bind(null, a.id)}>
                     <button className="text-neutral-500 hover:text-red-400 text-sm">Cancelar</button>
                   </form>
