@@ -1,5 +1,6 @@
-import { obterConfiguracaoTotem, atualizarLogoTotem, atualizarFundoTotem, removerLogoTotem, removerFundoTotem } from "@/lib/actions/totem";
+import { obterConfiguracaoTotem, atualizarLogoTotem, removerLogoTotem } from "@/lib/actions/totem";
 import { ImagemTotemForm } from "./imagem-totem-form";
+import { FundoTotemForm } from "./fundo-totem-form";
 
 export default async function TotemConfigPage() {
   const configuracao = await obterConfiguracaoTotem();
@@ -21,15 +22,7 @@ export default async function TotemConfigPage() {
           acao={atualizarLogoTotem}
           acaoRemover={removerLogoTotem}
         />
-        <ImagemTotemForm
-          campo="fundo"
-          label="Imagem de fundo"
-          descricao="Exibida atrás da tela do totem."
-          imagemUrl={configuracao?.fundoUrl ?? null}
-          aspecto="fundo"
-          acao={atualizarFundoTotem}
-          acaoRemover={removerFundoTotem}
-        />
+        <FundoTotemForm fundoUrl={configuracao?.fundoUrl ?? null} fundoTipo={configuracao?.fundoTipo ?? null} />
       </div>
     </div>
   );
