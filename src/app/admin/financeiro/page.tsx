@@ -1,23 +1,40 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo } from "@/lib/periodo";
+import { FiltroRelatorio } from "../filtro-relatorio";
 
 export default async function FinanceiroPage({
   searchParams,
 }: {
-  searchParams: Promise<{ periodo?: string }>;
+  searchParams: Promise<{
+    periodo?: string;
+    dataInicio?: string;
+    dataFim?: string;
+    servicoId?: string;
+    barbeiroId?: string;
+  }>;
 }) {
-  const { periodo: periodoParam } = await searchParams;
+  const { periodo: periodoParam, dataInicio, dataFim, servicoId, barbeiroId } = await searchParams;
   const periodo: Periodo =
-    periodoParam === "semana" || periodoParam === "mes" ? periodoParam : "hoje";
-  const { inicio, fim } = calcularIntervalo(periodo);
+    periodoParam === "semana" || periodoParam === "mes" || periodoParam === "personalizado"
+      ? periodoParam
+      : "hoje";
+  const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
 
-  const atendimentos = await prisma.atendimento.findMany({
-    where: { status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim } },
-    include: { barbeiro: true, cliente: true, servicos: true },
-    orderBy: { concluidoEm: "desc" },
-  });
+  const [atendimentos, servicos, barbeiros] = await Promise.all([
+    prisma.atendimento.findMany({
+      where: {
+        status: "CONCLUIDO",
+        concluidoEm: { gte: inicio, lte: fim },
+        ...(barbeiroId ? { barbeiroId } : {}),
+        ...(servicoId ? { servicos: { some: { servicoId } } } : {}),
+      },
+      include: { barbeiro: true, cliente: true, servicos: true },
+      orderBy: { concluidoEm: "desc" },
+    }),
+    prisma.servico.findMany({ orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
+  ]);
 
   const totalCentavos = atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
 
@@ -38,31 +55,20 @@ export default async function FinanceiroPage({
     porBarbeiro.set(a.barbeiro.id, atual);
   }
 
-  const abas: { valor: Periodo; label: string }[] = [
-    { valor: "hoje", label: "Hoje" },
-    { valor: "semana", label: "Esta semana" },
-    { valor: "mes", label: "Este mês" },
-  ];
-
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Financeiro</h1>
 
-      <div className="flex gap-2 mb-6">
-        {abas.map((a) => (
-          <Link
-            key={a.valor}
-            href={`/admin/financeiro?periodo=${a.valor}`}
-            className={`rounded-lg px-4 py-2 text-sm border ${
-              periodo === a.valor
-                ? "bg-blue-600 text-white border-blue-600 font-semibold"
-                : "border-slate-300 text-slate-700 hover:bg-slate-100"
-            }`}
-          >
-            {a.label}
-          </Link>
-        ))}
-      </div>
+      <FiltroRelatorio
+        basePath="/admin/financeiro"
+        periodo={periodo}
+        dataInicio={dataInicio}
+        dataFim={dataFim}
+        servicoId={servicoId}
+        barbeiroId={barbeiroId}
+        servicos={servicos}
+        barbeiros={barbeiros}
+      />
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">

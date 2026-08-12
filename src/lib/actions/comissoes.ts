@@ -3,11 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
-import type { Periodo } from "@/lib/periodo";
+type PeriodoComissao = "hoje" | "semana" | "mes";
 
 export async function marcarComissaoPaga(
   barbeiroId: string,
-  periodo: Periodo,
+  periodo: PeriodoComissao,
   chave: string,
   valorCentavos: number
 ) {
@@ -33,7 +33,7 @@ export async function marcarComissaoPaga(
   revalidatePath("/admin/comissoes");
 }
 
-export async function desmarcarComissaoPaga(barbeiroId: string, periodo: Periodo, chave: string) {
+export async function desmarcarComissaoPaga(barbeiroId: string, periodo: PeriodoComissao, chave: string) {
   await requireSession(["ADMIN"]);
 
   await prisma.pagamentoComissao.deleteMany({
