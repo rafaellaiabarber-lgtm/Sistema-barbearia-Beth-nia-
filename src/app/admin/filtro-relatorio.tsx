@@ -10,6 +10,7 @@ export function FiltroRelatorio({
   barbeiroId,
   servicos,
   barbeiros,
+  mostrarServico = true,
 }: {
   basePath: string;
   periodo: Periodo;
@@ -19,6 +20,7 @@ export function FiltroRelatorio({
   barbeiroId?: string;
   servicos: Servico[];
   barbeiros: Barbeiro[];
+  mostrarServico?: boolean;
 }) {
   return (
     <form
@@ -57,21 +59,23 @@ export function FiltroRelatorio({
           className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
         />
       </div>
-      <div>
-        <label className="block text-xs text-slate-500 mb-1">Serviço</label>
-        <select
-          name="servicoId"
-          defaultValue={servicoId ?? ""}
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white"
-        >
-          <option value="">Todos</option>
-          {servicos.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.nome}
-            </option>
-          ))}
-        </select>
-      </div>
+      {mostrarServico && (
+        <div>
+          <label className="block text-xs text-slate-500 mb-1">Serviço</label>
+          <select
+            name="servicoId"
+            defaultValue={servicoId ?? ""}
+            className="rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white"
+          >
+            <option value="">Todos</option>
+            {servicos.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.nome}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <div>
         <label className="block text-xs text-slate-500 mb-1">Barbeiro</label>
         <select
