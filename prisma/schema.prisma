@@ -50,6 +50,16 @@ enum CategoriaDespesa {
   OUTRA
 }
 
+enum TipoConta {
+  PAGAR
+  RECEBER
+}
+
+enum StatusConta {
+  PENDENTE
+  PAGO
+}
+
 model Usuario {
   id         String    @id @default(cuid())
   nome       String
@@ -189,4 +199,23 @@ model ConfiguracaoTotem {
   logoUrl      String?
   fundoUrl     String?
   atualizadoEm DateTime @updatedAt
+}
+
+model ConfiguracaoFinanceira {
+  id                        String   @id @default("singleton")
+  taxaCartaoPercentualX100  Int?
+  atualizadoEm              DateTime @updatedAt
+}
+
+model ContaFinanceira {
+  id            String            @id @default(cuid())
+  tipo          TipoConta
+  descricao     String
+  valorCentavos Int
+  vencimento    DateTime
+  status        StatusConta       @default(PENDENTE)
+  categoria     CategoriaDespesa?
+  pagoEm        DateTime?
+  movimentoId   String?
+  criadoEm      DateTime          @default(now())
 }

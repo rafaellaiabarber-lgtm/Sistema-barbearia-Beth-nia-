@@ -11,6 +11,7 @@ import {
   TrendingUp,
   Gauge,
   Image,
+  Receipt,
   type LucideIcon,
 } from "lucide-react";
 
@@ -23,6 +24,7 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   assinaturas: CreditCard,
   planos: Layers,
   caixa: Wallet,
+  contas: Receipt,
   comissoes: HandCoins,
   financeiro: TrendingUp,
   eficiencia: Gauge,

@@ -4,6 +4,7 @@ import { type Periodo, calcularIntervalo } from "@/lib/periodo";
 import { comissaoServicos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 import { BotaoExcluirAtendimento } from "../excluir-atendimento-button";
+import { TaxaCartaoForm } from "./taxa-cartao-form";
 
 export default async function FinanceiroPage({
   searchParams,
@@ -23,7 +24,7 @@ export default async function FinanceiroPage({
       : "hoje";
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
 
-  const [atendimentos, servicos, barbeiros, movimentos] = await Promise.all([
+  const [atendimentos, servicos, barbeiros, movimentos, configuracaoFinanceira] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
         status: "CONCLUIDO",
@@ -37,6 +38,7 @@ export default async function FinanceiroPage({
     prisma.servico.findMany({ orderBy: { nome: "asc" } }),
     prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
     prisma.movimentoCaixa.findMany({ where: { criadoEm: { gte: inicio, lte: fim } } }),
+    prisma.configuracaoFinanceira.findUnique({ where: { id: "singleton" } }),
   ]);
 
   const totalCentavos = atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
@@ -50,6 +52,11 @@ export default async function FinanceiroPage({
     if (m.tipo !== "ENTRADA" || !m.formaPagamento) continue;
     porFormaPagamento.set(m.formaPagamento, (porFormaPagamento.get(m.formaPagamento) ?? 0) + m.valorCentavos);
   }
+
+  const taxaCartaoPercentualX100 = configuracaoFinanceira?.taxaCartaoPercentualX100 ?? null;
+  const cartaoTotalCentavos = porFormaPagamento.get("CARTAO") ?? 0;
+  const taxaCartaoEstimadaCentavos =
+    taxaCartaoPercentualX100 !== null ? Math.round((cartaoTotalCentavos * taxaCartaoPercentualX100) / 10000) : null;
 
   const despesas = movimentos.filter((m) => m.tipo === "SAIDA");
   const totalDespesasCentavos = despesas.reduce((s, m) => s + m.valorCentavos, 0);
@@ -113,15 +120,26 @@ export default async function FinanceiroPage({
           {porFormaPagamento.size === 0 ? (
             <p className="text-slate-400 text-sm">Sem lançamentos com forma de pagamento no período.</p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 mb-3">
               {[...porFormaPagamento.entries()].map(([forma, valor]) => (
-                <div key={forma} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600">{LABEL_FORMA_PAGAMENTO[forma] ?? forma}</span>
-                  <span className="font-semibold text-blue-600">{formatarReais(valor)}</span>
+                <div key={forma}>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-600">{LABEL_FORMA_PAGAMENTO[forma] ?? forma}</span>
+                    <span className="font-semibold text-blue-600">{formatarReais(valor)}</span>
+                  </div>
+                  {forma === "CARTAO" && taxaCartaoEstimadaCentavos !== null && (
+                    <div className="flex items-center justify-between text-xs text-slate-400 pl-2">
+                      <span>Taxa estimada da maquininha</span>
+                      <span>-{formatarReais(taxaCartaoEstimadaCentavos)}</span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           )}
+          <div className="pt-3 border-t border-slate-100">
+            <TaxaCartaoForm taxaCartaoPercentualX100={taxaCartaoPercentualX100} />
+          </div>
         </div>
         <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
           <h2 className="text-sm font-semibold text-slate-700 mb-3">Despesas por categoria</h2>
