@@ -47,6 +47,17 @@ export function NovoServicoForm() {
           className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-24"
         />
       </div>
+      <div>
+        <label className="block text-xs text-slate-500 mb-1">Comissão (%, opcional)</label>
+        <input
+          name="comissao"
+          type="number"
+          min={0}
+          max={100}
+          placeholder="usa a do barbeiro"
+          className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-32"
+        />
+      </div>
       <button
         type="submit"
         disabled={pendente}

@@ -5,6 +5,7 @@ import { chamarProximo, chamarCliente, cancelarAtendimento } from "@/lib/actions
 import { logout } from "@/lib/actions/auth";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo } from "@/lib/periodo";
+import { comissaoServicos } from "@/lib/comissao";
 import { AutoRefresh } from "./auto-refresh";
 import { ConcluirForm } from "./concluir-form";
 
@@ -36,24 +37,22 @@ export default async function FilaPage() {
   const meuAtendimento =
     session.role === "BARBEIRO" ? emAtendimento.find((a) => a.barbeiroId === session.barbeiroId) : null;
 
-  let comissaoHoje: { comissaoCentavos: number; totalCentavos: number; qtd: number; percentual: number } | null =
-    null;
+  let comissaoHoje: { comissaoCentavos: number; totalCentavos: number; qtd: number } | null = null;
   if (session.role === "BARBEIRO" && session.barbeiroId) {
     const { inicio, fim } = calcularIntervalo("hoje");
     const [barbeiro, atendimentosHoje] = await Promise.all([
       prisma.barbeiro.findUnique({ where: { id: session.barbeiroId } }),
       prisma.atendimento.findMany({
         where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim } },
+        include: { servicos: true },
       }),
     ]);
     const totalCentavos = atendimentosHoje.reduce((s, a) => s + a.precoTotalCentavos, 0);
-    const percentual = barbeiro?.comissaoPercentual ?? 0;
-    comissaoHoje = {
-      totalCentavos,
-      qtd: atendimentosHoje.length,
-      percentual,
-      comissaoCentavos: Math.round((totalCentavos * percentual) / 100),
-    };
+    const comissaoCentavos = atendimentosHoje.reduce(
+      (soma, a) => soma + comissaoServicos(a.servicos, barbeiro?.comissaoPercentual ?? 0),
+      0
+    );
+    comissaoHoje = { totalCentavos, qtd: atendimentosHoje.length, comissaoCentavos };
   }
 
   return (
@@ -81,7 +80,7 @@ export default async function FilaPage() {
           <div>
             <p className="text-slate-500 text-sm">Sua comissão hoje</p>
             <p className="text-slate-400 text-xs">
-              {comissaoHoje.qtd} atendimento(s) · {comissaoHoje.percentual}% de {formatarReais(comissaoHoje.totalCentavos)}
+              {comissaoHoje.qtd} atendimento(s) · faturamento {formatarReais(comissaoHoje.totalCentavos)}
             </p>
           </div>
           <p className="text-2xl font-bold text-blue-600">{formatarReais(comissaoHoje.comissaoCentavos)}</p>

@@ -13,13 +13,22 @@ export async function criarServico(_prevState: ServicoState, formData: FormData)
   const nome = String(formData.get("nome") ?? "").trim();
   const preco = String(formData.get("preco") ?? "");
   const duracao = Number(formData.get("duracao") ?? 30);
+  const comissaoRaw = String(formData.get("comissao") ?? "").trim();
 
   if (!nome) return { erro: "Informe o nome do serviço." };
   const precoCentavos = reaisParaCentavos(preco);
   if (precoCentavos <= 0) return { erro: "Informe um preço válido." };
 
+  let comissaoPercentual: number | null = null;
+  if (comissaoRaw) {
+    comissaoPercentual = Number(comissaoRaw);
+    if (Number.isNaN(comissaoPercentual) || comissaoPercentual < 0 || comissaoPercentual > 100) {
+      return { erro: "Comissão deve ser um número entre 0 e 100." };
+    }
+  }
+
   await prisma.servico.create({
-    data: { nome, precoCentavos, duracaoMinutos: duracao || 30 },
+    data: { nome, precoCentavos, duracaoMinutos: duracao || 30, comissaoPercentual },
   });
 
   revalidatePath("/admin/servicos");
@@ -30,6 +39,27 @@ export async function alternarAtivoServico(id: string, ativo: boolean) {
   await requireSession(["ADMIN"]);
   await prisma.servico.update({ where: { id }, data: { ativo } });
   revalidatePath("/admin/servicos");
+}
+
+export async function atualizarComissaoServico(
+  id: string,
+  _prevState: ServicoState,
+  formData: FormData
+): Promise<ServicoState> {
+  await requireSession(["ADMIN"]);
+
+  const comissaoRaw = String(formData.get("comissao") ?? "").trim();
+  let comissaoPercentual: number | null = null;
+  if (comissaoRaw) {
+    comissaoPercentual = Number(comissaoRaw);
+    if (Number.isNaN(comissaoPercentual) || comissaoPercentual < 0 || comissaoPercentual > 100) {
+      return { erro: "Comissão deve ser um número entre 0 e 100." };
+    }
+  }
+
+  await prisma.servico.update({ where: { id }, data: { comissaoPercentual } });
+  revalidatePath("/admin/servicos");
+  return {};
 }
 
 export async function excluirServico(id: string) {

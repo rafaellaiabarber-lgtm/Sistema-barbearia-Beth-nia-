@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo, chavePeriodo } from "@/lib/periodo";
 import { marcarComissaoPaga, desmarcarComissaoPaga } from "@/lib/actions/comissoes";
+import { comissaoServicos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 
 export default async function ComissoesPage({
@@ -41,17 +42,18 @@ export default async function ComissoesPage({
 
   const porBarbeiro = new Map<
     string,
-    { nome: string; comissaoPercentual: number; totalCentavos: number; qtd: number }
+    { nome: string; totalCentavos: number; comissaoCentavos: number; qtd: number }
   >();
   for (const a of atendimentos) {
     if (!a.barbeiro) continue;
     const atual = porBarbeiro.get(a.barbeiro.id) ?? {
       nome: a.barbeiro.nome,
-      comissaoPercentual: a.barbeiro.comissaoPercentual,
       totalCentavos: 0,
+      comissaoCentavos: 0,
       qtd: 0,
     };
     atual.totalCentavos += a.precoTotalCentavos;
+    atual.comissaoCentavos += comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual);
     atual.qtd += 1;
     porBarbeiro.set(a.barbeiro.id, atual);
   }
@@ -105,7 +107,6 @@ export default async function ComissoesPage({
 
       <div className="space-y-2 mb-8">
         {[...porBarbeiro.entries()].map(([id, b]) => {
-          const comissao = Math.round((b.totalCentavos * b.comissaoPercentual) / 100);
           const pago = pagosPorBarbeiro.get(id);
           return (
             <div
@@ -115,12 +116,11 @@ export default async function ComissoesPage({
               <div>
                 <p className="font-semibold">{b.nome}</p>
                 <p className="text-slate-500 text-sm">
-                  {b.qtd} atendimento(s) · faturamento {formatarReais(b.totalCentavos)} · comissão{" "}
-                  {b.comissaoPercentual}%
+                  {b.qtd} atendimento(s) · faturamento {formatarReais(b.totalCentavos)}
                 </p>
               </div>
               <div className="text-right flex items-center gap-3">
-                <p className="text-blue-600 font-bold text-lg">{formatarReais(comissao)}</p>
+                <p className="text-blue-600 font-bold text-lg">{formatarReais(b.comissaoCentavos)}</p>
                 {podeMarcarPago &&
                   (pago ? (
                     <form action={desmarcarComissaoPaga.bind(null, id, periodo as "hoje" | "semana" | "mes", chave)}>
@@ -135,7 +135,7 @@ export default async function ComissoesPage({
                         id,
                         periodo as "hoje" | "semana" | "mes",
                         chave,
-                        comissao
+                        b.comissaoCentavos
                       )}
                     >
                       <button className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-sm font-medium">

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo } from "@/lib/periodo";
+import { comissaoServicos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 
 export default async function FinanceiroPage({
@@ -40,17 +41,18 @@ export default async function FinanceiroPage({
 
   const porBarbeiro = new Map<
     string,
-    { nome: string; comissaoPercentual: number; totalCentavos: number; qtd: number }
+    { nome: string; totalCentavos: number; comissaoCentavos: number; qtd: number }
   >();
   for (const a of atendimentos) {
     if (!a.barbeiro) continue;
     const atual = porBarbeiro.get(a.barbeiro.id) ?? {
       nome: a.barbeiro.nome,
-      comissaoPercentual: a.barbeiro.comissaoPercentual,
       totalCentavos: 0,
+      comissaoCentavos: 0,
       qtd: 0,
     };
     atual.totalCentavos += a.precoTotalCentavos;
+    atual.comissaoCentavos += comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual);
     atual.qtd += 1;
     porBarbeiro.set(a.barbeiro.id, atual);
   }
@@ -83,26 +85,21 @@ export default async function FinanceiroPage({
 
       <h2 className="text-lg font-semibold mb-3">Por barbeiro</h2>
       <div className="space-y-2 mb-8">
-        {[...porBarbeiro.values()].map((b) => {
-          const comissao = Math.round((b.totalCentavos * b.comissaoPercentual) / 100);
-          return (
-            <div
-              key={b.nome}
-              className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
-            >
-              <div>
-                <p className="font-semibold">{b.nome}</p>
-                <p className="text-slate-500 text-sm">
-                  {b.qtd} atendimento(s) · comissão {b.comissaoPercentual}%
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-blue-600 font-semibold">{formatarReais(b.totalCentavos)}</p>
-                <p className="text-slate-500 text-sm">comissão: {formatarReais(comissao)}</p>
-              </div>
+        {[...porBarbeiro.values()].map((b) => (
+          <div
+            key={b.nome}
+            className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
+          >
+            <div>
+              <p className="font-semibold">{b.nome}</p>
+              <p className="text-slate-500 text-sm">{b.qtd} atendimento(s)</p>
             </div>
-          );
-        })}
+            <div className="text-right">
+              <p className="text-blue-600 font-semibold">{formatarReais(b.totalCentavos)}</p>
+              <p className="text-slate-500 text-sm">comissão: {formatarReais(b.comissaoCentavos)}</p>
+            </div>
+          </div>
+        ))}
         {porBarbeiro.size === 0 && <p className="text-slate-400">Nenhum atendimento no período.</p>}
       </div>
 
