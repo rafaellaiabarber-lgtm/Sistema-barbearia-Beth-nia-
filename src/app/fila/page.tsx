@@ -34,11 +34,12 @@ export default async function FilaPage() {
     prisma.servico.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
   ]);
 
-  const meuAtendimento =
-    session.role === "BARBEIRO" ? emAtendimento.find((a) => a.barbeiroId === session.barbeiroId) : null;
+  const meuAtendimento = session.barbeiroId
+    ? emAtendimento.find((a) => a.barbeiroId === session.barbeiroId)
+    : null;
 
   let comissaoHoje: { comissaoCentavos: number; totalCentavos: number; qtd: number } | null = null;
-  if (session.role === "BARBEIRO" && session.barbeiroId) {
+  if (session.barbeiroId) {
     const { inicio, fim } = calcularIntervalo("hoje");
     const [barbeiro, atendimentosHoje] = await Promise.all([
       prisma.barbeiro.findUnique({ where: { id: session.barbeiroId } }),
@@ -75,7 +76,7 @@ export default async function FilaPage() {
         </div>
       </header>
 
-      {session.role === "BARBEIRO" && meuAtendimento ? (
+      {session.barbeiroId && meuAtendimento ? (
         <AtendendoAgora
           atendimentoId={meuAtendimento.id}
           clienteNome={meuAtendimento.cliente.nome}
@@ -84,7 +85,7 @@ export default async function FilaPage() {
         />
       ) : (
         <>
-          {session.role === "BARBEIRO" && comissaoHoje && (
+          {session.barbeiroId && comissaoHoje && (
             <div className="bg-white border border-slate-200 rounded-xl p-4 mb-6 shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-slate-500 text-sm">Sua comissão hoje</p>
@@ -96,7 +97,7 @@ export default async function FilaPage() {
             </div>
           )}
 
-          {session.role === "BARBEIRO" && (
+          {session.barbeiroId && (
             <section className="mb-8">
               <h2 className="text-lg font-semibold mb-3">Meu atendimento</h2>
               <form action={chamarProximo.bind(null, undefined)}>
@@ -168,7 +169,7 @@ export default async function FilaPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      {session.role === "BARBEIRO" && !meuAtendimento && (
+                      {session.barbeiroId && !meuAtendimento && (
                         <form action={chamarCliente.bind(null, a.id)}>
                           <button className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-3 py-1.5">
                             Atender
