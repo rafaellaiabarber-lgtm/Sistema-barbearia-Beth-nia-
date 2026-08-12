@@ -1,22 +1,50 @@
 "use client";
 
-import { useActionState, useRef, useEffect } from "react";
-import { atualizarFundoTotem, removerFundoTotem, type ConfiguracaoTotemState } from "@/lib/actions/totem";
+import { useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
+import { salvarFundoTotem, removerFundoTotem } from "@/lib/actions/totem";
 
-const estadoInicial: ConfiguracaoTotemState = {};
+const TAMANHO_MAXIMO_IMAGEM = 5 * 1024 * 1024;
+const TAMANHO_MAXIMO_VIDEO = 40 * 1024 * 1024;
 
 export function FundoTotemForm({ fundoUrl, fundoTipo }: { fundoUrl: string | null; fundoTipo: string | null }) {
-  const [estado, formAction, pendente] = useActionState(atualizarFundoTotem, estadoInicial);
+  const [erro, setErro] = useState<string | null>(null);
+  const [pendente, setPendente] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
-
-  useEffect(() => {
-    if (!estado.erro && !pendente) {
-      formRef.current?.reset();
-    }
-  }, [estado, pendente]);
 
   const ehVideo = fundoTipo === "video";
+
+  async function enviar(arquivo: File) {
+    setErro(null);
+
+    const ehImagem = arquivo.type.startsWith("image/");
+    const ehVideoArquivo = arquivo.type.startsWith("video/");
+    if (!ehImagem && !ehVideoArquivo) {
+      setErro("O arquivo precisa ser uma imagem ou um vídeo.");
+      return;
+    }
+    const tamanhoMaximo = ehVideoArquivo ? TAMANHO_MAXIMO_VIDEO : TAMANHO_MAXIMO_IMAGEM;
+    if (arquivo.size > tamanhoMaximo) {
+      setErro(
+        ehVideoArquivo ? "O vídeo deve ter no máximo 40MB — use um vídeo curto, em loop." : "A imagem deve ter no máximo 5MB."
+      );
+      return;
+    }
+
+    setPendente(true);
+    try {
+      const blob = await upload(`totem/fundo-${Date.now()}-${arquivo.name}`, arquivo, {
+        access: "public",
+        handleUploadUrl: "/api/upload/totem",
+      });
+      await salvarFundoTotem(blob.url, ehVideoArquivo ? "video" : "imagem");
+    } catch {
+      setErro("Falha ao enviar o arquivo. Tente novamente.");
+    } finally {
+      setPendente(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
 
   return (
     <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
@@ -43,14 +71,16 @@ export function FundoTotemForm({ fundoUrl, fundoTipo }: { fundoUrl: string | nul
         </div>
       )}
 
-      <form ref={formRef} action={formAction} className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <input
           ref={inputRef}
           type="file"
-          name="fundo"
           accept="image/*,video/*"
           className="hidden"
-          onChange={() => formRef.current?.requestSubmit()}
+          onChange={(e) => {
+            const arquivo = e.target.files?.[0];
+            if (arquivo) enviar(arquivo);
+          }}
         />
         <button
           type="button"
@@ -65,11 +95,11 @@ export function FundoTotemForm({ fundoUrl, fundoTipo }: { fundoUrl: string | nul
             Remover
           </button>
         )}
-        {estado.erro && <p className="text-red-600 text-sm w-full">{estado.erro}</p>}
+        {erro && <p className="text-red-600 text-sm w-full">{erro}</p>}
         <p className="text-slate-400 text-xs w-full">
           Imagem: até 5MB. Vídeo: até 40MB — prefira um vídeo curto (10-20s) em loop, sem som.
         </p>
-      </form>
+      </div>
     </div>
   );
 }
