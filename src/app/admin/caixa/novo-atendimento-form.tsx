@@ -1,0 +1,120 @@
+"use client";
+
+import { useActionState, useEffect, useRef, useState } from "react";
+import type { Barbeiro, Servico } from "@prisma/client";
+import { lancarAtendimentoManual, type LancarAtendimentoState } from "@/lib/actions/atendimentos";
+import { formatarReais } from "@/lib/format";
+
+const estadoInicial: LancarAtendimentoState = {};
+
+export function NovoAtendimentoForm({
+  barbeiros,
+  servicos,
+}: {
+  barbeiros: Barbeiro[];
+  servicos: Servico[];
+}) {
+  const [estado, formAction, pendente] = useActionState(lancarAtendimentoManual, estadoInicial);
+  const [selecionados, setSelecionados] = useState<string[]>([]);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (estado.sucesso) {
+      formRef.current?.reset();
+      setSelecionados([]);
+    }
+  }, [estado]);
+
+  function alternarServico(id: string) {
+    setSelecionados((atual) => (atual.includes(id) ? atual.filter((s) => s !== id) : [...atual, id]));
+  }
+
+  const totalCentavos = servicos
+    .filter((s) => selecionados.includes(s.id))
+    .reduce((soma, s) => soma + s.precoCentavos, 0);
+
+  return (
+    <details className="bg-white border border-slate-200 rounded-xl p-4 mb-6 shadow-sm">
+      <summary className="cursor-pointer font-semibold text-slate-800 select-none">
+        Lançar atendimento manual
+      </summary>
+      <form ref={formRef} action={formAction} className="mt-4">
+        <div className="flex flex-wrap items-end gap-3 mb-4">
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">Nome do cliente</label>
+            <input
+              name="nome"
+              required
+              placeholder="Nome"
+              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-48"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">Telefone</label>
+            <input
+              name="telefone"
+              required
+              placeholder="11999999999"
+              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-40"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">Barbeiro</label>
+            <select
+              name="barbeiroId"
+              required
+              defaultValue=""
+              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm"
+            >
+              <option value="" disabled>
+                Escolha
+              </option>
+              {barbeiros.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <p className="text-slate-700 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
+          {servicos.map((s) => {
+            const ativo = selecionados.includes(s.id);
+            return (
+              <button
+                type="button"
+                key={s.id}
+                onClick={() => alternarServico(s.id)}
+                className={`rounded-lg border-2 px-3 py-2 text-left text-sm transition-colors ${
+                  ativo ? "border-blue-600 bg-blue-50" : "border-slate-200 bg-white hover:border-slate-300"
+                }`}
+              >
+                <span className="block text-slate-900 font-medium">{s.nome}</span>
+                <span className="block text-blue-600 text-xs">{formatarReais(s.precoCentavos)}</span>
+              </button>
+            );
+          })}
+        </div>
+        {selecionados.map((id) => (
+          <input key={id} type="hidden" name="servicoIds" value={id} />
+        ))}
+
+        {totalCentavos > 0 && (
+          <p className="text-blue-600 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
+        )}
+
+        {estado.erro && <p className="text-red-600 text-sm mb-3">{estado.erro}</p>}
+
+        <button
+          type="submit"
+          disabled={pendente}
+          className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+        >
+          {pendente ? "Lançando..." : "Lançar atendimento"}
+        </button>
+      </form>
+    </details>
+  );
+}

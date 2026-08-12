@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { excluirMovimentoCaixa } from "@/lib/actions/caixa";
 import { NovoMovimentoForm } from "./novo-movimento-form";
+import { NovoAtendimentoForm } from "./novo-atendimento-form";
+import { BotaoExcluirAtendimento } from "../excluir-atendimento-button";
 
 function inicioDoDia() {
   const d = new Date();
@@ -11,16 +13,16 @@ function inicioDoDia() {
 
 type Lancamento = {
   id: string;
+  tipo: "atendimento" | "movimento";
   horario: Date;
   descricao: string;
   valorCentavos: number;
-  excluivel: boolean;
 };
 
 export default async function CaixaPage() {
   const inicio = inicioDoDia();
 
-  const [atendimentosHoje, movimentosHoje] = await Promise.all([
+  const [atendimentosHoje, movimentosHoje, barbeiros, servicos] = await Promise.all([
     prisma.atendimento.findMany({
       where: { status: "CONCLUIDO", concluidoEm: { gte: inicio } },
       include: { cliente: true, barbeiro: true },
@@ -30,22 +32,24 @@ export default async function CaixaPage() {
       where: { criadoEm: { gte: inicio } },
       orderBy: { criadoEm: "asc" },
     }),
+    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.servico.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
   ]);
 
   const lancamentos: Lancamento[] = [
     ...atendimentosHoje.map((a) => ({
-      id: `atendimento-${a.id}`,
+      id: a.id,
+      tipo: "atendimento" as const,
       horario: a.concluidoEm!,
       descricao: `Atendimento — ${a.cliente.nome}${a.barbeiro ? ` (${a.barbeiro.nome})` : ""}`,
       valorCentavos: a.precoTotalCentavos,
-      excluivel: false,
     })),
     ...movimentosHoje.map((m) => ({
       id: m.id,
+      tipo: "movimento" as const,
       horario: m.criadoEm,
       descricao: m.descricao,
       valorCentavos: m.tipo === "ENTRADA" ? m.valorCentavos : -m.valorCentavos,
-      excluivel: true,
     })),
   ].sort((a, b) => a.horario.getTime() - b.horario.getTime());
 
@@ -61,6 +65,7 @@ export default async function CaixaPage() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Caixa do dia</h1>
 
+      <NovoAtendimentoForm barbeiros={barbeiros} servicos={servicos} />
       <NovoMovimentoForm />
 
       <div className="bg-white border border-slate-200 rounded-xl p-5 mb-6 shadow-sm">
@@ -76,7 +81,7 @@ export default async function CaixaPage() {
         <div className="space-y-2">
           {linhas.map((l) => (
             <div
-              key={l.id}
+              key={`${l.tipo}-${l.id}`}
               className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
             >
               <div>
@@ -91,7 +96,9 @@ export default async function CaixaPage() {
                   {l.valorCentavos < 0 ? "-" : "+"}
                   {formatarReais(Math.abs(l.valorCentavos))}
                 </span>
-                {l.excluivel && (
+                {l.tipo === "atendimento" ? (
+                  <BotaoExcluirAtendimento atendimentoId={l.id} />
+                ) : (
                   <form action={excluirMovimentoCaixa.bind(null, l.id)}>
                     <button className="text-slate-400 hover:text-red-600 text-sm">Excluir</button>
                   </form>

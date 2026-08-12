@@ -3,6 +3,7 @@ import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo } from "@/lib/periodo";
 import { comissaoServicos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
+import { BotaoExcluirAtendimento } from "../excluir-atendimento-button";
 
 export default async function FinanceiroPage({
   searchParams,
@@ -115,7 +116,10 @@ export default async function FinanceiroPage({
                 {a.barbeiro?.nome ?? "—"} · {a.concluidoEm?.toLocaleString("pt-BR")}
               </p>
             </div>
-            <p className="text-blue-600 font-semibold">{formatarReais(a.precoTotalCentavos)}</p>
+            <div className="flex items-center gap-3">
+              <p className="text-blue-600 font-semibold">{formatarReais(a.precoTotalCentavos)}</p>
+              <BotaoExcluirAtendimento atendimentoId={a.id} />
+            </div>
           </div>
         ))}
         {atendimentos.length === 0 && <p className="text-slate-400">Nenhum atendimento no período.</p>}
