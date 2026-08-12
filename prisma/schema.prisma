@@ -60,6 +60,13 @@ enum StatusConta {
   PAGO
 }
 
+enum TipoMeta {
+  FATURAMENTO
+  ATENDIMENTOS
+  TICKET_MEDIO
+  CLIENTES_NOVOS
+}
+
 model Usuario {
   id         String    @id @default(cuid())
   nome       String
@@ -84,7 +91,33 @@ model Barbeiro {
   atendimentos            Atendimento[]       @relation("BarbeiroAtendeu")
   atendimentosPreferidos  Atendimento[]       @relation("BarbeiroPreferido")
   pagamentosComissao      PagamentoComissao[]
+  metas                   Meta[]
   criadoEm                DateTime            @default(now())
+}
+
+model Meta {
+  id         String      @id @default(cuid())
+  barbeiro   Barbeiro    @relation(fields: [barbeiroId], references: [id])
+  barbeiroId String
+  tipo       TipoMeta
+  ativa      Boolean     @default(true)
+  criadoEm   DateTime    @default(now())
+  niveis     NivelMeta[]
+
+  @@unique([barbeiroId, tipo])
+}
+
+// valorAlvo está em centavos para FATURAMENTO/TICKET_MEDIO, e em unidades inteiras para ATENDIMENTOS/CLIENTES_NOVOS.
+model NivelMeta {
+  id                  String @id @default(cuid())
+  meta                Meta   @relation(fields: [metaId], references: [id], onDelete: Cascade)
+  metaId              String
+  ordem               Int
+  nome                String
+  valorAlvo           Int
+  bonificacaoCentavos Int
+
+  @@unique([metaId, ordem])
 }
 
 model Cliente {
