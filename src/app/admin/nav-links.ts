@@ -8,6 +8,11 @@ export const gruposNav: NavGrupo[] = [
     links: [{ href: "/admin", label: "Visão geral", icone: "dashboard" }],
   },
   {
+    titulo: "Gerente Virtual",
+    icone: "gerenteVirtual",
+    links: [{ href: "/admin/gerente-virtual", label: "Gerente Virtual", icone: "gerenteVirtual" }],
+  },
+  {
     titulo: "Clientes",
     icone: "clientes",
     links: [{ href: "/admin/clientes", label: "Clientes", icone: "clientes" }],
