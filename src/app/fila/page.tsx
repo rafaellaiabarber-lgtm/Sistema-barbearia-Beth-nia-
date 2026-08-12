@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { chamarProximo, chamarCliente, cancelarAtendimento } from "@/lib/actions/fila";
 import { logout } from "@/lib/actions/auth";
 import { formatarReais } from "@/lib/format";
+import { calcularIntervalo } from "@/lib/periodo";
 import { AutoRefresh } from "./auto-refresh";
 import { ConcluirForm } from "./concluir-form";
 
@@ -35,6 +36,26 @@ export default async function FilaPage() {
   const meuAtendimento =
     session.role === "BARBEIRO" ? emAtendimento.find((a) => a.barbeiroId === session.barbeiroId) : null;
 
+  let comissaoHoje: { comissaoCentavos: number; totalCentavos: number; qtd: number; percentual: number } | null =
+    null;
+  if (session.role === "BARBEIRO" && session.barbeiroId) {
+    const { inicio, fim } = calcularIntervalo("hoje");
+    const [barbeiro, atendimentosHoje] = await Promise.all([
+      prisma.barbeiro.findUnique({ where: { id: session.barbeiroId } }),
+      prisma.atendimento.findMany({
+        where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim } },
+      }),
+    ]);
+    const totalCentavos = atendimentosHoje.reduce((s, a) => s + a.precoTotalCentavos, 0);
+    const percentual = barbeiro?.comissaoPercentual ?? 0;
+    comissaoHoje = {
+      totalCentavos,
+      qtd: atendimentosHoje.length,
+      percentual,
+      comissaoCentavos: Math.round((totalCentavos * percentual) / 100),
+    };
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 p-6">
       <AutoRefresh />
@@ -54,6 +75,18 @@ export default async function FilaPage() {
           </form>
         </div>
       </header>
+
+      {session.role === "BARBEIRO" && comissaoHoje && (
+        <div className="bg-white border border-slate-200 rounded-xl p-4 mb-6 shadow-sm flex items-center justify-between">
+          <div>
+            <p className="text-slate-500 text-sm">Sua comissão hoje</p>
+            <p className="text-slate-400 text-xs">
+              {comissaoHoje.qtd} atendimento(s) · {comissaoHoje.percentual}% de {formatarReais(comissaoHoje.totalCentavos)}
+            </p>
+          </div>
+          <p className="text-2xl font-bold text-blue-600">{formatarReais(comissaoHoje.comissaoCentavos)}</p>
+        </div>
+      )}
 
       {session.role === "BARBEIRO" && (
         <section className="mb-8">

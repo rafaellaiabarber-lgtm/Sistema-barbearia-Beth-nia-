@@ -1,23 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
-
-type Periodo = "hoje" | "semana" | "mes";
-
-function calcularIntervalo(periodo: Periodo) {
-  const agora = new Date();
-  const inicio = new Date(agora);
-  inicio.setHours(0, 0, 0, 0);
-
-  if (periodo === "semana") {
-    const diaSemana = inicio.getDay();
-    inicio.setDate(inicio.getDate() - diaSemana);
-  } else if (periodo === "mes") {
-    inicio.setDate(1);
-  }
-
-  return { inicio, fim: agora };
-}
+import { type Periodo, calcularIntervalo } from "@/lib/periodo";
 
 export default async function FinanceiroPage({
   searchParams,

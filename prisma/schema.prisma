@@ -24,6 +24,12 @@ enum TipoMovimentoCaixa {
   SAIDA
 }
 
+enum PeriodoComissao {
+  HOJE
+  SEMANA
+  MES
+}
+
 model Usuario {
   id         String    @id @default(cuid())
   nome       String
@@ -36,16 +42,17 @@ model Usuario {
 }
 
 model Barbeiro {
-  id                     String        @id @default(cuid())
+  id                     String              @id @default(cuid())
   nome                   String
   telefone               String?
   fotoUrl                String?
-  ativo                  Boolean       @default(true)
-  comissaoPercentual     Int           @default(50)
+  ativo                  Boolean             @default(true)
+  comissaoPercentual     Int                 @default(50)
   usuario                Usuario?
-  atendimentos           Atendimento[] @relation("BarbeiroAtendeu")
-  atendimentosPreferidos Atendimento[] @relation("BarbeiroPreferido")
-  criadoEm               DateTime      @default(now())
+  atendimentos           Atendimento[]       @relation("BarbeiroAtendeu")
+  atendimentosPreferidos Atendimento[]       @relation("BarbeiroPreferido")
+  pagamentosComissao     PagamentoComissao[]
+  criadoEm               DateTime            @default(now())
 }
 
 model Cliente {
@@ -89,6 +96,18 @@ model MovimentoCaixa {
   descricao     String
   valorCentavos Int
   criadoEm      DateTime           @default(now())
+}
+
+model PagamentoComissao {
+  id            String          @id @default(cuid())
+  barbeiro      Barbeiro        @relation(fields: [barbeiroId], references: [id])
+  barbeiroId    String
+  periodo       PeriodoComissao
+  chave         String
+  valorCentavos Int
+  pagoEm        DateTime        @default(now())
+
+  @@unique([barbeiroId, periodo, chave])
 }
 
 model AtendimentoServico {
