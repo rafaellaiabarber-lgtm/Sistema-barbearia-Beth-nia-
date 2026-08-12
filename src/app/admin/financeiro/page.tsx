@@ -71,8 +71,8 @@ export default async function FinanceiroPage({
             href={`/admin/financeiro?periodo=${a.valor}`}
             className={`rounded-lg px-4 py-2 text-sm border ${
               periodo === a.valor
-                ? "bg-amber-500 text-neutral-950 border-amber-500 font-semibold"
-                : "border-neutral-700 text-neutral-300 hover:bg-neutral-900"
+                ? "bg-blue-600 text-white border-blue-600 font-semibold"
+                : "border-slate-300 text-slate-700 hover:bg-slate-100"
             }`}
           >
             {a.label}
@@ -81,13 +81,13 @@ export default async function FinanceiroPage({
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-5">
-          <p className="text-neutral-400 text-sm">Faturamento total</p>
-          <p className="text-2xl font-bold text-amber-400">{formatarReais(totalCentavos)}</p>
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 text-sm">Faturamento total</p>
+          <p className="text-2xl font-bold text-blue-600">{formatarReais(totalCentavos)}</p>
         </div>
-        <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-5">
-          <p className="text-neutral-400 text-sm">Atendimentos concluídos</p>
-          <p className="text-2xl font-bold text-amber-400">{atendimentos.length}</p>
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 text-sm">Atendimentos concluídos</p>
+          <p className="text-2xl font-bold text-blue-600">{atendimentos.length}</p>
         </div>
       </div>
 
@@ -98,40 +98,40 @@ export default async function FinanceiroPage({
           return (
             <div
               key={b.nome}
-              className="flex items-center justify-between bg-neutral-900 border border-neutral-800 rounded-xl p-4"
+              className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
             >
               <div>
                 <p className="font-semibold">{b.nome}</p>
-                <p className="text-neutral-400 text-sm">
+                <p className="text-slate-500 text-sm">
                   {b.qtd} atendimento(s) · comissão {b.comissaoPercentual}%
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-amber-400 font-semibold">{formatarReais(b.totalCentavos)}</p>
-                <p className="text-neutral-400 text-sm">comissão: {formatarReais(comissao)}</p>
+                <p className="text-blue-600 font-semibold">{formatarReais(b.totalCentavos)}</p>
+                <p className="text-slate-500 text-sm">comissão: {formatarReais(comissao)}</p>
               </div>
             </div>
           );
         })}
-        {porBarbeiro.size === 0 && <p className="text-neutral-500">Nenhum atendimento no período.</p>}
+        {porBarbeiro.size === 0 && <p className="text-slate-400">Nenhum atendimento no período.</p>}
       </div>
 
       <h2 className="text-lg font-semibold mb-3">Atendimentos</h2>
       <div className="space-y-2">
         {atendimentos.map((a) => (
-          <div key={a.id} className="flex items-center justify-between bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-sm">
+          <div key={a.id} className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-3 text-sm shadow-sm">
             <div>
-              <p className="text-neutral-200">
+              <p className="text-slate-800">
                 {a.cliente.nome} — {a.servicos.map((s) => s.nomeSnapshot).join(", ")}
               </p>
-              <p className="text-neutral-500">
+              <p className="text-slate-400">
                 {a.barbeiro?.nome ?? "—"} · {a.concluidoEm?.toLocaleString("pt-BR")}
               </p>
             </div>
-            <p className="text-amber-400 font-semibold">{formatarReais(a.precoTotalCentavos)}</p>
+            <p className="text-blue-600 font-semibold">{formatarReais(a.precoTotalCentavos)}</p>
           </div>
         ))}
-        {atendimentos.length === 0 && <p className="text-neutral-500">Nenhum atendimento no período.</p>}
+        {atendimentos.length === 0 && <p className="text-slate-400">Nenhum atendimento no período.</p>}
       </div>
     </div>
   );

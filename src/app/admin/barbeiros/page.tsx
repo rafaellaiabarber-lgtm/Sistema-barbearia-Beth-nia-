@@ -19,7 +19,7 @@ export default async function BarbeirosPage() {
         {barbeiros.map((b) => (
           <div
             key={b.id}
-            className={`flex items-center justify-between bg-neutral-900 border border-neutral-800 rounded-xl p-4 ${
+            className={`flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 shadow-sm ${
               !b.ativo ? "opacity-50" : ""
             }`}
           >
@@ -27,13 +27,13 @@ export default async function BarbeirosPage() {
               <FotoBarbeiroForm barbeiroId={b.id} nome={b.nome} fotoUrl={b.fotoUrl} />
               <div>
                 <p className="font-semibold">{b.nome}</p>
-                <p className="text-neutral-400 text-sm">
+                <p className="text-slate-500 text-sm">
                   {b.telefone ?? "sem telefone"} · comissão {b.comissaoPercentual}% · login: {b.usuario?.login}
                 </p>
               </div>
             </div>
             <form action={alternarAtivoBarbeiro.bind(null, b.id, !b.ativo)}>
-              <button className="text-sm text-neutral-300 hover:text-amber-400">
+              <button className="text-sm text-slate-600 hover:text-blue-600">
                 {b.ativo ? "Desativar" : "Ativar"}
               </button>
             </form>

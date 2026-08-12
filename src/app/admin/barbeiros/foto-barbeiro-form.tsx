@@ -23,7 +23,7 @@ export function FotoBarbeiroForm({ barbeiroId, nome, fotoUrl }: { barbeiroId: st
         // eslint-disable-next-line @next/next/no-img-element
         <img src={fotoUrl} alt={nome} className="w-10 h-10 rounded-full object-cover" />
       ) : (
-        <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center text-lg">
+        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-lg">
           💈
         </div>
       )}
@@ -40,12 +40,12 @@ export function FotoBarbeiroForm({ barbeiroId, nome, fotoUrl }: { barbeiroId: st
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={pendente}
-          className="text-xs text-neutral-400 hover:text-amber-400 disabled:opacity-60"
+          className="text-xs text-slate-500 hover:text-blue-600 disabled:opacity-60"
         >
           {pendente ? "Enviando..." : fotoUrl ? "Trocar foto" : "Adicionar foto"}
         </button>
       </form>
-      {estado.erro && <p className="text-red-400 text-xs">{estado.erro}</p>}
+      {estado.erro && <p className="text-red-600 text-xs">{estado.erro}</p>}
     </div>
   );
 }

@@ -21,34 +21,34 @@ export default async function ClientesPage() {
         {clientes.map((c) => {
           const totalGasto = c.atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
           return (
-            <details key={c.id} className="bg-neutral-900 border border-neutral-800 rounded-xl p-4">
+            <details key={c.id} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
               <summary className="cursor-pointer flex items-center justify-between">
                 <span>
                   <span className="font-semibold">{c.nome}</span>{" "}
-                  <span className="text-neutral-400 text-sm">{c.telefone}</span>
+                  <span className="text-slate-500 text-sm">{c.telefone}</span>
                 </span>
-                <span className="text-neutral-400 text-sm">
+                <span className="text-slate-500 text-sm">
                   {c.atendimentos.length} atendimento(s) · {formatarReais(totalGasto)}
                 </span>
               </summary>
               <div className="mt-3 space-y-2">
                 {c.atendimentos.length === 0 && (
-                  <p className="text-neutral-500 text-sm">Sem atendimentos concluídos ainda.</p>
+                  <p className="text-slate-400 text-sm">Sem atendimentos concluídos ainda.</p>
                 )}
                 {c.atendimentos.map((a) => (
-                  <div key={a.id} className="text-sm border-t border-neutral-800 pt-2">
-                    <p className="text-neutral-300">
+                  <div key={a.id} className="text-sm border-t border-slate-200 pt-2">
+                    <p className="text-slate-700">
                       {a.concluidoEm?.toLocaleDateString("pt-BR")} — {a.barbeiro?.nome ?? "—"} —{" "}
                       {formatarReais(a.precoTotalCentavos)}
                     </p>
-                    <p className="text-neutral-500">{a.servicos.map((s) => s.nomeSnapshot).join(", ")}</p>
+                    <p className="text-slate-400">{a.servicos.map((s) => s.nomeSnapshot).join(", ")}</p>
                   </div>
                 ))}
               </div>
             </details>
           );
         })}
-        {clientes.length === 0 && <p className="text-neutral-500">Nenhum cliente cadastrado ainda.</p>}
+        {clientes.length === 0 && <p className="text-slate-400">Nenhum cliente cadastrado ainda.</p>}
       </div>
     </div>
   );

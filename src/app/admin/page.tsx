@@ -35,17 +35,17 @@ export default async function AdminHomePage() {
       <h1 className="text-2xl font-bold mb-6">Visão geral</h1>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         {cards.map((c) => (
-          <div key={c.label} className="bg-neutral-900 border border-neutral-800 rounded-xl p-5">
-            <p className="text-neutral-400 text-sm">{c.label}</p>
-            <p className="text-2xl font-bold text-amber-400">{c.valor}</p>
+          <div key={c.label} className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <p className="text-slate-500 text-sm">{c.label}</p>
+            <p className="text-2xl font-bold text-blue-600">{c.valor}</p>
           </div>
         ))}
       </div>
       <div className="flex gap-3">
-        <Link href="/admin/financeiro" className="text-amber-400 hover:underline text-sm">
+        <Link href="/admin/financeiro" className="text-blue-600 hover:underline text-sm">
           Ver relatório financeiro completo →
         </Link>
-        <Link href="/fila" className="text-amber-400 hover:underline text-sm">
+        <Link href="/fila" className="text-blue-600 hover:underline text-sm">
           Abrir painel da fila →
         </Link>
       </div>
