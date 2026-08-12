@@ -1,6 +1,5 @@
-import { obterConfiguracaoTotem } from "@/lib/actions/totem";
-import { LogoTotemForm } from "./logo-totem-form";
-import { FundoTotemForm } from "./fundo-totem-form";
+import { obterConfiguracaoTotem, atualizarLogoTotem, atualizarFundoTotem, removerLogoTotem, removerFundoTotem } from "@/lib/actions/totem";
+import { ImagemTotemForm } from "./imagem-totem-form";
 
 export default async function TotemConfigPage() {
   const configuracao = await obterConfiguracaoTotem();
@@ -13,8 +12,24 @@ export default async function TotemConfigPage() {
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <LogoTotemForm logoUrl={configuracao?.logoUrl ?? null} />
-        <FundoTotemForm fundoUrl={configuracao?.fundoUrl ?? null} fundoTipo={configuracao?.fundoTipo ?? null} />
+        <ImagemTotemForm
+          campo="logo"
+          label="Logo"
+          descricao="Exibida no topo da tela do totem, no lugar do nome da barbearia."
+          imagemUrl={configuracao?.logoUrl ?? null}
+          aspecto="logo"
+          acao={atualizarLogoTotem}
+          acaoRemover={removerLogoTotem}
+        />
+        <ImagemTotemForm
+          campo="fundo"
+          label="Imagem de fundo"
+          descricao="Exibida atrás da tela do totem."
+          imagemUrl={configuracao?.fundoUrl ?? null}
+          aspecto="fundo"
+          acao={atualizarFundoTotem}
+          acaoRemover={removerFundoTotem}
+        />
       </div>
     </div>
   );
