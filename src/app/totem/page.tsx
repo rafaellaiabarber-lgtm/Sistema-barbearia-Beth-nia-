@@ -12,12 +12,30 @@ export default async function TotemPage() {
     prisma.configuracaoTotem.findUnique({ where: { id: "singleton" } }),
   ]);
 
+  const fundoEhVideo = configuracao?.fundoTipo === "video";
+
   return (
-    <div
-      className="min-h-screen bg-slate-50 bg-cover bg-center flex items-center justify-center p-4"
-      style={configuracao?.fundoUrl ? { backgroundImage: `url(${configuracao.fundoUrl})` } : undefined}
-    >
-      <TotemForm barbeiros={barbeiros} logoUrl={configuracao?.logoUrl ?? null} />
+    <div className="relative min-h-screen bg-slate-50 flex items-center justify-center p-4 overflow-hidden">
+      {configuracao?.fundoUrl &&
+        (fundoEhVideo ? (
+          <video
+            key={configuracao.fundoUrl}
+            src={configuracao.fundoUrl}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${configuracao.fundoUrl})` }}
+          />
+        ))}
+      <div className="relative z-10 w-full flex items-center justify-center">
+        <TotemForm barbeiros={barbeiros} logoUrl={configuracao?.logoUrl ?? null} />
+      </div>
     </div>
   );
 }

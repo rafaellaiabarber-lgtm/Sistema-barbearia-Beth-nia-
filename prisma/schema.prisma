@@ -281,6 +281,8 @@ model ConfiguracaoTotem {
   id           String   @id @default("singleton")
   logoUrl      String?
   fundoUrl     String?
+  // "imagem" ou "video". Null (fundoUrl definido em versões antigas) é tratado como imagem.
+  fundoTipo    String?
   atualizadoEm DateTime @updatedAt
 }
 
