@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { reaisParaCentavos } from "@/lib/format";
 
-export type ServicoState = { erro?: string };
+export type ServicoState = { erro?: string; sucesso?: boolean };
 
 export async function criarServico(_prevState: ServicoState, formData: FormData): Promise<ServicoState> {
   await requireSession(["ADMIN"]);
@@ -37,6 +37,30 @@ export async function criarServico(_prevState: ServicoState, formData: FormData)
 
   revalidatePath("/admin/servicos");
   return {};
+}
+
+export async function atualizarServico(
+  id: string,
+  _prevState: ServicoState,
+  formData: FormData
+): Promise<ServicoState> {
+  await requireSession(["ADMIN"]);
+
+  const nome = String(formData.get("nome") ?? "").trim();
+  const preco = String(formData.get("preco") ?? "");
+  const duracao = Number(formData.get("duracao") ?? 30);
+
+  if (!nome) return { erro: "Informe o nome do serviço." };
+  const precoCentavos = reaisParaCentavos(preco);
+  if (precoCentavos <= 0) return { erro: "Informe um preço válido." };
+
+  await prisma.servico.update({
+    where: { id },
+    data: { nome, precoCentavos, duracaoMinutos: duracao || 30 },
+  });
+
+  revalidatePath("/admin/servicos");
+  return { sucesso: true };
 }
 
 export async function alternarAtivoServico(id: string, ativo: boolean) {
