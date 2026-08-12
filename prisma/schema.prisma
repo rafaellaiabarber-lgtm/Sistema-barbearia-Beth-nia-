@@ -165,3 +165,10 @@ model PagamentoAssinatura {
 
   @@unique([assinaturaId, competencia])
 }
+
+model ConfiguracaoTotem {
+  id           String   @id @default("singleton")
+  logoUrl      String?
+  fundoUrl     String?
+  atualizadoEm DateTime @updatedAt
+}
