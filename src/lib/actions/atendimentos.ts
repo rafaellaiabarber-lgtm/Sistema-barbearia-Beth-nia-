@@ -74,3 +74,18 @@ export async function excluirAtendimento(atendimentoId: string) {
   await prisma.atendimento.deleteMany({ where: { id: atendimentoId, status: "CONCLUIDO" } });
   revalidarRelatorios();
 }
+
+export type SugestaoCliente = { nome: string; telefone: string };
+
+export async function buscarClientesPorNome(query: string): Promise<SugestaoCliente[]> {
+  await requireSession(["ADMIN"]);
+  const termo = query.trim();
+  if (termo.length < 2) return [];
+
+  const clientes = await prisma.cliente.findMany({
+    where: { nome: { contains: termo, mode: "insensitive" } },
+    orderBy: { nome: "asc" },
+    take: 5,
+  });
+  return clientes.map((c) => ({ nome: c.nome, telefone: c.telefone }));
+}
