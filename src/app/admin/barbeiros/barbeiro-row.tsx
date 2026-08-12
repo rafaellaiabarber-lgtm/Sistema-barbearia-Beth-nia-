@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import type { Barbeiro, Usuario } from "@prisma/client";
-import { atualizarBarbeiro, alternarAtivoBarbeiro, type BarbeiroState } from "@/lib/actions/barbeiros";
+import { atualizarBarbeiro, alternarAtivoBarbeiro, excluirBarbeiro, type BarbeiroState } from "@/lib/actions/barbeiros";
 import { FotoBarbeiroForm } from "./foto-barbeiro-form";
 
 const estadoInicial: BarbeiroState = {};
@@ -101,6 +101,20 @@ export function BarbeiroRow({ barbeiro }: { barbeiro: Barbeiro & { usuario: Usua
                 {barbeiro.ativo ? "Desativar" : "Ativar"}
               </button>
             </form>
+            {!barbeiro.ativo && (
+              <form
+                action={excluirBarbeiro.bind(null, barbeiro.id)}
+                onSubmit={(e) => {
+                  if (!confirm(`Excluir ${barbeiro.nome}? Se ele já tiver atendimentos ou comissões no histórico, ele só continuará desativado.`)) {
+                    e.preventDefault();
+                  }
+                }}
+              >
+                <button type="submit" className="text-sm text-slate-400 hover:text-red-600">
+                  Excluir
+                </button>
+              </form>
+            )}
           </div>
         </>
       )}
