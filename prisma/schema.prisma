@@ -30,6 +30,11 @@ enum PeriodoComissao {
   MES
 }
 
+enum StatusAssinatura {
+  ATIVA
+  CANCELADA
+}
+
 model Usuario {
   id         String    @id @default(cuid())
   nome       String
@@ -61,6 +66,7 @@ model Cliente {
   telefone     String        @unique
   criadoEm     DateTime      @default(now())
   atendimentos Atendimento[]
+  assinaturas  Assinatura[]
 }
 
 model Servico {
@@ -120,5 +126,40 @@ model AtendimentoServico {
   servicoId          String
   nomeSnapshot       String
   precoCentavos      Int
+  custoCentavos      Int         @default(0)
   comissaoPercentual Int?
+}
+
+model Plano {
+  id                      String       @id @default(cuid())
+  nome                    String
+  precoCentavos           Int
+  servicosIncluidosPorMes Int
+  ativo                   Boolean      @default(true)
+  criadoEm                DateTime     @default(now())
+  assinaturas             Assinatura[]
+}
+
+model Assinatura {
+  id            String                @id @default(cuid())
+  cliente       Cliente               @relation(fields: [clienteId], references: [id])
+  clienteId     String
+  plano         Plano                 @relation(fields: [planoId], references: [id])
+  planoId       String
+  status        StatusAssinatura      @default(ATIVA)
+  diaVencimento Int
+  criadoEm      DateTime              @default(now())
+  canceladaEm   DateTime?
+  pagamentos    PagamentoAssinatura[]
+}
+
+model PagamentoAssinatura {
+  id            String     @id @default(cuid())
+  assinatura    Assinatura @relation(fields: [assinaturaId], references: [id])
+  assinaturaId  String
+  competencia   String
+  valorCentavos Int
+  pagoEm        DateTime   @default(now())
+
+  @@unique([assinaturaId, competencia])
 }

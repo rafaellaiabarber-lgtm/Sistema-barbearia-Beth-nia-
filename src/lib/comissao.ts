@@ -7,3 +7,13 @@ export function comissaoServicos(
     0
   );
 }
+
+export function lucroServicos(
+  servicos: { precoCentavos: number; custoCentavos: number; comissaoPercentual: number | null }[],
+  comissaoPadraoBarbeiro: number
+) {
+  return servicos.reduce((soma, s) => {
+    const comissaoCentavos = Math.round((s.precoCentavos * (s.comissaoPercentual ?? comissaoPadraoBarbeiro)) / 100);
+    return soma + (s.precoCentavos - s.custoCentavos - comissaoCentavos);
+  }, 0);
+}

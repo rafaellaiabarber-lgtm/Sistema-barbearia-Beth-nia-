@@ -26,6 +26,17 @@ export function calcularIntervalo(
   return { inicio, fim: agora };
 }
 
+export function intervaloAnterior(periodo: "hoje" | "semana" | "mes", inicio: Date, fim: Date) {
+  function deslocar(d: Date) {
+    const novo = new Date(d);
+    if (periodo === "hoje") novo.setDate(novo.getDate() - 1);
+    else if (periodo === "semana") novo.setDate(novo.getDate() - 7);
+    else novo.setMonth(novo.getMonth() - 1);
+    return novo;
+  }
+  return { inicio: deslocar(inicio), fim: deslocar(fim) };
+}
+
 function pad(n: number) {
   return String(n).padStart(2, "0");
 }

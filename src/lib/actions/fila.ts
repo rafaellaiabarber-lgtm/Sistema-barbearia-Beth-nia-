@@ -131,6 +131,7 @@ export async function concluirAtendimento(
           servicoId: s.id,
           nomeSnapshot: s.nome,
           precoCentavos: s.precoCentavos,
+          custoCentavos: s.custoCentavos,
           comissaoPercentual: s.comissaoPercentual ?? comissaoPadrao,
         })),
       },
