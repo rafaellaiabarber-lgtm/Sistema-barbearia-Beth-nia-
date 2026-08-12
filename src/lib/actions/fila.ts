@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
+export async function buscarNomePorTelefone(telefone: string): Promise<string | null> {
+  if (!telefone) return null;
+  const cliente = await prisma.cliente.findUnique({ where: { telefone } });
+  return cliente?.nome ?? null;
+}
+
 export type EntrarFilaState = { erro?: string; sucesso?: boolean; posicao?: number };
 
 export async function entrarNaFila(
