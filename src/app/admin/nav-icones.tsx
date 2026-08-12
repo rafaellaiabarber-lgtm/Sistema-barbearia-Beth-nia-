@@ -15,6 +15,7 @@ import {
   ArrowLeftRight,
   ClipboardList,
   Target,
+  Package,
   type LucideIcon,
 } from "lucide-react";
 
@@ -23,6 +24,7 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   clientes: Users,
   barbeiros: Scissors,
   servicos: Tag,
+  produtos: Package,
   atendimentos: Clock,
   assinaturas: CreditCard,
   planos: Layers,
