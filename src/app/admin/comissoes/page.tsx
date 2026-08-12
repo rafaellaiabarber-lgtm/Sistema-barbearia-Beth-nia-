@@ -1,25 +1,43 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo, chavePeriodo } from "@/lib/periodo";
 import { marcarComissaoPaga, desmarcarComissaoPaga } from "@/lib/actions/comissoes";
+import { FiltroRelatorio } from "../filtro-relatorio";
 
 export default async function ComissoesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ periodo?: string }>;
+  searchParams: Promise<{
+    periodo?: string;
+    dataInicio?: string;
+    dataFim?: string;
+    servicoId?: string;
+    barbeiroId?: string;
+  }>;
 }) {
-  const { periodo: periodoParam } = await searchParams;
+  const { periodo: periodoParam, dataInicio, dataFim, servicoId, barbeiroId } = await searchParams;
   const periodo: Periodo =
-    periodoParam === "semana" || periodoParam === "mes" ? periodoParam : "hoje";
-  const { inicio, fim } = calcularIntervalo(periodo);
-  const chave = chavePeriodo(periodo);
+    periodoParam === "semana" || periodoParam === "mes" || periodoParam === "personalizado"
+      ? periodoParam
+      : "hoje";
+  const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
+  const podeMarcarPago = periodo !== "personalizado";
+  const chave = podeMarcarPago ? chavePeriodo(periodo) : "";
 
-  const atendimentos = await prisma.atendimento.findMany({
-    where: { status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim } },
-    include: { barbeiro: true, servicos: true },
-    orderBy: { concluidoEm: "desc" },
-  });
+  const [atendimentos, servicos, barbeiros] = await Promise.all([
+    prisma.atendimento.findMany({
+      where: {
+        status: "CONCLUIDO",
+        concluidoEm: { gte: inicio, lte: fim },
+        ...(barbeiroId ? { barbeiroId } : {}),
+        ...(servicoId ? { servicos: { some: { servicoId } } } : {}),
+      },
+      include: { barbeiro: true, servicos: true },
+      orderBy: { concluidoEm: "desc" },
+    }),
+    prisma.servico.findMany({ orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
+  ]);
 
   const porBarbeiro = new Map<
     string,
@@ -38,13 +56,15 @@ export default async function ComissoesPage({
     porBarbeiro.set(a.barbeiro.id, atual);
   }
 
-  const pagamentos = await prisma.pagamentoComissao.findMany({
-    where: {
-      periodo: periodo.toUpperCase() as "HOJE" | "SEMANA" | "MES",
-      chave,
-      barbeiroId: { in: [...porBarbeiro.keys()] },
-    },
-  });
+  const pagamentos = podeMarcarPago
+    ? await prisma.pagamentoComissao.findMany({
+        where: {
+          periodo: periodo.toUpperCase() as "HOJE" | "SEMANA" | "MES",
+          chave,
+          barbeiroId: { in: [...porBarbeiro.keys()] },
+        },
+      })
+    : [];
   const pagosPorBarbeiro = new Map(pagamentos.map((p) => [p.barbeiroId, p]));
 
   const rankingServicos = new Map<string, { nome: string; qtd: number; totalCentavos: number }>();
@@ -62,39 +82,34 @@ export default async function ComissoesPage({
   }
   const ranking = [...rankingServicos.values()].sort((a, b) => b.qtd - a.qtd);
 
-  const abas: { valor: Periodo; label: string }[] = [
-    { valor: "hoje", label: "Hoje" },
-    { valor: "semana", label: "Esta semana" },
-    { valor: "mes", label: "Este mês" },
-  ];
-
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Comissões</h1>
 
-      <div className="flex gap-2 mb-6">
-        {abas.map((a) => (
-          <Link
-            key={a.valor}
-            href={`/admin/comissoes?periodo=${a.valor}`}
-            className={`rounded-lg px-4 py-2 text-sm border ${
-              periodo === a.valor
-                ? "bg-blue-600 text-white border-blue-600 font-semibold"
-                : "border-slate-300 text-slate-700 hover:bg-slate-100"
-            }`}
-          >
-            {a.label}
-          </Link>
-        ))}
-      </div>
+      <FiltroRelatorio
+        basePath="/admin/comissoes"
+        periodo={periodo}
+        dataInicio={dataInicio}
+        dataFim={dataFim}
+        servicoId={servicoId}
+        barbeiroId={barbeiroId}
+        servicos={servicos}
+        barbeiros={barbeiros}
+      />
+
+      {!podeMarcarPago && (
+        <p className="text-slate-400 text-xs mb-4">
+          Período personalizado: marcar comissão como paga fica disponível só em Hoje/Semana/Mês.
+        </p>
+      )}
 
       <div className="space-y-2 mb-8">
-        {[...porBarbeiro.entries()].map(([barbeiroId, b]) => {
+        {[...porBarbeiro.entries()].map(([id, b]) => {
           const comissao = Math.round((b.totalCentavos * b.comissaoPercentual) / 100);
-          const pago = pagosPorBarbeiro.get(barbeiroId);
+          const pago = pagosPorBarbeiro.get(id);
           return (
             <div
-              key={barbeiroId}
+              key={id}
               className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
             >
               <div>
@@ -106,19 +121,28 @@ export default async function ComissoesPage({
               </div>
               <div className="text-right flex items-center gap-3">
                 <p className="text-blue-600 font-bold text-lg">{formatarReais(comissao)}</p>
-                {pago ? (
-                  <form action={desmarcarComissaoPaga.bind(null, barbeiroId, periodo, chave)}>
-                    <button className="rounded-lg bg-green-50 text-green-700 border border-green-200 px-3 py-1.5 text-sm font-medium">
-                      ✓ Pago — desmarcar
-                    </button>
-                  </form>
-                ) : (
-                  <form action={marcarComissaoPaga.bind(null, barbeiroId, periodo, chave, comissao)}>
-                    <button className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-sm font-medium">
-                      Marcar como pago
-                    </button>
-                  </form>
-                )}
+                {podeMarcarPago &&
+                  (pago ? (
+                    <form action={desmarcarComissaoPaga.bind(null, id, periodo as "hoje" | "semana" | "mes", chave)}>
+                      <button className="rounded-lg bg-green-50 text-green-700 border border-green-200 px-3 py-1.5 text-sm font-medium">
+                        ✓ Pago — desmarcar
+                      </button>
+                    </form>
+                  ) : (
+                    <form
+                      action={marcarComissaoPaga.bind(
+                        null,
+                        id,
+                        periodo as "hoje" | "semana" | "mes",
+                        chave,
+                        comissao
+                      )}
+                    >
+                      <button className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-sm font-medium">
+                        Marcar como pago
+                      </button>
+                    </form>
+                  ))}
               </div>
             </div>
           );
