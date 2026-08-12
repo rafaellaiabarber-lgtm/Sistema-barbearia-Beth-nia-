@@ -36,19 +36,34 @@ export function NovoAtendimentoForm({
     }
   }, [estado]);
 
-  async function buscarPorTelefone() {
+  useEffect(() => {
     const digitos = telefone.replace(/\D/g, "");
-    if (digitos.length < 10) return;
-    setBuscandoNome(true);
-    const nomeExistente = await buscarNomePorTelefone(digitos);
-    setBuscandoNome(false);
-    if (nomeExistente) {
-      setClienteEncontrado(true);
-      if (!nome.trim()) setNome(nomeExistente);
-    } else {
+    if (digitos.length < 10) {
       setClienteEncontrado(false);
+      return;
     }
-  }
+
+    let cancelado = false;
+    setBuscandoNome(true);
+    const timer = setTimeout(async () => {
+      const nomeExistente = await buscarNomePorTelefone(digitos);
+      if (cancelado) return;
+      setBuscandoNome(false);
+      if (nomeExistente) {
+        setClienteEncontrado(true);
+        setNome(nomeExistente);
+      } else {
+        setClienteEncontrado(false);
+      }
+    }, 400);
+
+    return () => {
+      cancelado = true;
+      clearTimeout(timer);
+      setBuscandoNome(false);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [telefone]);
 
   function alternarServico(id: string) {
     setSelecionados((atual) => (atual.includes(id) ? atual.filter((s) => s !== id) : [...atual, id]));
@@ -73,7 +88,6 @@ export function NovoAtendimentoForm({
               placeholder="11999999999"
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
-              onBlur={buscarPorTelefone}
               className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-40"
             />
           </div>
