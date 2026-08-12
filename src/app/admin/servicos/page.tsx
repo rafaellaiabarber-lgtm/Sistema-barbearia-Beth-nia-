@@ -16,24 +16,24 @@ export default async function ServicosPage() {
         {servicos.map((s) => (
           <div
             key={s.id}
-            className={`flex items-center justify-between bg-neutral-900 border border-neutral-800 rounded-xl p-4 ${
+            className={`flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 shadow-sm ${
               !s.ativo ? "opacity-50" : ""
             }`}
           >
             <div>
               <p className="font-semibold">{s.nome}</p>
-              <p className="text-neutral-400 text-sm">
+              <p className="text-slate-500 text-sm">
                 {formatarReais(s.precoCentavos)} · {s.duracaoMinutos} min
               </p>
             </div>
             <div className="flex items-center gap-3">
               <form action={alternarAtivoServico.bind(null, s.id, !s.ativo)}>
-                <button className="text-sm text-neutral-300 hover:text-amber-400">
+                <button className="text-sm text-slate-600 hover:text-blue-600">
                   {s.ativo ? "Desativar" : "Ativar"}
                 </button>
               </form>
               <form action={excluirServico.bind(null, s.id)}>
-                <button className="text-sm text-neutral-500 hover:text-red-400">Excluir</button>
+                <button className="text-sm text-slate-400 hover:text-red-600">Excluir</button>
               </form>
             </div>
           </div>

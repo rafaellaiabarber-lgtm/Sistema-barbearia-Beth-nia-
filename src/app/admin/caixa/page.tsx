@@ -63,37 +63,37 @@ export default async function CaixaPage() {
 
       <NovoMovimentoForm />
 
-      <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-5 mb-6">
-        <p className="text-neutral-400 text-sm">Total no caixa hoje</p>
-        <p className={`text-3xl font-bold ${totalDoDia < 0 ? "text-red-400" : "text-amber-400"}`}>
+      <div className="bg-white border border-slate-200 rounded-xl p-5 mb-6 shadow-sm">
+        <p className="text-slate-500 text-sm">Total no caixa hoje</p>
+        <p className={`text-3xl font-bold ${totalDoDia < 0 ? "text-red-600" : "text-blue-600"}`}>
           {formatarReais(totalDoDia)}
         </p>
       </div>
 
       {linhas.length === 0 ? (
-        <p className="text-neutral-500">Nenhum lançamento hoje ainda.</p>
+        <p className="text-slate-400">Nenhum lançamento hoje ainda.</p>
       ) : (
         <div className="space-y-2">
           {linhas.map((l) => (
             <div
               key={l.id}
-              className="flex items-center justify-between bg-neutral-900 border border-neutral-800 rounded-xl p-4"
+              className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
             >
               <div>
                 <p className="font-medium">{l.descricao}</p>
-                <p className="text-neutral-500 text-xs">
+                <p className="text-slate-400 text-xs">
                   {l.horario.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })} · saldo:{" "}
                   {formatarReais(l.saldo)}
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`font-semibold ${l.valorCentavos < 0 ? "text-red-400" : "text-green-400"}`}>
+                <span className={`font-semibold ${l.valorCentavos < 0 ? "text-red-600" : "text-green-600"}`}>
                   {l.valorCentavos < 0 ? "-" : "+"}
                   {formatarReais(Math.abs(l.valorCentavos))}
                 </span>
                 {l.excluivel && (
                   <form action={excluirMovimentoCaixa.bind(null, l.id)}>
-                    <button className="text-neutral-500 hover:text-red-400 text-sm">Excluir</button>
+                    <button className="text-slate-400 hover:text-red-600 text-sm">Excluir</button>
                   </form>
                 )}
               </div>

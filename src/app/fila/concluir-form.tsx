@@ -28,7 +28,7 @@ export function ConcluirForm({
 
   return (
     <form action={formAction}>
-      <p className="text-neutral-300 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
+      <p className="text-slate-700 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
       <div className="grid grid-cols-2 gap-2 mb-3">
         {servicos.map((s) => {
           const ativo = selecionados.includes(s.id);
@@ -39,12 +39,12 @@ export function ConcluirForm({
               onClick={() => alternarServico(s.id)}
               className={`rounded-lg border-2 px-3 py-2 text-left text-sm transition-colors ${
                 ativo
-                  ? "border-amber-500 bg-amber-500/10"
-                  : "border-neutral-700 bg-neutral-800 hover:border-neutral-600"
+                  ? "border-blue-600 bg-blue-50"
+                  : "border-slate-200 bg-white hover:border-slate-300"
               }`}
             >
-              <span className="block text-white font-medium">{s.nome}</span>
-              <span className="block text-amber-400 text-xs">{formatarReais(s.precoCentavos)}</span>
+              <span className="block text-slate-900 font-medium">{s.nome}</span>
+              <span className="block text-blue-600 text-xs">{formatarReais(s.precoCentavos)}</span>
             </button>
           );
         })}
@@ -54,15 +54,15 @@ export function ConcluirForm({
       ))}
 
       {totalCentavos > 0 && (
-        <p className="text-amber-400 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
+        <p className="text-blue-600 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
       )}
 
-      {estado.erro && <p className="text-red-400 text-sm mb-3">{estado.erro}</p>}
+      {estado.erro && <p className="text-red-600 text-sm mb-3">{estado.erro}</p>}
 
       <button
         type="submit"
         disabled={pendente}
-        className="rounded-lg bg-green-600 hover:bg-green-500 disabled:opacity-60 px-4 py-2 font-semibold"
+        className="rounded-lg bg-green-600 hover:bg-green-700 text-white disabled:opacity-60 px-4 py-2 font-semibold"
       >
         {pendente ? "Concluindo..." : "Concluir atendimento"}
       </button>
