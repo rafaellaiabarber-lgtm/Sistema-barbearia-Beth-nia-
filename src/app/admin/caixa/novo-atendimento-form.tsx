@@ -4,7 +4,9 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import type { Barbeiro, Servico } from "@prisma/client";
 import {
   lancarAtendimentoManual,
+  buscarClientesPorNome,
   type LancarAtendimentoState,
+  type SugestaoCliente,
 } from "@/lib/actions/atendimentos";
 import { buscarNomePorTelefone } from "@/lib/actions/fila";
 import { formatarReais } from "@/lib/format";
@@ -24,7 +26,10 @@ export function NovoAtendimentoForm({
   const [telefone, setTelefone] = useState("");
   const [buscandoNome, setBuscandoNome] = useState(false);
   const [clienteEncontrado, setClienteEncontrado] = useState(false);
+  const [sugestoes, setSugestoes] = useState<SugestaoCliente[]>([]);
+  const [sugestoesAbertas, setSugestoesAbertas] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const ignorarBuscaTelefoneRef = useRef(false);
 
   useEffect(() => {
     if (estado.sucesso) {
@@ -33,10 +38,17 @@ export function NovoAtendimentoForm({
       setNome("");
       setTelefone("");
       setClienteEncontrado(false);
+      setSugestoes([]);
+      setSugestoesAbertas(false);
     }
   }, [estado]);
 
   useEffect(() => {
+    if (ignorarBuscaTelefoneRef.current) {
+      ignorarBuscaTelefoneRef.current = false;
+      return;
+    }
+
     const digitos = telefone.replace(/\D/g, "");
     if (digitos.length < 10) {
       setClienteEncontrado(false);
@@ -65,6 +77,34 @@ export function NovoAtendimentoForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [telefone]);
 
+  useEffect(() => {
+    const termo = nome.trim();
+    if (!sugestoesAbertas || termo.length < 2) {
+      setSugestoes([]);
+      return;
+    }
+
+    let cancelado = false;
+    const timer = setTimeout(async () => {
+      const resultado = await buscarClientesPorNome(termo);
+      if (!cancelado) setSugestoes(resultado);
+    }, 300);
+
+    return () => {
+      cancelado = true;
+      clearTimeout(timer);
+    };
+  }, [nome, sugestoesAbertas]);
+
+  function selecionarSugestao(cliente: SugestaoCliente) {
+    ignorarBuscaTelefoneRef.current = true;
+    setNome(cliente.nome);
+    setTelefone(cliente.telefone);
+    setClienteEncontrado(true);
+    setSugestoes([]);
+    setSugestoesAbertas(false);
+  }
+
   function alternarServico(id: string) {
     setSelecionados((atual) => (atual.includes(id) ? atual.filter((s) => s !== id) : [...atual, id]));
   }
@@ -91,16 +131,38 @@ export function NovoAtendimentoForm({
               className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-40"
             />
           </div>
-          <div>
+          <div className="relative">
             <label className="block text-xs text-slate-500 mb-1">Nome do cliente</label>
             <input
               name="nome"
               required
               placeholder={buscandoNome ? "Verificando..." : "Nome"}
               value={nome}
-              onChange={(e) => setNome(e.target.value)}
+              autoComplete="off"
+              onChange={(e) => {
+                setNome(e.target.value);
+                setSugestoesAbertas(true);
+              }}
+              onFocus={() => setSugestoesAbertas(true)}
+              onBlur={() => setTimeout(() => setSugestoesAbertas(false), 150)}
               className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-48"
             />
+            {sugestoesAbertas && sugestoes.length > 0 && (
+              <div className="absolute z-10 mt-1 w-56 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden">
+                {sugestoes.map((s) => (
+                  <button
+                    type="button"
+                    key={s.telefone}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => selecionarSugestao(s)}
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-blue-50"
+                  >
+                    <span className="block text-slate-900 font-medium">{s.nome}</span>
+                    <span className="block text-slate-400 text-xs">{s.telefone}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-xs text-slate-500 mb-1">Barbeiro</label>
