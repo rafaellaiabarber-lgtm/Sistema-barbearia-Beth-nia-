@@ -19,6 +19,7 @@ export function ServicoRow({ servico }: { servico: Servico }) {
   const acaoComId = atualizarServico.bind(null, servico.id);
   const [estado, formAction, pendente] = useActionState(acaoComId, estadoInicial);
   const formRef = useRef<HTMLFormElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (estado.sucesso) {
@@ -26,23 +27,30 @@ export function ServicoRow({ servico }: { servico: Servico }) {
     }
   }, [estado]);
 
+  useEffect(() => {
+    if (editando) {
+      rowRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [editando]);
+
   const margemCentavos = servico.precoCentavos - servico.custoCentavos;
 
   return (
     <div
-      className={`flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl p-4 shadow-sm ${
+      ref={rowRef}
+      className={`flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl p-4 shadow-sm scroll-mt-20 ${
         !servico.ativo ? "opacity-50" : ""
       }`}
     >
       {editando ? (
-        <form ref={formRef} action={formAction} className="flex flex-wrap items-end gap-3">
-          <div>
+        <form ref={formRef} action={formAction} className="flex flex-wrap items-end gap-3 w-full">
+          <div className="w-full sm:w-auto">
             <label className="block text-xs text-slate-500 mb-1">Nome</label>
             <input
               name="nome"
               required
               defaultValue={servico.nome}
-              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-40"
+              className="rounded-lg bg-white border border-slate-300 px-3 py-2 text-sm w-full sm:w-40"
             />
           </div>
           <div>
