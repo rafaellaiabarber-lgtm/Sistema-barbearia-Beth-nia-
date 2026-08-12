@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { CategoriaDespesa } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { reaisParaCentavos } from "@/lib/format";
@@ -16,6 +17,8 @@ export async function criarMovimentoCaixa(
   const tipo = String(formData.get("tipo") ?? "");
   const descricao = String(formData.get("descricao") ?? "").trim();
   const valor = String(formData.get("valor") ?? "");
+  const formaPagamentoRaw = String(formData.get("formaPagamento") ?? "");
+  const categoriaRaw = String(formData.get("categoria") ?? "");
 
   if (tipo !== "ENTRADA" && tipo !== "SAIDA") return { erro: "Tipo inválido." };
   if (!descricao) return { erro: "Informe uma descrição." };
@@ -23,8 +26,18 @@ export async function criarMovimentoCaixa(
   const valorCentavos = reaisParaCentavos(valor);
   if (valorCentavos <= 0) return { erro: "Informe um valor válido." };
 
+  const formasValidas = ["DINHEIRO", "PIX", "CARTAO"];
+  if (!formasValidas.includes(formaPagamentoRaw)) return { erro: "Escolha a forma de pagamento." };
+  const formaPagamento = formaPagamentoRaw as "DINHEIRO" | "PIX" | "CARTAO";
+
+  const categoriasValidas = ["FIXA", "VARIAVEL", "TAXA_CARTAO", "PRO_LABORE", "IMPOSTO", "OUTRA"];
+  if (tipo === "SAIDA" && !categoriasValidas.includes(categoriaRaw)) {
+    return { erro: "Escolha a categoria da despesa." };
+  }
+  const categoria = tipo === "SAIDA" ? (categoriaRaw as CategoriaDespesa) : null;
+
   await prisma.movimentoCaixa.create({
-    data: { tipo, descricao, valorCentavos },
+    data: { tipo, descricao, valorCentavos, formaPagamento, categoria },
   });
 
   revalidatePath("/admin/caixa");

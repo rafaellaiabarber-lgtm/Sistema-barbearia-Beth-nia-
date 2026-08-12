@@ -24,11 +24,15 @@ export async function lancarAtendimentoManual(
   const telefone = String(formData.get("telefone") ?? "").trim();
   const barbeiroId = String(formData.get("barbeiroId") ?? "").trim();
   const servicoIds = formData.getAll("servicoIds").map(String);
+  const formaPagamento = String(formData.get("formaPagamento") ?? "");
 
   if (!nome) return { erro: "Informe o nome do cliente." };
   if (!telefone) return { erro: "Informe o telefone do cliente." };
   if (!barbeiroId) return { erro: "Escolha o barbeiro." };
   if (servicoIds.length === 0) return { erro: "Escolha ao menos um serviço." };
+  if (formaPagamento !== "DINHEIRO" && formaPagamento !== "PIX" && formaPagamento !== "CARTAO") {
+    return { erro: "Escolha a forma de pagamento." };
+  }
 
   const [barbeiro, servicos] = await Promise.all([
     prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true } }),
@@ -54,6 +58,7 @@ export async function lancarAtendimentoManual(
       criadoEm: agora,
       concluidoEm: agora,
       precoTotalCentavos,
+      formaPagamento,
       servicos: {
         create: servicos.map((s) => ({
           servicoId: s.id,

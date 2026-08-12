@@ -146,6 +146,11 @@ export async function concluirAtendimento(
     return { erro: "Escolha ao menos um serviço realizado." };
   }
 
+  const formaPagamento = String(formData.get("formaPagamento") ?? "");
+  if (formaPagamento !== "DINHEIRO" && formaPagamento !== "PIX" && formaPagamento !== "CARTAO") {
+    return { erro: "Escolha a forma de pagamento." };
+  }
+
   const [servicos, atendimento] = await Promise.all([
     prisma.servico.findMany({ where: { id: { in: servicoIds } } }),
     prisma.atendimento.findUnique({ where: { id: atendimentoId }, include: { barbeiro: true } }),
@@ -161,6 +166,7 @@ export async function concluirAtendimento(
       status: "CONCLUIDO",
       concluidoEm: new Date(),
       precoTotalCentavos,
+      formaPagamento,
       servicos: {
         create: servicos.map((s) => ({
           servicoId: s.id,
