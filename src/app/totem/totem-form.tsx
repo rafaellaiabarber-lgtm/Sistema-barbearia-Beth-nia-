@@ -36,7 +36,11 @@ export function TotemForm({ barbeiros }: { barbeiros: Barbeiro[] }) {
   }
 
   return (
-    <div className="w-full max-w-xl bg-white rounded-3xl shadow-xl p-8 border border-slate-200">
+    <div
+      className={`w-full bg-white rounded-3xl shadow-xl p-8 border border-slate-200 ${
+        etapa === "barbeiro" ? "max-w-3xl" : "max-w-xl"
+      }`}
+    >
       <h1 className="text-3xl font-black text-slate-900 text-center mb-1">Barbearia Bethânia</h1>
       <p className="text-slate-500 text-center mb-8">Toque para entrar na fila</p>
 
@@ -119,16 +123,18 @@ export function TotemForm({ barbeiros }: { barbeiros: Barbeiro[] }) {
             <button
               type="button"
               onClick={() => setBarbeiroPreferidoId(null)}
-              className={`rounded-2xl border-2 p-4 flex flex-col items-center gap-2 transition-colors ${
+              className={`rounded-2xl border-2 overflow-hidden transition-colors ${
                 barbeiroPreferidoId === null
-                  ? "border-blue-600 bg-blue-50"
-                  : "border-slate-200 bg-white hover:border-slate-300"
+                  ? "border-blue-600"
+                  : "border-slate-200 hover:border-slate-300"
               }`}
             >
-              <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-2xl">
+              <div className="w-full aspect-square bg-slate-100 flex items-center justify-center text-6xl">
                 🤝
               </div>
-              <span className="text-slate-900 font-semibold text-sm">Sem preferência</span>
+              <div className={`py-2 ${barbeiroPreferidoId === null ? "bg-blue-50" : "bg-white"}`}>
+                <span className="text-slate-900 font-semibold text-sm">Sem preferência</span>
+              </div>
             </button>
 
             {barbeiros.map((b) => (
@@ -136,25 +142,23 @@ export function TotemForm({ barbeiros }: { barbeiros: Barbeiro[] }) {
                 type="button"
                 key={b.id}
                 onClick={() => setBarbeiroPreferidoId(b.id)}
-                className={`rounded-2xl border-2 p-4 flex flex-col items-center gap-2 transition-colors ${
+                className={`rounded-2xl border-2 overflow-hidden transition-colors ${
                   barbeiroPreferidoId === b.id
-                    ? "border-blue-600 bg-blue-50"
-                    : "border-slate-200 bg-white hover:border-slate-300"
+                    ? "border-blue-600"
+                    : "border-slate-200 hover:border-slate-300"
                 }`}
               >
                 {b.fotoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={b.fotoUrl}
-                    alt={b.nome}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
+                  <img src={b.fotoUrl} alt={b.nome} className="w-full aspect-square object-cover" />
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-2xl">
+                  <div className="w-full aspect-square bg-slate-100 flex items-center justify-center text-6xl">
                     💈
                   </div>
                 )}
-                <span className="text-slate-900 font-semibold text-sm">{b.nome}</span>
+                <div className={`py-2 ${barbeiroPreferidoId === b.id ? "bg-blue-50" : "bg-white"}`}>
+                  <span className="text-slate-900 font-semibold text-sm">{b.nome}</span>
+                </div>
               </button>
             ))}
           </div>
