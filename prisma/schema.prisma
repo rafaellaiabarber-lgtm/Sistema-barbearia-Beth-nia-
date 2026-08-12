@@ -67,6 +67,7 @@ model Servico {
   id                  String               @id @default(cuid())
   nome                String
   precoCentavos       Int
+  custoCentavos       Int                  @default(0)
   duracaoMinutos      Int                  @default(30)
   comissaoPercentual  Int?
   ativo               Boolean              @default(true)
