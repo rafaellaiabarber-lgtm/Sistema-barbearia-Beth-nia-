@@ -14,6 +14,7 @@ import {
   Receipt,
   ArrowLeftRight,
   ClipboardList,
+  Target,
   type LucideIcon,
 } from "lucide-react";
 
@@ -28,6 +29,7 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   caixa: Wallet,
   contas: Receipt,
   comissoes: HandCoins,
+  metas: Target,
   financeiro: TrendingUp,
   fluxoCaixa: ArrowLeftRight,
   dre: ClipboardList,
