@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import type { CategoriaDespesa } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
-import { reaisParaCentavos } from "@/lib/format";
+import { reaisParaCentavos, valorParaPercentualX100 } from "@/lib/format";
 
 export type MovimentoCaixaState = { erro?: string };
 
@@ -48,4 +48,28 @@ export async function excluirMovimentoCaixa(id: string) {
   await requireSession(["ADMIN"]);
   await prisma.movimentoCaixa.delete({ where: { id } });
   revalidatePath("/admin/caixa");
+}
+
+export type ConfiguracaoFinanceiraState = { erro?: string; sucesso?: boolean };
+
+export async function atualizarTaxaCartao(
+  _prevState: ConfiguracaoFinanceiraState,
+  formData: FormData
+): Promise<ConfiguracaoFinanceiraState> {
+  await requireSession(["ADMIN"]);
+
+  const taxa = String(formData.get("taxaCartao") ?? "").trim();
+  const taxaCartaoPercentualX100 = taxa ? valorParaPercentualX100(taxa) : null;
+  if (taxaCartaoPercentualX100 !== null && taxaCartaoPercentualX100 < 0) {
+    return { erro: "Informe uma taxa válida." };
+  }
+
+  await prisma.configuracaoFinanceira.upsert({
+    where: { id: "singleton" },
+    create: { id: "singleton", taxaCartaoPercentualX100 },
+    update: { taxaCartaoPercentualX100 },
+  });
+
+  revalidatePath("/admin/financeiro");
+  return { sucesso: true };
 }

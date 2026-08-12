@@ -40,6 +40,7 @@ export const gruposNav: NavGrupo[] = [
     icone: "caixa",
     links: [
       { href: "/admin/caixa", label: "Caixa", icone: "caixa" },
+      { href: "/admin/contas", label: "Contas a pagar/receber", icone: "contas" },
       { href: "/admin/comissoes", label: "Comissões", icone: "comissoes" },
     ],
   },

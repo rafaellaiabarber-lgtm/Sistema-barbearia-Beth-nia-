@@ -26,3 +26,15 @@ export const LABEL_CATEGORIA_DESPESA: Record<string, string> = {
   IMPOSTO: "Imposto",
   OUTRA: "Outra",
 };
+
+// Percentuais são guardados como "percentual × 100" (ex.: 349 = 3,49%) para suportar casas decimais.
+export function percentualX100ParaValor(percentualX100: number) {
+  return (percentualX100 / 100).toFixed(2).replace(".", ",");
+}
+
+export function valorParaPercentualX100(valor: string) {
+  const normalizado = valor.replace(/\./g, "").replace(",", ".");
+  const numero = Number.parseFloat(normalizado);
+  if (Number.isNaN(numero)) return 0;
+  return Math.round(numero * 100);
+}
