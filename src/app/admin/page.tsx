@@ -152,7 +152,7 @@ export default async function AdminHomePage() {
       <h1 className="text-2xl font-bold mb-6">Visão geral</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="rounded-xl p-5 shadow-sm bg-lime-600 text-slate-950 flex items-start justify-between">
+        <div className="rounded-xl p-5 shadow-sm bg-lime-400 text-slate-950 flex items-start justify-between">
           <div>
             <p className="text-2xl font-bold mb-1">{formatarReais(faturamentoHoje)}</p>
             <p className="text-lime-100 text-sm mb-2">Faturamento hoje</p>
@@ -201,7 +201,7 @@ export default async function AdminHomePage() {
             {rankingServicos.map((r, i) => (
               <div key={r.nome} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-lime-600 font-bold w-5 text-center">{i + 1}º</span>
+                  <span className="text-lime-600 dark:text-lime-400 font-bold w-5 text-center">{i + 1}º</span>
                   <span className="font-medium">{r.nome}</span>
                 </div>
                 <div className="text-right">
@@ -220,7 +220,7 @@ export default async function AdminHomePage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Faturamento da semana</p>
-          <p className="text-2xl font-bold text-lime-600 mb-1">{formatarReais(faturamentoSemana)}</p>
+          <p className="text-2xl font-bold text-lime-600 dark:text-lime-400 mb-1">{formatarReais(faturamentoSemana)}</p>
           <Variacao atual={faturamentoSemana} anterior={faturamentoSemanaAnterior} />
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
@@ -232,12 +232,12 @@ export default async function AdminHomePage() {
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Atendimentos</p>
-          <p className="text-2xl font-bold text-lime-600 mb-1">{qtdAtendimentosMes}</p>
+          <p className="text-2xl font-bold text-lime-600 dark:text-lime-400 mb-1">{qtdAtendimentosMes}</p>
           <Variacao atual={qtdAtendimentosMes} anterior={qtdAtendimentosMesAnterior} />
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Ticket médio</p>
-          <p className="text-2xl font-bold text-lime-600 mb-1">{formatarReais(ticketMedioMes)}</p>
+          <p className="text-2xl font-bold text-lime-600 dark:text-lime-400 mb-1">{formatarReais(ticketMedioMes)}</p>
           <Variacao atual={ticketMedioMes} anterior={ticketMedioMesAnterior} />
         </div>
       </div>
@@ -245,19 +245,19 @@ export default async function AdminHomePage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Na fila agora</p>
-          <p className="text-2xl font-bold text-lime-600">{aguardando}</p>
+          <p className="text-2xl font-bold text-lime-600 dark:text-lime-400">{aguardando}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Em atendimento</p>
-          <p className="text-2xl font-bold text-lime-600">{emAtendimento}</p>
+          <p className="text-2xl font-bold text-lime-600 dark:text-lime-400">{emAtendimento}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Clientes novos (mês)</p>
-          <p className="text-2xl font-bold text-lime-600">{clientesNovos}</p>
+          <p className="text-2xl font-bold text-lime-600 dark:text-lime-400">{clientesNovos}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Clientes recorrentes (mês)</p>
-          <p className="text-2xl font-bold text-lime-600">{clientesRecorrentes}</p>
+          <p className="text-2xl font-bold text-lime-600 dark:text-lime-400">{clientesRecorrentes}</p>
         </div>
       </div>
 
@@ -271,7 +271,7 @@ export default async function AdminHomePage() {
             >
               <span className="font-medium">{b.nome}</span>
               <div className="text-right">
-                <p className="font-semibold text-lime-600">{formatarReais(b.totalCentavos)}</p>
+                <p className="font-semibold text-lime-600 dark:text-lime-400">{formatarReais(b.totalCentavos)}</p>
                 <p className="text-slate-400 dark:text-slate-500 text-xs">{b.qtd} atendimento(s)</p>
               </div>
             </div>
@@ -283,13 +283,13 @@ export default async function AdminHomePage() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Link href="/admin/financeiro" className="text-lime-600 hover:underline text-sm">
+        <Link href="/admin/financeiro" className="text-lime-600 dark:text-lime-400 hover:underline text-sm">
           Ver relatório financeiro completo →
         </Link>
-        <Link href="/admin/eficiencia" className="text-lime-600 hover:underline text-sm">
+        <Link href="/admin/eficiencia" className="text-lime-600 dark:text-lime-400 hover:underline text-sm">
           Ver eficiência dos barbeiros →
         </Link>
-        <Link href="/fila" className="text-lime-600 hover:underline text-sm">
+        <Link href="/fila" className="text-lime-600 dark:text-lime-400 hover:underline text-sm">
           Abrir painel da fila →
         </Link>
       </div>

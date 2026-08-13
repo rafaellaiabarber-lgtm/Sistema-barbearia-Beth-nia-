@@ -176,7 +176,7 @@ export default async function FilaPage({
 
   return (
     <div
-      className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-6 ${
+      className={`min-h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 p-6 ${
         mostrarAvisoCampanha ? "pb-28" : ""
       }`}
     >
@@ -226,7 +226,7 @@ export default async function FilaPage({
                     href={`/fila?periodo=${p}`}
                     className={`rounded-lg px-3 py-1.5 text-sm font-medium border ${
                       !personalizado && periodoFila === p
-                        ? "bg-lime-600 border-lime-600 text-slate-950"
+                        ? "bg-lime-400 border-lime-600 text-slate-950"
                         : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-slate-400"
                     }`}
                   >
@@ -262,7 +262,7 @@ export default async function FilaPage({
                       className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
                     />
                   </div>
-                  <button type="submit" className="rounded-lg bg-lime-600 hover:bg-lime-700 text-slate-950 font-semibold px-4 py-2 text-sm">
+                  <button type="submit" className="rounded-lg bg-lime-400 hover:bg-lime-300 text-slate-950 font-semibold px-4 py-2 text-sm">
                     Ver por data
                   </button>
                   {personalizado && (
@@ -302,7 +302,7 @@ export default async function FilaPage({
                 {metaInfo && (
                   <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-3">
-                      <Target className="w-4 h-4 text-lime-600" />
+                      <Target className="w-4 h-4 text-lime-600 dark:text-lime-400" />
                       <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Minha meta do mês</p>
                     </div>
                     <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
@@ -353,7 +353,7 @@ export default async function FilaPage({
               <form action={chamarProximo.bind(null, undefined)}>
                 <button
                   disabled={aguardando.length === 0}
-                  className="rounded-xl bg-lime-600 hover:bg-lime-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-bold px-6 py-4 text-lg"
+                  className="rounded-xl bg-lime-400 hover:bg-lime-300 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-bold px-6 py-4 text-lg"
                 >
                   Chamar próximo cliente
                 </button>
@@ -375,7 +375,7 @@ export default async function FilaPage({
                         <BadgeAssinante info={planoInfoPorCliente.get(a.clienteId)} />{" "}
                         <span className="text-slate-500 dark:text-slate-400 text-sm">com {a.barbeiro?.nome}</span>
                       </p>
-                      <p className="text-lime-600 text-sm">{formatarReais(a.precoTotalCentavos)}</p>
+                      <p className="text-lime-600 dark:text-lime-400 text-sm">{formatarReais(a.precoTotalCentavos)}</p>
                     </div>
                   ))}
                 </div>
@@ -410,7 +410,7 @@ export default async function FilaPage({
                     className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
                   >
                     <div className="flex items-center gap-4">
-                      <span className="text-2xl font-black text-lime-600 w-10 text-center">{i + 1}º</span>
+                      <span className="text-2xl font-black text-lime-600 dark:text-lime-400 w-10 text-center">{i + 1}º</span>
                       <div>
                         <p className="font-semibold">
                           {a.cliente.nome}
@@ -426,7 +426,7 @@ export default async function FilaPage({
                     <div className="flex items-center gap-3">
                       {session.barbeiroId && !meuAtendimento && (
                         <form action={chamarCliente.bind(null, a.id)}>
-                          <button className="rounded-lg bg-lime-600 hover:bg-lime-700 text-slate-950 font-semibold text-sm px-3 py-1.5">
+                          <button className="rounded-lg bg-lime-400 hover:bg-lime-300 text-slate-950 font-semibold text-sm px-3 py-1.5">
                             Atender
                           </button>
                         </form>

@@ -72,7 +72,7 @@ export function NovaIndicacaoForm({ barbeiros, souAdmin }: { barbeiros: Barbeiro
         <button
           type="submit"
           disabled={pendente}
-          className="rounded-lg bg-lime-600 hover:bg-lime-700 disabled:opacity-60 text-slate-950 font-semibold px-4 py-2 text-sm"
+          className="rounded-lg bg-lime-400 hover:bg-lime-300 disabled:opacity-60 text-slate-950 font-semibold px-4 py-2 text-sm"
         >
           {pendente ? "Salvando..." : "Salvar indicação"}
         </button>

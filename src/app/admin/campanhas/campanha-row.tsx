@@ -39,7 +39,7 @@ export function CampanhaRow({
         </div>
         <div className="flex items-center gap-4">
           <form action={alternarAtivaCampanha.bind(null, id, !ativa)}>
-            <button className="text-sm text-slate-600 dark:text-slate-300 hover:text-lime-600">
+            <button className="text-sm text-slate-600 dark:text-slate-300 hover:text-lime-600 dark:hover:text-lime-400">
               {ativa ? "Encerrar" : "Reativar"}
             </button>
           </form>

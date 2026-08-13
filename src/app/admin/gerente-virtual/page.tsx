@@ -93,21 +93,21 @@ export default async function GerenteVirtualPage({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
             <p className="text-slate-500 dark:text-slate-400 text-xs">Faturamento</p>
-            <p className="text-xl font-bold text-lime-600">{formatarReais(comparativoAtual.faturamentoCentavos)}</p>
+            <p className="text-xl font-bold text-lime-600 dark:text-lime-400">{formatarReais(comparativoAtual.faturamentoCentavos)}</p>
           </div>
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
             <p className="text-slate-500 dark:text-slate-400 text-xs">Margem</p>
-            <p className={`text-xl font-bold ${margemAtual < 0 ? "text-red-600" : "text-lime-600"}`}>
+            <p className={`text-xl font-bold ${margemAtual < 0 ? "text-red-600" : "text-lime-600 dark:text-lime-400"}`}>
               {margemAtual.toFixed(0)}%
             </p>
           </div>
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
             <p className="text-slate-500 dark:text-slate-400 text-xs">Ticket médio</p>
-            <p className="text-xl font-bold text-lime-600">{formatarReais(ticketMedioAtual)}</p>
+            <p className="text-xl font-bold text-lime-600 dark:text-lime-400">{formatarReais(ticketMedioAtual)}</p>
           </div>
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
             <p className="text-slate-500 dark:text-slate-400 text-xs">Clientes novos</p>
-            <p className="text-xl font-bold text-lime-600">{comparativoAtual.clientesNovos}</p>
+            <p className="text-xl font-bold text-lime-600 dark:text-lime-400">{comparativoAtual.clientesNovos}</p>
           </div>
         </div>
 
@@ -138,7 +138,7 @@ export default async function GerenteVirtualPage({
           <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">
             No ritmo atual ({formatarReais(previsao.ritmoDiarioCentavos)}/dia), você deve fechar o mês em:
           </p>
-          <p className="text-2xl font-bold text-lime-600 mb-3">{formatarReais(previsao.previsaoFechamentoCentavos)}</p>
+          <p className="text-2xl font-bold text-lime-600 dark:text-lime-400 mb-3">{formatarReais(previsao.previsaoFechamentoCentavos)}</p>
 
           {metaCentavos !== null ? (
             <p className="text-slate-600 dark:text-slate-300 text-sm">
@@ -173,7 +173,7 @@ export default async function GerenteVirtualPage({
               className="w-16 rounded-lg border border-slate-300 dark:border-slate-600 px-2 py-1 text-sm"
             />
             <span className="text-slate-500 dark:text-slate-400 text-sm">dias</span>
-            <button type="submit" className="rounded-lg bg-lime-600 hover:bg-lime-700 text-slate-950 text-sm font-medium px-3 py-1.5">
+            <button type="submit" className="rounded-lg bg-lime-400 hover:bg-lime-300 text-slate-950 text-sm font-medium px-3 py-1.5">
               Filtrar
             </button>
           </form>

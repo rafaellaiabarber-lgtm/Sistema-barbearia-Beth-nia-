@@ -40,7 +40,7 @@ export function FotoBarbeiroForm({ barbeiroId, nome, fotoUrl }: { barbeiroId: st
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={pendente}
-          className="text-xs text-slate-500 dark:text-slate-400 hover:text-lime-600 disabled:opacity-60"
+          className="text-xs text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 disabled:opacity-60"
         >
           {pendente ? "Enviando..." : fotoUrl ? "Trocar foto" : "Adicionar foto"}
         </button>

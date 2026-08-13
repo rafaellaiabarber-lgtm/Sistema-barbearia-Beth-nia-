@@ -186,7 +186,7 @@ export function NovoAtendimentoForm({
         </div>
 
         {clienteEncontrado && (
-          <p className="text-lime-600 text-xs mb-3">Cliente já cadastrado — nome preenchido automaticamente.</p>
+          <p className="text-lime-600 dark:text-lime-400 text-xs mb-3">Cliente já cadastrado — nome preenchido automaticamente.</p>
         )}
 
         <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
@@ -203,7 +203,7 @@ export function NovoAtendimentoForm({
                 }`}
               >
                 <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
-                <span className="block text-lime-600 text-xs">{formatarReais(s.precoCentavos)}</span>
+                <span className="block text-lime-600 dark:text-lime-400 text-xs">{formatarReais(s.precoCentavos)}</span>
               </button>
             );
           })}
@@ -213,7 +213,7 @@ export function NovoAtendimentoForm({
         ))}
 
         {totalCentavos > 0 && (
-          <p className="text-lime-600 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
+          <p className="text-lime-600 dark:text-lime-400 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
         )}
 
         <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Forma de pagamento:</p>
@@ -226,7 +226,7 @@ export function NovoAtendimentoForm({
         <button
           type="submit"
           disabled={pendente}
-          className="rounded-lg bg-lime-600 hover:bg-lime-700 disabled:opacity-60 text-slate-950 font-semibold px-4 py-2 text-sm"
+          className="rounded-lg bg-lime-400 hover:bg-lime-300 disabled:opacity-60 text-slate-950 font-semibold px-4 py-2 text-sm"
         >
           {pendente ? "Lançando..." : "Lançar atendimento"}
         </button>

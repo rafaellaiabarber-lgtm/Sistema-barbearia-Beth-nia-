@@ -30,7 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body
-        className="min-h-full flex flex-col font-sans bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100"
+        className="min-h-full flex flex-col font-sans bg-slate-50 text-slate-900 dark:bg-black dark:text-slate-100"
         suppressHydrationWarning
       >
         {children}

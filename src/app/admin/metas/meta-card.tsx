@@ -160,7 +160,7 @@ export function MetaCard({
             <button
               type="submit"
               disabled={pendente}
-              className="rounded-lg bg-lime-600 hover:bg-lime-700 disabled:opacity-60 text-slate-950 text-sm font-semibold px-4 py-2"
+              className="rounded-lg bg-lime-400 hover:bg-lime-300 disabled:opacity-60 text-slate-950 text-sm font-semibold px-4 py-2"
             >
               {pendente ? "Salvando..." : "Salvar"}
             </button>
@@ -182,11 +182,11 @@ export function MetaCard({
       <div className="flex items-center justify-between mb-1">
         <p className="font-semibold">{LABEL_TIPO_META[tipo]}</p>
         <div className="flex items-center gap-3">
-          <button type="button" onClick={() => setEditando(true)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-lime-600">
+          <button type="button" onClick={() => setEditando(true)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400">
             Editar
           </button>
           <form action={alternarAtivaMeta.bind(null, metaId, !ativa)}>
-            <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-lime-600">{ativa ? "Desativar" : "Ativar"}</button>
+            <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400">{ativa ? "Desativar" : "Ativar"}</button>
           </form>
           <form
             action={excluirMeta.bind(null, metaId)}

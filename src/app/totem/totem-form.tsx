@@ -51,7 +51,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
         </p>
         <a
           href="/totem"
-          className="inline-block rounded-xl bg-lime-600 hover:bg-lime-700 text-slate-950 font-bold text-lg px-6 py-3 transition-colors"
+          className="inline-block rounded-xl bg-lime-400 hover:bg-lime-300 text-slate-950 font-bold text-lg px-6 py-3 transition-colors"
         >
           Concluir
         </a>

@@ -57,12 +57,12 @@ export function IndicacaoRow({
           WhatsApp
         </a>
         <form action={alternarContatada.bind(null, id, !contatada)}>
-          <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-lime-600">
+          <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400">
             {contatada ? "Marcar pendente" : "Marcar contatada"}
           </button>
         </form>
         <form action={alternarConvertida.bind(null, id, !convertida)}>
-          <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-lime-600">
+          <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400">
             {convertida ? "Desfazer conversão" : "Marcar que virou cliente"}
           </button>
         </form>
