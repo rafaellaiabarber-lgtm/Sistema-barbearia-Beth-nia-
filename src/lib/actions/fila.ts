@@ -3,10 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
+import { normalizarTelefone } from "@/lib/format";
 
 export async function buscarNomePorTelefone(telefone: string): Promise<string | null> {
   if (!telefone) return null;
-  const cliente = await prisma.cliente.findUnique({ where: { telefone } });
+  const cliente = await prisma.cliente.findUnique({ where: { telefone: normalizarTelefone(telefone) } });
   return cliente?.nome ?? null;
 }
 
@@ -15,7 +16,7 @@ export type ClienteInfo = { nome: string | null; planoAtivo: string | null };
 export async function buscarClienteInfoPorTelefone(telefone: string): Promise<ClienteInfo> {
   if (!telefone) return { nome: null, planoAtivo: null };
   const cliente = await prisma.cliente.findUnique({
-    where: { telefone },
+    where: { telefone: normalizarTelefone(telefone) },
     include: { assinaturas: { where: { status: "ATIVA" }, include: { plano: true }, take: 1 } },
   });
   return {
@@ -37,10 +38,10 @@ export async function entrarNaFila(
   formData: FormData
 ): Promise<EntrarFilaState> {
   const nome = String(formData.get("nome") ?? "").trim();
-  const telefone = String(formData.get("telefone") ?? "").trim();
+  const telefone = normalizarTelefone(String(formData.get("telefone") ?? ""));
   const barbeiroPreferidoId = String(formData.get("barbeiroPreferidoId") ?? "").trim() || null;
   const acompanhanteNome = String(formData.get("acompanhanteNome") ?? "").trim();
-  const acompanhanteTelefone = String(formData.get("acompanhanteTelefone") ?? "").trim();
+  const acompanhanteTelefone = normalizarTelefone(String(formData.get("acompanhanteTelefone") ?? ""));
 
   if (!telefone) return { erro: "Informe seu telefone." };
   if (!nome) return { erro: "Informe seu nome." };

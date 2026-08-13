@@ -39,6 +39,10 @@ export function valorParaPercentualX100(valor: string) {
   return Math.round(numero * 100);
 }
 
+export function normalizarTelefone(telefone: string) {
+  return telefone.replace(/\D/g, "");
+}
+
 export function formatarTelefone(telefone: string) {
   const digitos = telefone.replace(/\D/g, "");
   if (digitos.length === 11) return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`;
