@@ -40,6 +40,7 @@ export async function buscarCampanhasAtivasComProgresso(barbeiroId: string) {
           nome: item.produto?.nome ?? item.servico?.nome ?? "?",
           quantidadeAlvo: item.quantidadeAlvo,
           quantidadeAtual: await buscarQuantidadeAtualItem(item, barbeiroId, c.criadoEm),
+          precoCentavos: item.produto?.precoCentavos ?? item.servico?.precoCentavos ?? 0,
         }))
       );
       return { id: c.id, titulo: c.titulo, itens };
@@ -62,6 +63,7 @@ export async function buscarTodasCampanhasAtivasComProgresso() {
           nome: item.produto?.nome ?? item.servico?.nome ?? "?",
           quantidadeAlvo: item.quantidadeAlvo,
           quantidadeAtual: await buscarQuantidadeAtualItem(item, c.barbeiroId, c.criadoEm),
+          precoCentavos: item.produto?.precoCentavos ?? item.servico?.precoCentavos ?? 0,
         }))
       );
       return { id: c.id, titulo: c.titulo, barbeiroNome: c.barbeiro.nome, itens };

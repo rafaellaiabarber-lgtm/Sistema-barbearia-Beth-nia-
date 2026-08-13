@@ -8,6 +8,7 @@ import { formatarReais } from "@/lib/format";
 import { calcularIntervalo } from "@/lib/periodo";
 import { comissaoServicos } from "@/lib/comissao";
 import { buscarCampanhasAtivasComProgresso } from "@/lib/campanhas-server";
+import { itemCompleto, quantidadeFaltando, valorPotencialCentavos } from "@/lib/campanhas";
 import { AutoRefresh } from "./auto-refresh";
 import { AtendendoAgora } from "./atendendo-agora";
 import { ThemeToggle } from "../theme-toggle";
@@ -87,6 +88,8 @@ export default async function FilaPage({
     bonificacaoCentavos: number | null;
   } | null = null;
   const campanhasAtivas = session.barbeiroId ? await buscarCampanhasAtivasComProgresso(session.barbeiroId) : [];
+  const itensFaltandoCampanha = campanhasAtivas.flatMap((c) => c.itens.filter((i) => !itemCompleto(i)));
+  const potencialCampanhaCentavos = valorPotencialCentavos(itensFaltandoCampanha);
 
   if (session.barbeiroId) {
     const intervaloSelecionado =
@@ -287,6 +290,16 @@ export default async function FilaPage({
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {session.barbeiroId && itensFaltandoCampanha.length > 0 && (
+            <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-900 rounded-xl p-4 mb-6">
+              <p className="text-amber-900 dark:text-amber-100 text-sm">
+                💡 Hoje, se vender {itensFaltandoCampanha.map((i) => `${quantidadeFaltando(i)}x ${i.nome}`).join(", ")}, você
+                aumenta <span className="font-semibold">{formatarReais(potencialCampanhaCentavos)}</span> no seu faturamento.
+                Não esqueça de oferecer!
+              </p>
             </div>
           )}
 
