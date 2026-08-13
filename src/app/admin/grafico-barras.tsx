@@ -12,7 +12,7 @@ export function GraficoBarras({ dados }: { dados: { label: string; valor: number
           return (
             <div key={i} className="flex-1 h-full flex items-end group relative">
               <div
-                className="w-full bg-blue-500 group-hover:bg-blue-600 rounded-t transition-colors"
+                className="w-full bg-lime-500 group-hover:bg-lime-600 rounded-t transition-colors"
                 style={{ height: alturaPx }}
               />
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-slate-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">

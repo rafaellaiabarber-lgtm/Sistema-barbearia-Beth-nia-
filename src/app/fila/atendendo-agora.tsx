@@ -58,11 +58,11 @@ export function AtendendoAgora({
             </div>
           )}
           {planoInfo && !planoInfo.cobertoHoje && (
-            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-300 dark:border-blue-800 rounded-xl p-3 mb-4 text-center">
-              <p className="text-blue-900 dark:text-blue-100 text-sm font-semibold">
+            <div className="bg-lime-50 dark:bg-lime-950 border border-lime-300 dark:border-lime-800 rounded-xl p-3 mb-4 text-center">
+              <p className="text-lime-900 dark:text-lime-100 text-sm font-semibold">
                 🎫 Este cliente tem o plano {planoInfo.nome}, mas hoje não é dia coberto
               </p>
-              <p className="text-blue-800 dark:text-blue-200 text-xs mt-1">Pode cobrar avulso normalmente.</p>
+              <p className="text-lime-800 dark:text-lime-200 text-xs mt-1">Pode cobrar avulso normalmente.</p>
             </div>
           )}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
@@ -95,7 +95,7 @@ export function AtendendoAgora({
         </p>
       )}
       <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Iniciado às {horaInicio}</p>
-      <p className="text-3xl font-bold text-blue-600 mb-8 tabular-nums">{formatarDuracao(segundos)}</p>
+      <p className="text-3xl font-bold text-lime-600 mb-8 tabular-nums">{formatarDuracao(segundos)}</p>
 
       {campanhas.map((c) => (
         <div
@@ -127,7 +127,7 @@ export function AtendendoAgora({
       <button
         type="button"
         onClick={() => setFinalizando(true)}
-        className="w-full max-w-sm rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-4 mb-3 transition-colors"
+        className="w-full max-w-sm rounded-xl bg-lime-600 hover:bg-lime-700 text-slate-950 font-bold text-lg py-4 mb-3 transition-colors"
       >
         Finalizar atendimento
       </button>

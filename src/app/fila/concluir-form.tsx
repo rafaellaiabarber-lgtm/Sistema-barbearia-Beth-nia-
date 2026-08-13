@@ -40,12 +40,12 @@ export function ConcluirForm({
               onClick={() => alternarServico(s.id)}
               className={`rounded-lg border-2 px-3 py-2 text-left text-sm transition-colors ${
                 ativo
-                  ? "border-blue-600 bg-blue-50 dark:bg-blue-950"
+                  ? "border-lime-600 bg-lime-50 dark:bg-lime-950"
                   : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300"
               }`}
             >
               <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
-              <span className="block text-blue-600 text-xs">{formatarReais(s.precoCentavos)}</span>
+              <span className="block text-lime-600 text-xs">{formatarReais(s.precoCentavos)}</span>
             </button>
           );
         })}
@@ -55,7 +55,7 @@ export function ConcluirForm({
       ))}
 
       {totalCentavos > 0 && (
-        <p className="text-blue-600 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
+        <p className="text-lime-600 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
       )}
 
       <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Forma de pagamento:</p>

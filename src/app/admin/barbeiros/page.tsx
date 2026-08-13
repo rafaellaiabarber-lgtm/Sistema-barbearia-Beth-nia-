@@ -117,7 +117,7 @@ export default async function BarbeirosPage({
             href={`/admin/barbeiros?periodo=${p}`}
             className={`rounded-lg px-3 py-1.5 text-sm font-medium border ${
               periodo === p
-                ? "bg-blue-600 border-blue-600 text-white"
+                ? "bg-lime-600 border-lime-600 text-slate-950"
                 : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-slate-400"
             }`}
           >
@@ -137,14 +137,14 @@ export default async function BarbeirosPage({
               <div key={m.barbeiro.id} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-3">
                   <span
-                    className={`font-bold w-6 text-center ${i === 0 ? "text-amber-500" : "text-blue-600"}`}
+                    className={`font-bold w-6 text-center ${i === 0 ? "text-amber-500" : "text-lime-600"}`}
                   >
                     {i + 1}º
                   </span>
                   <span className="font-medium">{m.barbeiro.nome}</span>
                 </div>
                 <div className="text-right">
-                  <span className="font-semibold text-blue-600">{formatarReais(m.faturamentoCentavos)}</span>
+                  <span className="font-semibold text-lime-600">{formatarReais(m.faturamentoCentavos)}</span>
                   <span className="text-slate-400 dark:text-slate-500 text-xs ml-2">
                     {m.qtdAtendimentos} atend. · ticket médio {formatarReais(m.ticketMedioCentavos)}
                   </span>
@@ -170,7 +170,7 @@ export default async function BarbeirosPage({
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
                 <div>
                   <p className="text-slate-400 dark:text-slate-500 text-xs">Faturamento ({LABEL_PERIODO[periodo]})</p>
-                  <p className="font-semibold text-blue-600">{formatarReais(m.faturamentoCentavos)}</p>
+                  <p className="font-semibold text-lime-600">{formatarReais(m.faturamentoCentavos)}</p>
                 </div>
                 <div>
                   <p className="text-slate-400 dark:text-slate-500 text-xs">Atendimentos ({LABEL_PERIODO[periodo]})</p>
@@ -195,7 +195,7 @@ export default async function BarbeirosPage({
                   </div>
                   <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full ${m.bateuMeta ? "bg-green-500" : "bg-blue-500"}`}
+                      className={`h-full rounded-full ${m.bateuMeta ? "bg-green-500" : "bg-lime-500"}`}
                       style={{ width: `${Math.min(m.percentualMeta, 100)}%` }}
                     />
                   </div>
@@ -215,7 +215,7 @@ export default async function BarbeirosPage({
 
               {m.servicosRealizados.length > 0 && (
                 <details className="mt-4">
-                  <summary className="cursor-pointer text-sm text-blue-600 hover:underline select-none">
+                  <summary className="cursor-pointer text-sm text-lime-600 hover:underline select-none">
                     Serviços realizados ({LABEL_PERIODO[periodo]}) — {m.qtdAtendimentos}
                   </summary>
                   <div className="mt-2 space-y-1">

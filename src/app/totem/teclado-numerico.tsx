@@ -40,7 +40,7 @@ export function TecladoNumerico({
               key={tecla}
               type="button"
               onClick={() => apertar(tecla)}
-              className="rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-blue-600 active:text-white active:scale-95 text-slate-900 text-2xl font-bold py-4 transition-all"
+              className="rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-lime-600 active:text-slate-950 active:scale-95 text-slate-900 text-2xl font-bold py-4 transition-all"
             >
               {tecla}
             </button>

@@ -132,11 +132,11 @@ export default async function PlanosPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Receita recorrente (MRR)</p>
-          <p className="text-2xl font-bold text-blue-600">{formatarReais(mrrTotalCentavos)}</p>
+          <p className="text-2xl font-bold text-lime-600">{formatarReais(mrrTotalCentavos)}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Assinantes ativos</p>
-          <p className="text-2xl font-bold text-blue-600">{ativosTotal}</p>
+          <p className="text-2xl font-bold text-lime-600">{ativosTotal}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Inadimplentes</p>
@@ -146,7 +146,7 @@ export default async function PlanosPage() {
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Churn (mês)</p>
-          <p className="text-2xl font-bold text-blue-600">{formatarPercentual(churnGeral)}</p>
+          <p className="text-2xl font-bold text-lime-600">{formatarPercentual(churnGeral)}</p>
         </div>
       </div>
 
@@ -181,7 +181,7 @@ export default async function PlanosPage() {
                 </div>
                 <div>
                   <p className="text-slate-400 dark:text-slate-500 text-xs">Receita recorrente (MRR)</p>
-                  <p className="font-semibold text-blue-600">{formatarReais(m.mrrCentavos)}</p>
+                  <p className="font-semibold text-lime-600">{formatarReais(m.mrrCentavos)}</p>
                 </div>
                 <div>
                   <p className="text-slate-400 dark:text-slate-500 text-xs">Inadimplência</p>
@@ -202,7 +202,7 @@ export default async function PlanosPage() {
               </div>
 
               <details>
-                <summary className="cursor-pointer text-sm text-blue-600 hover:underline select-none">
+                <summary className="cursor-pointer text-sm text-lime-600 hover:underline select-none">
                   Utilização do plano — {formatarPercentual(m.utilizacaoPercentual)}
                   {m.utilizacaoPercentual !== null ? "" : " (sem assinantes ativos)"}
                 </summary>

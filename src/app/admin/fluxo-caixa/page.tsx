@@ -97,9 +97,13 @@ export default async function FluxoCaixaPage({
           <p className="text-2xl font-bold mb-1">{formatarReais(totalSaidasCentavos)}</p>
           <p className="text-red-100 text-sm">Total de saídas</p>
         </div>
-        <div className={`rounded-xl p-5 shadow-sm text-white ${saldoPeriodoCentavos < 0 ? "bg-red-700" : "bg-blue-600"}`}>
+        <div
+          className={`rounded-xl p-5 shadow-sm ${
+            saldoPeriodoCentavos < 0 ? "bg-red-700 text-white" : "bg-lime-600 text-slate-950"
+          }`}
+        >
           <p className="text-2xl font-bold mb-1">{formatarReais(saldoPeriodoCentavos)}</p>
-          <p className="text-blue-100 text-sm">Saldo do período</p>
+          <p className={`text-sm ${saldoPeriodoCentavos < 0 ? "text-red-100" : "text-lime-950/70"}`}>Saldo do período</p>
         </div>
       </div>
 

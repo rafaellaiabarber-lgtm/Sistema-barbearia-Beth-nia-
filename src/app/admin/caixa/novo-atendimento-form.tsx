@@ -156,7 +156,7 @@ export function NovoAtendimentoForm({
                     key={s.telefone}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => selecionarSugestao(s)}
-                    className="block w-full text-left px-3 py-2 text-sm hover:bg-blue-50"
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-lime-50"
                   >
                     <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
                     <span className="block text-slate-400 dark:text-slate-500 text-xs">{s.telefone}</span>
@@ -186,7 +186,7 @@ export function NovoAtendimentoForm({
         </div>
 
         {clienteEncontrado && (
-          <p className="text-blue-600 text-xs mb-3">Cliente já cadastrado — nome preenchido automaticamente.</p>
+          <p className="text-lime-600 text-xs mb-3">Cliente já cadastrado — nome preenchido automaticamente.</p>
         )}
 
         <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
@@ -199,11 +199,11 @@ export function NovoAtendimentoForm({
                 key={s.id}
                 onClick={() => alternarServico(s.id)}
                 className={`rounded-lg border-2 px-3 py-2 text-left text-sm transition-colors ${
-                  ativo ? "border-blue-600 bg-blue-50 dark:bg-blue-950" : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300"
+                  ativo ? "border-lime-600 bg-lime-50 dark:bg-lime-950" : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300"
                 }`}
               >
                 <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
-                <span className="block text-blue-600 text-xs">{formatarReais(s.precoCentavos)}</span>
+                <span className="block text-lime-600 text-xs">{formatarReais(s.precoCentavos)}</span>
               </button>
             );
           })}
@@ -213,7 +213,7 @@ export function NovoAtendimentoForm({
         ))}
 
         {totalCentavos > 0 && (
-          <p className="text-blue-600 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
+          <p className="text-lime-600 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
         )}
 
         <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Forma de pagamento:</p>
@@ -226,7 +226,7 @@ export function NovoAtendimentoForm({
         <button
           type="submit"
           disabled={pendente}
-          className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+          className="rounded-lg bg-lime-600 hover:bg-lime-700 disabled:opacity-60 text-slate-950 font-semibold px-4 py-2 text-sm"
         >
           {pendente ? "Lançando..." : "Lançar atendimento"}
         </button>

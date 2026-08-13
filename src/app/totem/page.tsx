@@ -14,7 +14,7 @@ export default async function TotemPage() {
 
   return (
     <div
-      className="min-h-screen bg-slate-50 bg-cover bg-center flex items-center justify-center p-4"
+      className="min-h-screen bg-slate-950 bg-cover bg-center flex items-center justify-center p-4"
       style={configuracao?.fundoUrl ? { backgroundImage: `url(${configuracao.fundoUrl})` } : undefined}
     >
       <TotemForm barbeiros={barbeiros} logoUrl={configuracao?.logoUrl ?? null} />

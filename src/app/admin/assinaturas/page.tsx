@@ -36,7 +36,7 @@ export default async function AssinaturasPage() {
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Assinaturas ativas</p>
-          <p className="text-2xl font-bold text-blue-600">{ativas.length}</p>
+          <p className="text-2xl font-bold text-lime-600">{ativas.length}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Inadimplentes ({formatarCompetencia(competencia)})</p>
@@ -90,7 +90,7 @@ export default async function AssinaturasPage() {
                       </form>
                     ) : (
                       <form action={marcarPagamentoAssinatura.bind(null, a.id, a.plano.precoCentavos)}>
-                        <button className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-sm font-medium">
+                        <button className="rounded-lg bg-lime-600 hover:bg-lime-700 text-slate-950 px-3 py-1.5 text-sm font-medium">
                           Marcar como pago
                         </button>
                       </form>
@@ -102,7 +102,7 @@ export default async function AssinaturasPage() {
                 )}
                 {a.status === "CANCELADA" && (
                   <form action={reativarAssinatura.bind(null, a.id)}>
-                    <button className="text-sm text-blue-600 hover:underline">Reativar</button>
+                    <button className="text-sm text-lime-600 hover:underline">Reativar</button>
                   </form>
                 )}
               </div>

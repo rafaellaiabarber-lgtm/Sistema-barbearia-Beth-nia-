@@ -75,7 +75,7 @@ export function ServicoRow({ servico }: { servico: Servico }) {
           <button
             type="submit"
             disabled={pendente}
-            className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold px-3 py-2"
+            className="rounded-lg bg-lime-600 hover:bg-lime-700 disabled:opacity-60 text-slate-950 text-sm font-semibold px-3 py-2"
           >
             {pendente ? "Salvando..." : "Salvar"}
           </button>
@@ -117,20 +117,20 @@ export function ServicoRow({ servico }: { servico: Servico }) {
               <button
                 type="button"
                 onClick={() => setEditando(true)}
-                className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600"
+                className="text-sm text-slate-600 dark:text-slate-300 hover:text-lime-600"
               >
                 Editar
               </button>
               <form action={alternarPontuaRanking.bind(null, servico.id, !servico.pontuaRanking)}>
                 <button
-                  className={`text-sm ${servico.pontuaRanking ? "text-blue-600 hover:text-blue-800" : "text-slate-400 dark:text-slate-500 hover:text-blue-600"}`}
+                  className={`text-sm ${servico.pontuaRanking ? "text-lime-600 hover:text-lime-800" : "text-slate-400 dark:text-slate-500 hover:text-lime-600"}`}
                   title="Se conta pontos no Ranking dos barbeiros quando esse serviço é feito"
                 >
                   {servico.pontuaRanking ? "🏆 Conta no ranking" : "Não conta no ranking"}
                 </button>
               </form>
               <form action={alternarAtivoServico.bind(null, servico.id, !servico.ativo)}>
-                <button className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600">
+                <button className="text-sm text-slate-600 dark:text-slate-300 hover:text-lime-600">
                   {servico.ativo ? "Desativar" : "Ativar"}
                 </button>
               </form>
