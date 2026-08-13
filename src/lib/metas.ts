@@ -1,7 +1,7 @@
 import { formatarReais } from "@/lib/format";
 
 export const LABEL_TIPO_META: Record<string, string> = {
-  FATURAMENTO: "Faturamento",
+  FATURAMENTO: "Comissão",
   ATENDIMENTOS: "Nº de atendimentos",
   TICKET_MEDIO: "Ticket médio",
   CLIENTES_NOVOS: "Clientes novos",
@@ -24,6 +24,7 @@ export function valorEditavelMeta(tipo: string, valor: number) {
 
 export type ProgressoBarbeiro = {
   faturamentoCentavos: number;
+  comissaoCentavos: number;
   qtdAtendimentos: number;
   clientesNovos: number;
   vendasProdutoCentavos: number;
@@ -32,7 +33,7 @@ export type ProgressoBarbeiro = {
 export function valorAtualPorTipo(tipo: string, progresso: ProgressoBarbeiro): number {
   switch (tipo) {
     case "FATURAMENTO":
-      return progresso.faturamentoCentavos;
+      return progresso.comissaoCentavos;
     case "ATENDIMENTOS":
       return progresso.qtdAtendimentos;
     case "TICKET_MEDIO":

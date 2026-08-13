@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { calcularIntervalo } from "@/lib/periodo";
 import { LABEL_TIPO_META, valorAtualPorTipo, type ProgressoBarbeiro } from "@/lib/metas";
+import { comissaoServicos } from "@/lib/comissao";
 import { NovaMetaForm } from "./nova-meta-form";
 import { MetaCard } from "./meta-card";
 
@@ -16,7 +17,7 @@ type MetaComNiveis = {
   niveis: { id: string; ordem: number; nome: string; valorAlvo: number; bonificacaoCentavos: number }[];
 };
 
-async function calcularProgresso(meta: MetaComNiveis): Promise<number> {
+async function calcularProgresso(meta: MetaComNiveis, comissaoPadraoBarbeiro: number): Promise<number> {
   const periodo =
     meta.dataInicio && meta.dataFim
       ? { inicio: meta.dataInicio, fim: meta.dataFim }
@@ -36,6 +37,7 @@ async function calcularProgresso(meta: MetaComNiveis): Promise<number> {
 
   const progresso: ProgressoBarbeiro = {
     faturamentoCentavos: 0,
+    comissaoCentavos: 0,
     qtdAtendimentos: 0,
     clientesNovos: 0,
     vendasProdutoCentavos: 0,
@@ -58,6 +60,7 @@ async function calcularProgresso(meta: MetaComNiveis): Promise<number> {
     const clientesNovosIds = new Set<string>();
     for (const item of itens) {
       progresso.faturamentoCentavos += item.precoCentavos;
+      progresso.comissaoCentavos += comissaoServicos([item], comissaoPadraoBarbeiro);
       progresso.qtdAtendimentos += 1;
       const cliente = item.atendimento.cliente;
       if (cliente.criadoEm >= periodo.inicio && cliente.criadoEm <= periodo.fim) {
@@ -72,10 +75,11 @@ async function calcularProgresso(meta: MetaComNiveis): Promise<number> {
         barbeiroId: meta.barbeiroId,
         concluidoEm: { gte: periodo.inicio, lte: periodo.fim },
       },
-      include: { cliente: true },
+      include: { cliente: true, servicos: true },
     });
     for (const a of atendimentos) {
       progresso.faturamentoCentavos += a.precoTotalCentavos;
+      progresso.comissaoCentavos += comissaoServicos(a.servicos, comissaoPadraoBarbeiro);
       progresso.qtdAtendimentos += 1;
       if (a.cliente.criadoEm >= periodo.inicio && a.cliente.criadoEm <= periodo.fim) {
         progresso.clientesNovos += 1;
@@ -102,9 +106,11 @@ export default async function MetasPage() {
     prisma.produto.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
   ]);
 
-  const todasMetas = barbeiros.flatMap((b) => b.metas);
-  const progressos = await Promise.all(todasMetas.map((m) => calcularProgresso(m)));
-  const progressoPorMeta = new Map(todasMetas.map((m, i) => [m.id, progressos[i]]));
+  const todasMetas = barbeiros.flatMap((b) => b.metas.map((m) => ({ meta: m, comissaoPadrao: b.comissaoPercentual })));
+  const progressos = await Promise.all(
+    todasMetas.map(({ meta, comissaoPadrao }) => calcularProgresso(meta, comissaoPadrao))
+  );
+  const progressoPorMeta = new Map(todasMetas.map(({ meta }, i) => [meta.id, progressos[i]]));
 
   return (
     <div>
