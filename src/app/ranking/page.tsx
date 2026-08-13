@@ -93,14 +93,14 @@ export default async function RankingPage({
   const pontuacaoMinimaPremio = configuracao?.pontuacaoMinimaPremio ?? null;
 
   const premiosSemanal = {
-    premio1Centavos: configuracao?.premio1LugarSemanalCentavos ?? null,
-    premio2Centavos: configuracao?.premio2LugarSemanalCentavos ?? null,
-    premio3Centavos: configuracao?.premio3LugarSemanalCentavos ?? null,
+    premio1: configuracao?.premio1LugarSemanal ?? null,
+    premio2: configuracao?.premio2LugarSemanal ?? null,
+    premio3: configuracao?.premio3LugarSemanal ?? null,
   };
   const premiosMensal = {
-    premio1Centavos: configuracao?.premio1LugarMensalCentavos ?? null,
-    premio2Centavos: configuracao?.premio2LugarMensalCentavos ?? null,
-    premio3Centavos: configuracao?.premio3LugarMensalCentavos ?? null,
+    premio1: configuracao?.premio1LugarMensal ?? null,
+    premio2: configuracao?.premio2LugarMensal ?? null,
+    premio3: configuracao?.premio3LugarMensal ?? null,
   };
 
   return (
@@ -180,12 +180,12 @@ export default async function RankingPage({
             pontosPorVendaProduto={pontos.pontosPorVendaProduto}
             pontosPorAssinatura={pontos.pontosPorAssinatura}
             pontosPorIndicacaoConvertida={pontos.pontosPorIndicacaoConvertida}
-            premio1LugarSemanalCentavos={configuracao?.premio1LugarSemanalCentavos ?? null}
-            premio2LugarSemanalCentavos={configuracao?.premio2LugarSemanalCentavos ?? null}
-            premio3LugarSemanalCentavos={configuracao?.premio3LugarSemanalCentavos ?? null}
-            premio1LugarMensalCentavos={configuracao?.premio1LugarMensalCentavos ?? null}
-            premio2LugarMensalCentavos={configuracao?.premio2LugarMensalCentavos ?? null}
-            premio3LugarMensalCentavos={configuracao?.premio3LugarMensalCentavos ?? null}
+            premio1LugarSemanal={configuracao?.premio1LugarSemanal ?? null}
+            premio2LugarSemanal={configuracao?.premio2LugarSemanal ?? null}
+            premio3LugarSemanal={configuracao?.premio3LugarSemanal ?? null}
+            premio1LugarMensal={configuracao?.premio1LugarMensal ?? null}
+            premio2LugarMensal={configuracao?.premio2LugarMensal ?? null}
+            premio3LugarMensal={configuracao?.premio3LugarMensal ?? null}
             pontuacaoMinimaPremio={pontuacaoMinimaPremio}
           />
         </section>

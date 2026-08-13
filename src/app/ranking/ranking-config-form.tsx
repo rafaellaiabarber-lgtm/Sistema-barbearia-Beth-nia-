@@ -5,33 +5,29 @@ import { atualizarConfiguracaoRanking, type ConfiguracaoRankingState } from "@/l
 
 const estadoInicial: ConfiguracaoRankingState = {};
 
-function valorCentavos(centavos: number | null) {
-  return centavos !== null ? (centavos / 100).toFixed(2).replace(".", ",") : "";
-}
-
 export function RankingConfigForm({
   pontosPorAtendimento,
   pontosPorVendaProduto,
   pontosPorAssinatura,
   pontosPorIndicacaoConvertida,
-  premio1LugarSemanalCentavos,
-  premio2LugarSemanalCentavos,
-  premio3LugarSemanalCentavos,
-  premio1LugarMensalCentavos,
-  premio2LugarMensalCentavos,
-  premio3LugarMensalCentavos,
+  premio1LugarSemanal,
+  premio2LugarSemanal,
+  premio3LugarSemanal,
+  premio1LugarMensal,
+  premio2LugarMensal,
+  premio3LugarMensal,
   pontuacaoMinimaPremio,
 }: {
   pontosPorAtendimento: number;
   pontosPorVendaProduto: number;
   pontosPorAssinatura: number;
   pontosPorIndicacaoConvertida: number;
-  premio1LugarSemanalCentavos: number | null;
-  premio2LugarSemanalCentavos: number | null;
-  premio3LugarSemanalCentavos: number | null;
-  premio1LugarMensalCentavos: number | null;
-  premio2LugarMensalCentavos: number | null;
-  premio3LugarMensalCentavos: number | null;
+  premio1LugarSemanal: string | null;
+  premio2LugarSemanal: string | null;
+  premio3LugarSemanal: string | null;
+  premio1LugarMensal: string | null;
+  premio2LugarMensal: string | null;
+  premio3LugarMensal: string | null;
   pontuacaoMinimaPremio: number | null;
 }) {
   const [estado, formAction, pendente] = useActionState(atualizarConfiguracaoRanking, estadoInicial);
@@ -93,15 +89,18 @@ export function RankingConfigForm({
         </div>
 
         <div>
-          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Prêmio semanal (R$, opcional)</p>
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Prêmio semanal (opcional)</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+            Pode ser um valor (ex: R$ 100,00) ou qualquer coisa escrita (ex: Um dia de folga, Vale-presente).
+          </p>
           <div className="flex flex-wrap gap-3">
             <div>
               <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">🥇 1º lugar</label>
               <input
                 name="premio1LugarSemanal"
                 placeholder="sem prêmio"
-                defaultValue={valorCentavos(premio1LugarSemanalCentavos)}
-                className="w-32 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                defaultValue={premio1LugarSemanal ?? ""}
+                className="w-40 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
               />
             </div>
             <div>
@@ -109,8 +108,8 @@ export function RankingConfigForm({
               <input
                 name="premio2LugarSemanal"
                 placeholder="sem prêmio"
-                defaultValue={valorCentavos(premio2LugarSemanalCentavos)}
-                className="w-32 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                defaultValue={premio2LugarSemanal ?? ""}
+                className="w-40 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
               />
             </div>
             <div>
@@ -118,23 +117,23 @@ export function RankingConfigForm({
               <input
                 name="premio3LugarSemanal"
                 placeholder="sem prêmio"
-                defaultValue={valorCentavos(premio3LugarSemanalCentavos)}
-                className="w-32 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                defaultValue={premio3LugarSemanal ?? ""}
+                className="w-40 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
               />
             </div>
           </div>
         </div>
 
         <div>
-          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Prêmio mensal (R$, opcional)</p>
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Prêmio mensal (opcional)</p>
           <div className="flex flex-wrap gap-3">
             <div>
               <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">🥇 1º lugar</label>
               <input
                 name="premio1LugarMensal"
                 placeholder="sem prêmio"
-                defaultValue={valorCentavos(premio1LugarMensalCentavos)}
-                className="w-32 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                defaultValue={premio1LugarMensal ?? ""}
+                className="w-40 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
               />
             </div>
             <div>
@@ -142,8 +141,8 @@ export function RankingConfigForm({
               <input
                 name="premio2LugarMensal"
                 placeholder="sem prêmio"
-                defaultValue={valorCentavos(premio2LugarMensalCentavos)}
-                className="w-32 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                defaultValue={premio2LugarMensal ?? ""}
+                className="w-40 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
               />
             </div>
             <div>
@@ -151,8 +150,8 @@ export function RankingConfigForm({
               <input
                 name="premio3LugarMensal"
                 placeholder="sem prêmio"
-                defaultValue={valorCentavos(premio3LugarMensalCentavos)}
-                className="w-32 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                defaultValue={premio3LugarMensal ?? ""}
+                className="w-40 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
               />
             </div>
           </div>

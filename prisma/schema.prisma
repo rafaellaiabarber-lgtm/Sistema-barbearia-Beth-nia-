@@ -329,12 +329,12 @@ model ConfiguracaoRanking {
   pontosPorVendaProduto        Int      @default(1)
   pontosPorAssinatura          Int      @default(1)
   pontosPorIndicacaoConvertida Int      @default(1)
-  premio1LugarSemanalCentavos  Int?
-  premio2LugarSemanalCentavos  Int?
-  premio3LugarSemanalCentavos  Int?
-  premio1LugarMensalCentavos   Int?
-  premio2LugarMensalCentavos   Int?
-  premio3LugarMensalCentavos   Int?
+  premio1LugarSemanal          String?
+  premio2LugarSemanal          String?
+  premio3LugarSemanal          String?
+  premio1LugarMensal           String?
+  premio2LugarMensal           String?
+  premio3LugarMensal           String?
   pontuacaoMinimaPremio        Int?
   atualizadoEm                 DateTime @updatedAt
 }
