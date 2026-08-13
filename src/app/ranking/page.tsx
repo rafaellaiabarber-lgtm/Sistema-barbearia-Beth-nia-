@@ -55,13 +55,19 @@ async function buscarContagens(
   }));
 }
 
-export default async function RankingPage() {
+export default async function RankingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ dataInicio?: string; dataFim?: string }>;
+}) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
   const souAdmin = session.role === "ADMIN";
+  const { dataInicio, dataFim } = await searchParams;
 
   const agora = new Date();
   const semana = calcularIntervalo("semana", agora);
   const mes = calcularIntervalo("mes", agora);
+  const personalizado = dataInicio ? calcularIntervalo("personalizado", agora, { dataInicio, dataFim }) : null;
 
   const [barbeirosAtivos, configuracao] = await Promise.all([
     prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
@@ -75,13 +81,16 @@ export default async function RankingPage() {
     pontosPorIndicacaoConvertida: configuracao?.pontosPorIndicacaoConvertida ?? 1,
   };
 
-  const [contagensSemana, contagensMes] = await Promise.all([
+  const [contagensSemana, contagensMes, contagensPersonalizado] = await Promise.all([
     buscarContagens(semana.inicio, semana.fim, barbeirosAtivos),
     buscarContagens(mes.inicio, mes.fim, barbeirosAtivos),
+    personalizado ? buscarContagens(personalizado.inicio, personalizado.fim, barbeirosAtivos) : null,
   ]);
 
   const rankingSemanal = montarRanking(contagensSemana, pontos);
   const rankingMensal = montarRanking(contagensMes, pontos);
+  const rankingPersonalizado = contagensPersonalizado ? montarRanking(contagensPersonalizado, pontos) : null;
+  const premiosVazio = { premio1Centavos: null, premio2Centavos: null, premio3Centavos: null };
 
   const premiosSemanal = {
     premio1Centavos: configuracao?.premio1LugarSemanalCentavos ?? null,
@@ -113,6 +122,46 @@ export default async function RankingPage() {
           </Link>
         </div>
       </header>
+
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold mb-3">Ranking de um período escolhido</h2>
+        <form method="get" className="flex flex-wrap items-end gap-3 mb-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">De</label>
+            <input
+              type="date"
+              name="dataInicio"
+              defaultValue={dataInicio}
+              required
+              className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Até</label>
+            <input
+              type="date"
+              name="dataFim"
+              defaultValue={dataFim}
+              className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+            />
+          </div>
+          <button type="submit" className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
+            Ver ranking
+          </button>
+          {personalizado && (
+            <Link href="/ranking" className="text-slate-400 dark:text-slate-500 hover:text-slate-700 text-sm">
+              Limpar
+            </Link>
+          )}
+        </form>
+        {rankingPersonalizado ? (
+          <RankingLista ranking={rankingPersonalizado} premios={premiosVazio} />
+        ) : (
+          <p className="text-slate-400 dark:text-slate-500 text-sm">
+            Escolhe uma data de início pra ver o ranking só daquele período — de sexta a domingo, de uma semana específica, etc.
+          </p>
+        )}
+      </section>
 
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">Ranking da semana</h2>
