@@ -8,6 +8,10 @@ export function comissaoServicos(
   );
 }
 
+export function comissaoProdutos(vendas: { totalCentavos: number; comissaoPercentual: number | null }[]) {
+  return vendas.reduce((soma, v) => soma + Math.round((v.totalCentavos * (v.comissaoPercentual ?? 0)) / 100), 0);
+}
+
 export function lucroServicos(
   servicos: { precoCentavos: number; custoCentavos: number; comissaoPercentual: number | null }[],
   comissaoPadraoBarbeiro: number

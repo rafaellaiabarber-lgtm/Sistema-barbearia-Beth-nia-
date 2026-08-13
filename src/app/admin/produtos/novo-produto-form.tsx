@@ -47,6 +47,17 @@ export function NovoProdutoForm() {
           className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-28"
         />
       </div>
+      <div>
+        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Comissão (%, opcional)</label>
+        <input
+          name="comissao"
+          type="number"
+          min={0}
+          max={100}
+          placeholder="sem comissão"
+          className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-32"
+        />
+      </div>
       <button
         type="submit"
         disabled={pendente}

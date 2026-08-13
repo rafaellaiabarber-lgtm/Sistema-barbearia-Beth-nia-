@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatarReais, LABEL_FORMA_PAGAMENTO, LABEL_CATEGORIA_DESPESA } from "@/lib/format";
 import { type Periodo, calcularIntervalo } from "@/lib/periodo";
-import { comissaoServicos } from "@/lib/comissao";
+import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 import { BotaoExcluirAtendimento } from "../excluir-atendimento-button";
 import { TaxaCartaoForm } from "./taxa-cartao-form";
@@ -24,7 +24,7 @@ export default async function FinanceiroPage({
       : "hoje";
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
 
-  const [atendimentos, servicos, barbeiros, movimentos, configuracaoFinanceira] = await Promise.all([
+  const [atendimentos, servicos, barbeiros, movimentos, configuracaoFinanceira, vendasProduto] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
         status: "CONCLUIDO",
@@ -39,6 +39,9 @@ export default async function FinanceiroPage({
     prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
     prisma.movimentoCaixa.findMany({ where: { criadoEm: { gte: inicio, lte: fim } } }),
     prisma.configuracaoFinanceira.findUnique({ where: { id: "singleton" } }),
+    prisma.vendaProduto.findMany({
+      where: { criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
+    }),
   ]);
 
   const totalCentavos = atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
@@ -82,6 +85,19 @@ export default async function FinanceiroPage({
     atual.comissaoCentavos += comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual);
     atual.qtd += 1;
     porBarbeiro.set(a.barbeiro.id, atual);
+  }
+  const barbeirosPorId = new Map(barbeiros.map((b) => [b.id, b]));
+  const vendasPorBarbeiro = new Map<string, typeof vendasProduto>();
+  for (const v of vendasProduto) {
+    if (!v.barbeiroId) continue;
+    vendasPorBarbeiro.set(v.barbeiroId, [...(vendasPorBarbeiro.get(v.barbeiroId) ?? []), v]);
+  }
+  for (const [barbeiroId, vendas] of vendasPorBarbeiro) {
+    const barbeiro = barbeirosPorId.get(barbeiroId);
+    if (!barbeiro) continue;
+    const atual = porBarbeiro.get(barbeiroId) ?? { nome: barbeiro.nome, totalCentavos: 0, comissaoCentavos: 0, qtd: 0 };
+    atual.comissaoCentavos += comissaoProdutos(vendas);
+    porBarbeiro.set(barbeiroId, atual);
   }
 
   return (

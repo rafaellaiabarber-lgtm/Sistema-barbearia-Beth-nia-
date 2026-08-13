@@ -4,6 +4,7 @@ export type ItemProgresso = {
   quantidadeAlvo: number;
   quantidadeAtual: number;
   precoCentavos: number;
+  comissaoPercentual: number;
 };
 
 export function itemCompleto(item: ItemProgresso): boolean {
@@ -19,5 +20,8 @@ export function quantidadeFaltando(item: ItemProgresso): number {
 }
 
 export function valorPotencialCentavos(itens: ItemProgresso[]): number {
-  return itens.reduce((soma, item) => soma + quantidadeFaltando(item) * item.precoCentavos, 0);
+  return itens.reduce(
+    (soma, item) => soma + Math.round((quantidadeFaltando(item) * item.precoCentavos * item.comissaoPercentual) / 100),
+    0
+  );
 }

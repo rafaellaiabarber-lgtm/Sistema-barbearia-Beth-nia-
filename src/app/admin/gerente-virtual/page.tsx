@@ -1,26 +1,26 @@
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo, intervaloAnterior } from "@/lib/periodo";
-import { comissaoServicos } from "@/lib/comissao";
+import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { calcularMargem, calcularTicketMedio, gerarAlertas, calcularPrevisao, type ComparativoMes } from "@/lib/gerente-virtual";
 import { MetaMensalForm } from "./meta-mensal-form";
 import { ClienteInativoRow } from "./cliente-inativo-row";
 
 async function buscarComparativo(inicio: Date, fim: Date): Promise<ComparativoMes> {
-  const [atendimentos, movimentos, clientesNovos] = await Promise.all([
+  const [atendimentos, movimentos, clientesNovos, vendasProduto] = await Promise.all([
     prisma.atendimento.findMany({
       where: { status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim } },
       include: { barbeiro: true, servicos: true },
     }),
     prisma.movimentoCaixa.findMany({ where: { tipo: "SAIDA", criadoEm: { gte: inicio, lte: fim } } }),
     prisma.cliente.count({ where: { criadoEm: { gte: inicio, lte: fim } } }),
+    prisma.vendaProduto.findMany({ where: { criadoEm: { gte: inicio, lte: fim } } }),
   ]);
 
   const faturamentoCentavos = atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
-  const comissoesCentavos = atendimentos.reduce(
-    (s, a) => s + (a.barbeiro ? comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual) : 0),
-    0
-  );
+  const comissoesCentavos =
+    atendimentos.reduce((s, a) => s + (a.barbeiro ? comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual) : 0), 0) +
+    comissaoProdutos(vendasProduto);
   const despesasCentavos = movimentos.reduce((s, m) => s + m.valorCentavos, 0);
 
   return {

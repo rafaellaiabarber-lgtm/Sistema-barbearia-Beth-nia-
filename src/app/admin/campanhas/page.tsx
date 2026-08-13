@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NovaCampanhaForm } from "./nova-campanha-form";
 import { CampanhaRow } from "./campanha-row";
 import type { ItemProgresso } from "@/lib/campanhas";
-import { buscarQuantidadeAtualItem } from "@/lib/campanhas-server";
+import { buscarQuantidadeAtualItem, comissaoPercentualItem } from "@/lib/campanhas-server";
 
 export default async function CampanhasPage() {
   const [barbeirosAtivos, produtosAtivos, servicosAtivos, campanhas] = await Promise.all([
@@ -24,6 +24,7 @@ export default async function CampanhasPage() {
           quantidadeAlvo: item.quantidadeAlvo,
           quantidadeAtual: await buscarQuantidadeAtualItem(item, c.barbeiroId, c.criadoEm),
           precoCentavos: item.produto?.precoCentavos ?? item.servico?.precoCentavos ?? 0,
+          comissaoPercentual: comissaoPercentualItem(item, c.barbeiro.comissaoPercentual),
         }))
       );
       return { id: c.id, titulo: c.titulo, ativa: c.ativa, barbeiroNome: c.barbeiro.nome, criadoEm: c.criadoEm, itens };

@@ -12,6 +12,7 @@ function revalidarRelatorios() {
   revalidatePath("/admin/fluxo-caixa");
   revalidatePath("/admin/dre");
   revalidatePath("/admin/metas");
+  revalidatePath("/admin/comissoes");
   revalidatePath("/ranking");
   revalidatePath("/admin/campanhas");
   revalidatePath("/fila");
@@ -52,6 +53,7 @@ export async function registrarVendaProduto(
         quantidade,
         precoUnitarioCentavos: produto.precoCentavos,
         totalCentavos,
+        comissaoPercentual: produto.comissaoPercentual,
         formaPagamento,
       },
     });
