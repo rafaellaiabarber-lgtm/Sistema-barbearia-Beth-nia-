@@ -180,38 +180,43 @@ export default async function FilaPage({
                 ))}
               </div>
 
-              <form
-                method="get"
-                className="flex flex-wrap items-end gap-3 mb-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3"
-              >
-                <div>
-                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">De</label>
-                  <input
-                    type="date"
-                    name="dataInicio"
-                    defaultValue={dataInicio}
-                    required
-                    className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Até</label>
-                  <input
-                    type="date"
-                    name="dataFim"
-                    defaultValue={dataFim}
-                    className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
-                  />
-                </div>
-                <button type="submit" className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
-                  Ver por data
-                </button>
-                {personalizado && (
-                  <Link href="/fila" className="text-slate-400 dark:text-slate-500 hover:text-slate-700 text-sm">
-                    Limpar
-                  </Link>
-                )}
-              </form>
+              <details className="mb-4" open={!!personalizado}>
+                <summary className="cursor-pointer text-sm text-blue-600 dark:text-blue-400 hover:underline select-none">
+                  Personalizar por data
+                </summary>
+                <form
+                  method="get"
+                  className="flex flex-wrap items-end gap-3 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3"
+                >
+                  <div>
+                    <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">De</label>
+                    <input
+                      type="date"
+                      name="dataInicio"
+                      defaultValue={dataInicio}
+                      required
+                      className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Até</label>
+                    <input
+                      type="date"
+                      name="dataFim"
+                      defaultValue={dataFim}
+                      className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+                    />
+                  </div>
+                  <button type="submit" className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
+                    Ver por data
+                  </button>
+                  {personalizado && (
+                    <Link href="/fila" className="text-slate-400 dark:text-slate-500 hover:text-slate-700 text-sm">
+                      Limpar
+                    </Link>
+                  )}
+                </form>
+              </details>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {comissaoPeriodo && (
