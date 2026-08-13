@@ -7,7 +7,7 @@ import { TecladoNumerico } from "./teclado-numerico";
 
 const estadoInicial: EntrarFilaState = {};
 
-type Etapa = "telefone" | "nome" | "barbeiro" | "acompanhante";
+type Etapa = "telefone" | "avisoPlano" | "nome" | "barbeiro" | "acompanhante";
 
 export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoUrl: string | null }) {
   const [estado, formAction, pendente] = useActionState(entrarNaFila, estadoInicial);
@@ -100,12 +100,50 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
                 setBoasVindas(false);
               }
               setClienteInfo(info);
-              setEtapa("nome");
+              setEtapa(info.planoAtivo && !info.planoCobertoHoje ? "avisoPlano" : "nome");
             }}
             className="w-full rounded-xl bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-bold text-lg py-4 transition-colors mt-6"
           >
             {buscandoNome ? "Verificando..." : "Continuar"}
           </button>
+        </div>
+      )}
+
+      {etapa === "avisoPlano" && (
+        <div>
+          <div className="rounded-2xl border-4 border-red-500 bg-red-950/70 p-6 mb-6 text-center">
+            <p className="text-red-400 text-3xl font-black mb-3 tracking-wide">⚠️ ATENÇÃO</p>
+            <p className="text-white text-xl font-bold mb-2">
+              Hoje o seu plano {clienteInfo?.planoAtivo} não cobre atendimento
+              {clienteInfo?.planoDiasTexto ? ` (cobre ${clienteInfo.planoDiasTexto})` : ""}.
+            </p>
+            <p className="text-red-100 text-lg font-semibold">
+              Para prosseguir, você vai pagar o corte avulso.
+            </p>
+          </div>
+          <p className="text-white text-xl font-semibold mb-4 text-center">Você concorda?</p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setEtapa("telefone");
+                setTelefone("");
+                setNome("");
+                setBoasVindas(false);
+                setClienteInfo(null);
+              }}
+              className="flex-1 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-bold text-lg py-4 transition-colors"
+            >
+              Não
+            </button>
+            <button
+              type="button"
+              onClick={() => setEtapa("nome")}
+              className="flex-1 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-lg py-4 transition-colors"
+            >
+              Sim, concordo
+            </button>
+          </div>
         </div>
       )}
 
@@ -126,8 +164,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
           )}
           {clienteInfo?.planoAtivo && !clienteInfo.planoCobertoHoje && (
             <p className="text-amber-400 text-sm font-semibold mb-3 text-center px-2">
-              🎫 Você tem o plano {clienteInfo.planoAtivo}, mas hoje não é dia coberto (cobre {clienteInfo.planoDiasTexto})
-              — hoje seria cobrado avulso.
+              🎫 Lembrete: hoje é avulso (plano {clienteInfo.planoAtivo} não cobre hoje).
             </p>
           )}
           <input
