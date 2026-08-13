@@ -7,6 +7,7 @@ import { logout } from "@/lib/actions/auth";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo } from "@/lib/periodo";
 import { comissaoServicos } from "@/lib/comissao";
+import { buscarCampanhasAtivasComProgresso } from "@/lib/campanhas-server";
 import { AutoRefresh } from "./auto-refresh";
 import { AtendendoAgora } from "./atendendo-agora";
 import { ThemeToggle } from "../theme-toggle";
@@ -48,6 +49,7 @@ export default async function FilaPage() {
     bateuMeta: boolean;
     bonificacaoCentavos: number | null;
   } | null = null;
+  const campanhasAtivas = session.barbeiroId ? await buscarCampanhasAtivasComProgresso(session.barbeiroId) : [];
 
   if (session.barbeiroId) {
     const hoje = calcularIntervalo("hoje");
@@ -115,6 +117,7 @@ export default async function FilaPage() {
           clienteNome={meuAtendimento.cliente.nome}
           chamadoEm={meuAtendimento.chamadoEm ?? meuAtendimento.criadoEm}
           servicos={servicosAtivos}
+          campanhas={campanhasAtivas}
         />
       ) : (
         <>

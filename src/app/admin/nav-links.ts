@@ -37,6 +37,7 @@ export const gruposNav: NavGrupo[] = [
       { href: "/fila", label: "Fila de atendimento", icone: "atendimentos" },
       { href: "/indicacoes", label: "Indicações", icone: "indicacoes" },
       { href: "/ranking", label: "Ranking", icone: "ranking" },
+      { href: "/admin/campanhas", label: "Campanhas de venda", icone: "campanhas" },
     ],
   },
   {
