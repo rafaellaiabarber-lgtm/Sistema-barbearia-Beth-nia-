@@ -23,6 +23,7 @@ export default async function CampanhasPage() {
           nome: item.produto?.nome ?? item.servico?.nome ?? "?",
           quantidadeAlvo: item.quantidadeAlvo,
           quantidadeAtual: await buscarQuantidadeAtualItem(item, c.barbeiroId, c.criadoEm),
+          precoCentavos: item.produto?.precoCentavos ?? item.servico?.precoCentavos ?? 0,
         }))
       );
       return { id: c.id, titulo: c.titulo, ativa: c.ativa, barbeiroNome: c.barbeiro.nome, criadoEm: c.criadoEm, itens };

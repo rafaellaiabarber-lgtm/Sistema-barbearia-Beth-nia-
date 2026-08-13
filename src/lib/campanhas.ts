@@ -3,6 +3,7 @@ export type ItemProgresso = {
   nome: string;
   quantidadeAlvo: number;
   quantidadeAtual: number;
+  precoCentavos: number;
 };
 
 export function itemCompleto(item: ItemProgresso): boolean {
@@ -11,4 +12,12 @@ export function itemCompleto(item: ItemProgresso): boolean {
 
 export function campanhaCompleta(itens: ItemProgresso[]): boolean {
   return itens.length > 0 && itens.every(itemCompleto);
+}
+
+export function quantidadeFaltando(item: ItemProgresso): number {
+  return Math.max(item.quantidadeAlvo - item.quantidadeAtual, 0);
+}
+
+export function valorPotencialCentavos(itens: ItemProgresso[]): number {
+  return itens.reduce((soma, item) => soma + quantidadeFaltando(item) * item.precoCentavos, 0);
 }
