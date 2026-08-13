@@ -347,16 +347,6 @@ export default async function FilaPage({
             </div>
           )}
 
-          {session.barbeiroId && itensFaltandoCampanha.length > 0 && (
-            <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-900 rounded-xl p-4 mb-6">
-              <p className="text-amber-900 dark:text-amber-100 text-sm">
-                💡 Hoje, se vender {itensFaltandoCampanha.map((i) => `${quantidadeFaltando(i)}x ${i.nome}`).join(", ")}, você
-                aumenta <span className="font-semibold">{formatarReais(potencialCampanhaCentavos)}</span> no seu faturamento.
-                Não esqueça de oferecer!
-              </p>
-            </div>
-          )}
-
           {session.barbeiroId && (
             <section className="mb-8">
               <h2 className="text-lg font-semibold mb-3">Meu atendimento</h2>
