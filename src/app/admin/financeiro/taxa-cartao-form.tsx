@@ -23,7 +23,7 @@ export function TaxaCartaoForm({ taxaCartaoPercentualX100 }: { taxaCartaoPercent
       <button
         type="submit"
         disabled={pendente}
-        className="text-sm text-lime-600 dark:text-lime-400 hover:underline disabled:opacity-60 py-1.5"
+        className="text-sm text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-60 py-1.5"
       >
         {pendente ? "..." : "Salvar"}
       </button>

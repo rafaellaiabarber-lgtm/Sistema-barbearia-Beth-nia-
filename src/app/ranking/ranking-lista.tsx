@@ -44,7 +44,7 @@ export function RankingLista({
             >
               <p className="text-3xl mb-1">{MEDALHA[p.posicao]}</p>
               <p className="font-semibold">{p.nome}</p>
-              <p className="text-lime-600 dark:text-lime-400 font-bold text-lg">{p.pontos} pts</p>
+              <p className="text-blue-600 dark:text-blue-400 font-bold text-lg">{p.pontos} pts</p>
               {premio !== null && (
                 <p className="text-green-600 text-xs font-medium mt-1">Prêmio: {premio}</p>
               )}

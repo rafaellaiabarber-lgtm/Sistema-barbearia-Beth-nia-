@@ -73,7 +73,7 @@ export function NovaContaForm({ tipo }: { tipo: "PAGAR" | "RECEBER" }) {
       <button
         type="submit"
         disabled={pendente}
-        className="rounded-lg bg-lime-400 hover:bg-lime-300 disabled:opacity-60 text-slate-950 font-semibold px-4 py-2 text-sm"
+        className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
       >
         {pendente ? "Lançando..." : tipo === "PAGAR" ? "Adicionar conta a pagar" : "Adicionar conta a receber"}
       </button>

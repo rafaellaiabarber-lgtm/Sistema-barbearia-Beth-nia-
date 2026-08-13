@@ -23,7 +23,7 @@ export function MetaMensalForm({ metaAtual }: { metaAtual: number | null }) {
       <button
         type="submit"
         disabled={pendente}
-        className="rounded-lg bg-lime-400 hover:bg-lime-300 disabled:opacity-60 text-slate-950 text-sm font-semibold px-4 py-2"
+        className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold px-4 py-2"
       >
         {pendente ? "Salvando..." : "Salvar meta"}
       </button>

@@ -160,7 +160,7 @@ export function MetaCard({
             <button
               type="submit"
               disabled={pendente}
-              className="rounded-lg bg-lime-400 hover:bg-lime-300 disabled:opacity-60 text-slate-950 text-sm font-semibold px-4 py-2"
+              className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold px-4 py-2"
             >
               {pendente ? "Salvando..." : "Salvar"}
             </button>
@@ -182,11 +182,11 @@ export function MetaCard({
       <div className="flex items-center justify-between mb-1">
         <p className="font-semibold">{LABEL_TIPO_META[tipo]}</p>
         <div className="flex items-center gap-3">
-          <button type="button" onClick={() => setEditando(true)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400">
+          <button type="button" onClick={() => setEditando(true)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">
             Editar
           </button>
           <form action={alternarAtivaMeta.bind(null, metaId, !ativa)}>
-            <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400">{ativa ? "Desativar" : "Ativar"}</button>
+            <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">{ativa ? "Desativar" : "Ativar"}</button>
           </form>
           <form
             action={excluirMeta.bind(null, metaId)}
@@ -200,7 +200,7 @@ export function MetaCard({
       </div>
 
       <div className="flex flex-wrap gap-1 mb-3">
-        <span className="inline-block rounded-full bg-lime-50 dark:bg-lime-950 text-lime-700 text-xs px-2 py-0.5">
+        <span className="inline-block rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 text-xs px-2 py-0.5">
           Período: {periodoTexto}
         </span>
         {escopoTexto && (
@@ -226,7 +226,7 @@ export function MetaCard({
 
       <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
         <div
-          className={`h-full rounded-full ${atual ? "bg-green-500" : "bg-lime-500"}`}
+          className={`h-full rounded-full ${atual ? "bg-green-500" : "bg-blue-500"}`}
           style={{ width: `${percentualAteProximo}%` }}
         />
       </div>

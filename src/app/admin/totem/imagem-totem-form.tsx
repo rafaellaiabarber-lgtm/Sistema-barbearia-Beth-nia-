@@ -60,7 +60,7 @@ export function ImagemTotemForm({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={pendente}
-          className="text-sm rounded-lg bg-lime-400 hover:bg-lime-300 disabled:opacity-60 text-slate-950 font-semibold px-3 py-2"
+          className="text-sm rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-3 py-2"
         >
           {pendente ? "Enviando..." : imagemUrl ? "Trocar imagem" : "Enviar imagem"}
         </button>

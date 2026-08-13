@@ -62,7 +62,7 @@ export function ProdutoRow({ produto }: { produto: Produto }) {
           <button
             type="submit"
             disabled={pendente}
-            className="rounded-lg bg-lime-400 hover:bg-lime-300 disabled:opacity-60 text-slate-950 text-sm font-semibold px-3 py-2"
+            className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold px-3 py-2"
           >
             {pendente ? "Salvando..." : "Salvar"}
           </button>
@@ -98,12 +98,12 @@ export function ProdutoRow({ produto }: { produto: Produto }) {
             <button
               type="button"
               onClick={() => setEditando(true)}
-              className="text-sm text-slate-600 dark:text-slate-300 hover:text-lime-600 dark:hover:text-lime-400"
+              className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400"
             >
               Editar
             </button>
             <form action={alternarAtivoProduto.bind(null, produto.id, !produto.ativo)}>
-              <button className="text-sm text-slate-600 dark:text-slate-300 hover:text-lime-600 dark:hover:text-lime-400">
+              <button className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400">
                 {produto.ativo ? "Desativar" : "Ativar"}
               </button>
             </form>

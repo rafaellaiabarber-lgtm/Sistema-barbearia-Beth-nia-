@@ -48,10 +48,10 @@ export default async function IndicacoesPage({
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggle className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800" />
-          <Link href="/ranking" className="text-lime-600 dark:text-lime-400 hover:underline text-sm">
+          <Link href="/ranking" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
             Ranking
           </Link>
-          <Link href={session.role === "ADMIN" ? "/admin" : "/fila"} className="text-lime-600 dark:text-lime-400 hover:underline text-sm">
+          <Link href={session.role === "ADMIN" ? "/admin" : "/fila"} className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
             {session.role === "ADMIN" ? "Painel admin" : "Voltar pra fila"}
           </Link>
         </div>
@@ -59,7 +59,7 @@ export default async function IndicacoesPage({
 
       <div className="grid grid-cols-2 gap-4 mb-6 max-w-md">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-2xl font-bold text-lime-600 dark:text-lime-400">{totalPendentes}</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{totalPendentes}</p>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Pendente(s)</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
@@ -100,7 +100,7 @@ export default async function IndicacoesPage({
             </select>
           </div>
         )}
-        <button type="submit" className="rounded-lg bg-lime-400 hover:bg-lime-300 text-slate-950 font-semibold px-4 py-2 text-sm">
+        <button type="submit" className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
           Filtrar
         </button>
       </form>
