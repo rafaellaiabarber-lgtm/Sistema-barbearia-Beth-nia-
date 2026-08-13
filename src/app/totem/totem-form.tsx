@@ -39,11 +39,11 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
           <img src={logoUrl} alt="Logo" className="h-14 mx-auto mb-4 object-contain" />
         )}
         <p className="text-slate-300 text-lg mb-2">Você entrou na fila!</p>
-        <p className="text-7xl font-black text-blue-400 mb-4">{estado.posicao}º</p>
+        <p className="text-7xl font-black text-lime-400 mb-4">{estado.posicao}º</p>
         {estado.acompanhanteNome && estado.acompanhantePosicao && (
           <p className="text-slate-300 mb-2">
             {estado.acompanhanteNome} também entrou na fila, na posição{" "}
-            <span className="font-bold text-blue-400">{estado.acompanhantePosicao}º</span>.
+            <span className="font-bold text-lime-400">{estado.acompanhantePosicao}º</span>.
           </p>
         )}
         <p className="text-slate-200 mb-8">
@@ -51,7 +51,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
         </p>
         <a
           href="/totem"
-          className="inline-block rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-6 py-3 transition-colors"
+          className="inline-block rounded-xl bg-lime-600 hover:bg-lime-700 text-slate-950 font-bold text-lg px-6 py-3 transition-colors"
         >
           Concluir
         </a>
@@ -153,7 +153,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
             Como te chamamos?
           </p>
           {boasVindas && (
-            <p className="text-blue-400 text-sm mb-3 text-center">
+            <p className="text-lime-400 text-sm mb-3 text-center">
               Bem-vindo(a) de volta! Confirme ou edite seu nome abaixo.
             </p>
           )}
@@ -176,8 +176,8 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               setNome(e.target.value);
               setBoasVindas(false);
             }}
-            className={`w-full rounded-xl bg-white border text-slate-900 text-2xl text-center px-4 py-4 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              boasVindas ? "border-blue-400" : "border-slate-300"
+            className={`w-full rounded-xl bg-white border text-slate-900 text-2xl text-center px-4 py-4 mb-6 focus:outline-none focus:ring-2 focus:ring-lime-500 ${
+              boasVindas ? "border-lime-400" : "border-slate-300"
             }`}
           />
           <div className="flex gap-3">
@@ -289,7 +289,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               }}
               className={`flex-1 rounded-xl border-2 py-4 font-semibold transition-colors ${
                 temAcompanhante === false
-                  ? "border-blue-500 bg-blue-50 text-blue-700"
+                  ? "border-lime-500 bg-lime-50 text-lime-700"
                   : "border-white/20 text-slate-200 hover:border-white/40"
               }`}
             >
@@ -300,7 +300,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               onClick={() => setTemAcompanhante(true)}
               className={`flex-1 rounded-xl border-2 py-4 font-semibold transition-colors ${
                 temAcompanhante === true
-                  ? "border-blue-500 bg-blue-50 text-blue-700"
+                  ? "border-lime-500 bg-lime-50 text-lime-700"
                   : "border-white/20 text-slate-200 hover:border-white/40"
               }`}
             >
@@ -316,7 +316,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
                 placeholder="Nome da pessoa"
                 value={acompanhanteNome}
                 onChange={(e) => setAcompanhanteNome(e.target.value)}
-                className="w-full rounded-xl bg-white border border-slate-300 text-slate-900 text-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-xl bg-white border border-slate-300 text-slate-900 text-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-lime-500"
               />
               <input
                 type="tel"
@@ -324,7 +324,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
                 placeholder="Celular (opcional)"
                 value={acompanhanteTelefone}
                 onChange={(e) => setAcompanhanteTelefone(e.target.value)}
-                className="w-full rounded-xl bg-white border border-slate-300 text-slate-900 text-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-xl bg-white border border-slate-300 text-slate-900 text-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-500"
               />
             </div>
           )}

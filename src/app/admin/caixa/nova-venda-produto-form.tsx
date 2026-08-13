@@ -89,7 +89,7 @@ export function NovaVendaProdutoForm({ barbeiros, produtos }: { barbeiros: Barbe
         </div>
 
         {produtoSelecionado && (
-          <p className="text-blue-600 font-semibold mb-3">
+          <p className="text-lime-600 font-semibold mb-3">
             Preço unitário: {formatarReais(produtoSelecionado.precoCentavos)}
           </p>
         )}
@@ -104,7 +104,7 @@ export function NovaVendaProdutoForm({ barbeiros, produtos }: { barbeiros: Barbe
         <button
           type="submit"
           disabled={pendente}
-          className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+          className="rounded-lg bg-lime-600 hover:bg-lime-700 disabled:opacity-60 text-slate-950 font-semibold px-4 py-2 text-sm"
         >
           {pendente ? "Registrando..." : "Registrar venda"}
         </button>

@@ -82,7 +82,7 @@ export function NivelInputs({
           </div>
         ))}
       </div>
-      <button type="button" onClick={adicionar} className="text-blue-600 hover:underline text-sm">
+      <button type="button" onClick={adicionar} className="text-lime-600 hover:underline text-sm">
         + Adicionar nível
       </button>
     </div>

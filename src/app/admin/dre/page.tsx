@@ -129,17 +129,17 @@ export default async function DrePage({
             key={l.label}
             className={`flex items-center justify-between px-5 py-3 text-sm ${
               l.subtotal ? "bg-slate-50 dark:bg-slate-950 font-semibold border-t border-b border-slate-200 dark:border-slate-800" : ""
-            } ${l.destaque ? "bg-blue-50 dark:bg-blue-950 font-bold text-base" : ""} ${
+            } ${l.destaque ? "bg-lime-50 dark:bg-lime-950 font-bold text-base" : ""} ${
               !l.subtotal && !l.destaque ? "border-b border-slate-100 dark:border-slate-800 last:border-b-0" : ""
             }`}
           >
-            <span className={l.destaque ? "text-blue-900 dark:text-blue-200" : "text-slate-700 dark:text-slate-200"}>{l.label}</span>
+            <span className={l.destaque ? "text-lime-900 dark:text-lime-200" : "text-slate-700 dark:text-slate-200"}>{l.label}</span>
             <span
               className={
                 l.destaque
                   ? l.valorCentavos < 0
                     ? "text-red-600"
-                    : "text-blue-700"
+                    : "text-lime-700"
                   : l.valorCentavos < 0
                     ? "text-red-500"
                     : "text-slate-800 dark:text-slate-100"
@@ -153,7 +153,7 @@ export default async function DrePage({
 
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
         <p className="text-slate-500 dark:text-slate-400 text-sm">Margem líquida no período</p>
-        <p className={`text-2xl font-bold ${lucroLiquidoCentavos < 0 ? "text-red-600" : "text-blue-600"}`}>
+        <p className={`text-2xl font-bold ${lucroLiquidoCentavos < 0 ? "text-red-600" : "text-lime-600"}`}>
           {margemPercentual}%
         </p>
       </div>

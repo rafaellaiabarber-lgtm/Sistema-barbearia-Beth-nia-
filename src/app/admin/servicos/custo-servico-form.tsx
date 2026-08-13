@@ -28,7 +28,7 @@ export function CustoServicoForm({
       <button
         type="submit"
         disabled={pendente}
-        className="text-xs text-blue-600 hover:underline disabled:opacity-60"
+        className="text-xs text-lime-600 hover:underline disabled:opacity-60"
       >
         {pendente ? "..." : "Salvar"}
       </button>

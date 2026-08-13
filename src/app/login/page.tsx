@@ -26,7 +26,7 @@ export default function LoginPage() {
               type="text"
               autoComplete="username"
               required
-              className="w-full rounded-lg bg-white border border-slate-300 text-slate-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg bg-white border border-slate-300 text-slate-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-lime-500"
             />
           </div>
           <div>
@@ -39,7 +39,7 @@ export default function LoginPage() {
               type="password"
               autoComplete="current-password"
               required
-              className="w-full rounded-lg bg-white border border-slate-300 text-slate-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg bg-white border border-slate-300 text-slate-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-lime-500"
             />
           </div>
 
@@ -48,14 +48,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={pendente}
-            className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold py-2 transition-colors"
+            className="w-full rounded-lg bg-lime-600 hover:bg-lime-700 disabled:opacity-60 text-slate-950 font-semibold py-2 transition-colors"
           >
             {pendente ? "Entrando..." : "Entrar"}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <Link href="/totem" className="text-sm text-slate-500 hover:text-blue-600">
+          <Link href="/totem" className="text-sm text-slate-500 hover:text-lime-600">
             Sou cliente, quero entrar na fila →
           </Link>
         </div>

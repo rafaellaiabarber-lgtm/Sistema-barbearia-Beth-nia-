@@ -17,11 +17,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="pt-BR" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         <script
-          // Roda antes da hidratação pra evitar o "flash" da tela clara antes de aplicar o tema escuro salvo.
+          // Roda antes da hidratação pra evitar o "flash" da tela clara. Escuro é o padrão agora;
+          // só fica claro se a pessoa escolheu isso explicitamente antes (salvo em localStorage).
           dangerouslySetInnerHTML={{
             __html: `try {
               var tema = localStorage.getItem('tema');
-              if (tema === 'escuro' || (!tema && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+              if (tema !== 'claro') {
                 document.documentElement.classList.add('dark');
               }
             } catch (e) {}`,

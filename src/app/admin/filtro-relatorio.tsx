@@ -93,7 +93,7 @@ export function FiltroRelatorio({
       </div>
       <button
         type="submit"
-        className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm"
+        className="rounded-lg bg-lime-600 hover:bg-lime-700 text-slate-950 font-semibold px-4 py-2 text-sm"
       >
         Buscar
       </button>

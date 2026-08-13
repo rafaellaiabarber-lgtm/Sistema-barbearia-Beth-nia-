@@ -63,7 +63,7 @@ export function BarbeiroRow({ barbeiro }: { barbeiro: Barbeiro & { usuario: Usua
           <button
             type="submit"
             disabled={pendente}
-            className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold px-3 py-2"
+            className="rounded-lg bg-lime-600 hover:bg-lime-700 disabled:opacity-60 text-slate-950 text-sm font-semibold px-3 py-2"
           >
             {pendente ? "Salvando..." : "Salvar"}
           </button>
@@ -92,12 +92,12 @@ export function BarbeiroRow({ barbeiro }: { barbeiro: Barbeiro & { usuario: Usua
             <button
               type="button"
               onClick={() => setEditando(true)}
-              className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600"
+              className="text-sm text-slate-600 dark:text-slate-300 hover:text-lime-600"
             >
               Editar
             </button>
             <form action={alternarAtivoBarbeiro.bind(null, barbeiro.id, !barbeiro.ativo)}>
-              <button className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600">
+              <button className="text-sm text-slate-600 dark:text-slate-300 hover:text-lime-600">
                 {barbeiro.ativo ? "Desativar" : "Ativar"}
               </button>
             </form>

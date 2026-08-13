@@ -43,7 +43,7 @@ export function CampanhasVenda({
                       </div>
                       <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full ${feito ? "bg-green-500" : "bg-blue-500"}`}
+                          className={`h-full rounded-full ${feito ? "bg-green-500" : "bg-lime-500"}`}
                           style={{ width: `${percentual}%` }}
                         />
                       </div>

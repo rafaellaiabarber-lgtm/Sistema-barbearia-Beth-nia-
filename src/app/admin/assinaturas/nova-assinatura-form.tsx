@@ -136,7 +136,7 @@ export function NovaAssinaturaForm({ planos, barbeiros }: { planos: Plano[]; bar
                     key={s.telefone}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => selecionarSugestao(s)}
-                    className="block w-full text-left px-3 py-2 text-sm hover:bg-blue-50"
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-lime-50"
                   >
                     <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
                     <span className="block text-slate-400 dark:text-slate-500 text-xs">{s.telefone}</span>
@@ -193,7 +193,7 @@ export function NovaAssinaturaForm({ planos, barbeiros }: { planos: Plano[]; bar
         </div>
 
         {clienteEncontrado && (
-          <p className="text-blue-600 text-xs mb-3">Cliente já cadastrado — nome preenchido automaticamente.</p>
+          <p className="text-lime-600 text-xs mb-3">Cliente já cadastrado — nome preenchido automaticamente.</p>
         )}
 
         {estado.erro && <p className="text-red-600 text-sm mb-3">{estado.erro}</p>}
@@ -201,7 +201,7 @@ export function NovaAssinaturaForm({ planos, barbeiros }: { planos: Plano[]; bar
         <button
           type="submit"
           disabled={pendente}
-          className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+          className="rounded-lg bg-lime-600 hover:bg-lime-700 disabled:opacity-60 text-slate-950 font-semibold px-4 py-2 text-sm"
         >
           {pendente ? "Criando..." : "Criar assinatura"}
         </button>

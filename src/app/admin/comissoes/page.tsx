@@ -162,7 +162,7 @@ export default async function ComissoesPage({
                   </p>
                 </div>
                 <div className="text-right flex items-center gap-3">
-                  <p className="text-blue-600 font-bold text-lg">{formatarReais(b.comissaoCentavos)}</p>
+                  <p className="text-lime-600 font-bold text-lg">{formatarReais(b.comissaoCentavos)}</p>
                   {podeMarcarPago &&
                     (pago ? (
                       <form action={desmarcarComissaoPaga.bind(null, id, periodo as "hoje" | "semana" | "mes", chave)}>
@@ -180,7 +180,7 @@ export default async function ComissoesPage({
                           b.comissaoCentavos
                         )}
                       >
-                      <button className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-sm font-medium">
+                      <button className="rounded-lg bg-lime-600 hover:bg-lime-700 text-slate-950 px-3 py-1.5 text-sm font-medium">
                         Marcar como pago
                       </button>
                     </form>
@@ -200,7 +200,7 @@ export default async function ComissoesPage({
                   </div>
                   <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full ${percentualMeta >= 100 ? "bg-green-500" : "bg-blue-500"}`}
+                      className={`h-full rounded-full ${percentualMeta >= 100 ? "bg-green-500" : "bg-lime-500"}`}
                       style={{ width: `${Math.min(percentualMeta, 100)}%` }}
                     />
                   </div>
@@ -220,7 +220,7 @@ export default async function ComissoesPage({
             className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm shadow-sm"
           >
             <div className="flex items-center gap-3">
-              <span className="text-blue-600 font-bold w-6 text-center">{i + 1}º</span>
+              <span className="text-lime-600 font-bold w-6 text-center">{i + 1}º</span>
               <span className="font-medium">{r.nome}</span>
             </div>
             <div className="text-right">
