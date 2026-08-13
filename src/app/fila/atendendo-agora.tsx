@@ -18,12 +18,14 @@ export function AtendendoAgora({
   chamadoEm,
   servicos,
   campanhas,
+  comAvisoFixo,
 }: {
   atendimentoId: string;
   clienteNome: string;
   chamadoEm: Date;
   servicos: Servico[];
   campanhas: { id: string; titulo: string | null; itens: ItemProgresso[] }[];
+  comAvisoFixo?: boolean;
 }) {
   const [agora, setAgora] = useState(() => Date.now());
   const [finalizando, setFinalizando] = useState(false);
@@ -38,7 +40,7 @@ export function AtendendoAgora({
 
   if (finalizando) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center px-4">
+      <div className={`min-h-[70vh] flex flex-col items-center justify-center px-4 ${comAvisoFixo ? "pb-16" : ""}`}>
         <div className="w-full max-w-md">
           <p className="text-slate-500 dark:text-slate-400 text-center mb-4">
             Finalizando atendimento de <span className="font-semibold text-slate-900 dark:text-white">{clienteNome}</span>
@@ -59,7 +61,7 @@ export function AtendendoAgora({
   }
 
   return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
+    <div className={`min-h-[70vh] flex flex-col items-center justify-center text-center px-4 ${comAvisoFixo ? "pb-16" : ""}`}>
       <p className="text-slate-500 dark:text-slate-400 text-lg mb-2">Atendendo agora</p>
       <p className="text-4xl font-black text-slate-900 dark:text-white mb-4">{clienteNome}</p>
       <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Iniciado às {horaInicio}</p>

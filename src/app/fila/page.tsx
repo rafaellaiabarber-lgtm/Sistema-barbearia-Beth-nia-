@@ -136,8 +136,14 @@ export default async function FilaPage({
     }
   }
 
+  const mostrarAvisoCampanha = !!session.barbeiroId && itensFaltandoCampanha.length > 0;
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-6">
+    <div
+      className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-6 ${
+        mostrarAvisoCampanha ? "pb-28" : ""
+      }`}
+    >
       <AutoRefresh />
       <header className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <div>
@@ -170,6 +176,7 @@ export default async function FilaPage({
           chamadoEm={meuAtendimento.chamadoEm ?? meuAtendimento.criadoEm}
           servicos={servicosAtivos}
           campanhas={campanhasAtivas}
+          comAvisoFixo={mostrarAvisoCampanha}
         />
       ) : (
         <>
@@ -293,16 +300,6 @@ export default async function FilaPage({
             </div>
           )}
 
-          {session.barbeiroId && itensFaltandoCampanha.length > 0 && (
-            <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-900 rounded-xl p-4 mb-6">
-              <p className="text-amber-900 dark:text-amber-100 text-sm">
-                💡 Hoje, se vender {itensFaltandoCampanha.map((i) => `${quantidadeFaltando(i)}x ${i.nome}`).join(", ")}, você
-                aumenta <span className="font-semibold">{formatarReais(potencialCampanhaCentavos)}</span> no seu faturamento.
-                Não esqueça de oferecer!
-              </p>
-            </div>
-          )}
-
           {session.barbeiroId && (
             <section className="mb-8">
               <h2 className="text-lg font-semibold mb-3">Meu atendimento</h2>
@@ -392,6 +389,16 @@ export default async function FilaPage({
             )}
           </section>
         </>
+      )}
+
+      {mostrarAvisoCampanha && (
+        <div className="fixed inset-x-0 bottom-0 z-50 bg-red-600 text-white px-4 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.2)]">
+          <p className="text-sm max-w-3xl mx-auto">
+            🔴 Hoje, se vender {itensFaltandoCampanha.map((i) => `${quantidadeFaltando(i)}x ${i.nome}`).join(", ")}, você
+            aumenta <span className="font-semibold">{formatarReais(potencialCampanhaCentavos)}</span> no seu faturamento.
+            Não esqueça de oferecer!
+          </p>
+        </div>
       )}
     </div>
   );
