@@ -10,6 +10,7 @@ export type AssinaturaState = { erro?: string; sucesso?: boolean };
 function revalidarPaginas() {
   revalidatePath("/admin/assinaturas");
   revalidatePath("/admin");
+  revalidatePath("/ranking");
 }
 
 export async function criarAssinatura(

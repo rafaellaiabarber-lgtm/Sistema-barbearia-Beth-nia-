@@ -9,6 +9,7 @@ export type CampanhaState = { erro?: string };
 function revalidar() {
   revalidatePath("/admin/campanhas");
   revalidatePath("/fila");
+  revalidatePath("/ranking");
 }
 
 export async function criarCampanha(_prevState: CampanhaState, formData: FormData): Promise<CampanhaState> {
