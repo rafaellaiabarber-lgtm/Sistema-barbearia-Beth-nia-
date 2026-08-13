@@ -12,16 +12,18 @@ import { NovaAssinaturaForm } from "./nova-assinatura-form";
 export default async function AssinaturasPage() {
   const competencia = competenciaAtual();
 
-  const [assinaturas, planosAtivos] = await Promise.all([
+  const [assinaturas, planosAtivos, barbeirosAtivos] = await Promise.all([
     prisma.assinatura.findMany({
       include: {
         cliente: true,
         plano: true,
+        barbeiro: true,
         pagamentos: { where: { competencia } },
       },
       orderBy: [{ status: "asc" }, { criadoEm: "desc" }],
     }),
     prisma.plano.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
   ]);
 
   const ativas = assinaturas.filter((a) => a.status === "ATIVA");
@@ -44,7 +46,7 @@ export default async function AssinaturasPage() {
         </div>
       </div>
 
-      <NovaAssinaturaForm planos={planosAtivos} />
+      <NovaAssinaturaForm planos={planosAtivos} barbeiros={barbeirosAtivos} />
 
       <div className="space-y-2">
         {assinaturas.map((a) => {
@@ -60,7 +62,8 @@ export default async function AssinaturasPage() {
               <div>
                 <p className="font-semibold">{a.cliente.nome}</p>
                 <p className="text-slate-500 dark:text-slate-400 text-sm">
-                  {a.plano.nome} — {formatarReais(a.plano.precoCentavos)}/mês · vence dia {a.diaVencimento} ·{" "}
+                  {a.plano.nome} — {formatarReais(a.plano.precoCentavos)}/mês · vence dia {a.diaVencimento}
+                  {a.barbeiro ? ` · vendido por ${a.barbeiro.nome}` : ""} ·{" "}
                   {a.status === "CANCELADA" ? (
                     <span className="text-slate-400 dark:text-slate-500">cancelada</span>
                   ) : pago ? (

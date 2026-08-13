@@ -48,6 +48,9 @@ export default async function IndicacoesPage({
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggle className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800" />
+          <Link href="/ranking" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
+            Ranking
+          </Link>
           <Link href={session.role === "ADMIN" ? "/admin" : "/fila"} className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
             {session.role === "ADMIN" ? "Painel admin" : "Voltar pra fila"}
           </Link>
@@ -110,6 +113,7 @@ export default async function IndicacoesPage({
             nome={i.nome}
             telefone={i.telefone}
             contatada={i.contatada}
+            convertida={i.convertida}
             barbeiroNome={souAdmin ? i.barbeiro.nome : null}
             criadoEm={i.criadoEm}
           />

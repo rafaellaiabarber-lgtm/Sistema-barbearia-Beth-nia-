@@ -21,6 +21,7 @@ export async function criarAssinatura(
   const nome = String(formData.get("nome") ?? "").trim();
   const telefone = String(formData.get("telefone") ?? "").trim();
   const planoId = String(formData.get("planoId") ?? "").trim();
+  const barbeiroId = String(formData.get("barbeiroId") ?? "").trim() || null;
   const diaVencimento = Number(formData.get("diaVencimento") ?? 5);
 
   if (!nome) return { erro: "Informe o nome do cliente." };
@@ -45,7 +46,7 @@ export async function criarAssinatura(
   if (jaTemAtiva) return { erro: "Esse cliente já tem uma assinatura ativa." };
 
   await prisma.assinatura.create({
-    data: { clienteId: cliente.id, planoId, diaVencimento: Math.round(diaVencimento), status: "ATIVA" },
+    data: { clienteId: cliente.id, planoId, barbeiroId, diaVencimento: Math.round(diaVencimento), status: "ATIVA" },
   });
 
   revalidarPaginas();
