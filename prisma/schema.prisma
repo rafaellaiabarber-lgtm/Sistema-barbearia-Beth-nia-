@@ -311,6 +311,7 @@ model ConfiguracaoRanking {
   premio1LugarMensalCentavos   Int?
   premio2LugarMensalCentavos   Int?
   premio3LugarMensalCentavos   Int?
+  pontuacaoMinimaPremio        Int?
   atualizadoEm                 DateTime @updatedAt
 }
 
