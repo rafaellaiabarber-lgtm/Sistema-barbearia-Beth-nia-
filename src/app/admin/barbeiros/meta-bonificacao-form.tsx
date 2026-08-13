@@ -21,7 +21,7 @@ export function MetaBonificacaoForm({
   return (
     <form ref={formRef} action={formAction} className="flex flex-wrap items-end gap-3">
       <div>
-        <label className="block text-xs text-slate-400 dark:text-slate-500 mb-1">Meta de faturamento/mês (R$)</label>
+        <label className="block text-xs text-slate-400 dark:text-slate-500 mb-1">Meta de comissão/mês (R$)</label>
         <input
           name="meta"
           placeholder="sem meta"
