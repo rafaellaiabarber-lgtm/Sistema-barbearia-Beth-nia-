@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { competenciaAtual } from "@/lib/assinaturas";
+import { normalizarTelefone } from "@/lib/format";
 
 export type AssinaturaState = { erro?: string; sucesso?: boolean };
 
@@ -20,7 +21,7 @@ export async function criarAssinatura(
   await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
-  const telefone = String(formData.get("telefone") ?? "").trim();
+  const telefone = normalizarTelefone(String(formData.get("telefone") ?? ""));
   const planoId = String(formData.get("planoId") ?? "").trim();
   const barbeiroId = String(formData.get("barbeiroId") ?? "").trim() || null;
   const diaVencimento = Number(formData.get("diaVencimento") ?? 5);

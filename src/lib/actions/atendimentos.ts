@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
+import { normalizarTelefone } from "@/lib/format";
 
 function revalidarRelatorios() {
   revalidatePath("/admin/caixa");
@@ -21,7 +22,7 @@ export async function lancarAtendimentoManual(
   await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
-  const telefone = String(formData.get("telefone") ?? "").trim();
+  const telefone = normalizarTelefone(String(formData.get("telefone") ?? ""));
   const barbeiroId = String(formData.get("barbeiroId") ?? "").trim();
   const servicoIds = formData.getAll("servicoIds").map(String);
   const formaPagamento = String(formData.get("formaPagamento") ?? "");
