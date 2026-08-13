@@ -3,8 +3,10 @@ import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { calcularIntervalo } from "@/lib/periodo";
 import { montarRanking, type ContagemBarbeiro, type PontosPorAcao } from "@/lib/ranking";
+import { buscarTodasCampanhasAtivasComProgresso } from "@/lib/campanhas-server";
 import { RankingLista } from "./ranking-lista";
 import { RankingConfigForm } from "./ranking-config-form";
+import { CampanhasVenda } from "./campanhas-venda";
 import { ThemeToggle } from "../theme-toggle";
 
 async function buscarContagens(
@@ -69,9 +71,10 @@ export default async function RankingPage({
   const mes = calcularIntervalo("mes", agora);
   const personalizado = dataInicio ? calcularIntervalo("personalizado", agora, { dataInicio, dataFim }) : null;
 
-  const [barbeirosAtivos, configuracao] = await Promise.all([
+  const [barbeirosAtivos, configuracao, campanhasAtivas] = await Promise.all([
     prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
     prisma.configuracaoRanking.findUnique({ where: { id: "singleton" } }),
+    buscarTodasCampanhasAtivasComProgresso(),
   ]);
 
   const pontos: PontosPorAcao = {
@@ -122,6 +125,8 @@ export default async function RankingPage({
           </Link>
         </div>
       </header>
+
+      <CampanhasVenda campanhas={campanhasAtivas} />
 
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">Ranking de um período escolhido</h2>

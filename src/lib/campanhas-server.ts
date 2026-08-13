@@ -46,3 +46,25 @@ export async function buscarCampanhasAtivasComProgresso(barbeiroId: string) {
     })
   );
 }
+
+export async function buscarTodasCampanhasAtivasComProgresso() {
+  const campanhas = await prisma.campanhaVenda.findMany({
+    where: { ativa: true },
+    include: { barbeiro: true, itens: { include: { produto: true, servico: true } } },
+    orderBy: [{ barbeiro: { nome: "asc" } }, { criadoEm: "asc" }],
+  });
+
+  return Promise.all(
+    campanhas.map(async (c) => {
+      const itens: ItemProgresso[] = await Promise.all(
+        c.itens.map(async (item) => ({
+          itemId: item.id,
+          nome: item.produto?.nome ?? item.servico?.nome ?? "?",
+          quantidadeAlvo: item.quantidadeAlvo,
+          quantidadeAtual: await buscarQuantidadeAtualItem(item, c.barbeiroId, c.criadoEm),
+        }))
+      );
+      return { id: c.id, titulo: c.titulo, barbeiroNome: c.barbeiro.nome, itens };
+    })
+  );
+}
