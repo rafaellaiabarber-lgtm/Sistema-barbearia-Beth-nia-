@@ -10,6 +10,8 @@ import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { buscarCampanhasAtivasComProgresso } from "@/lib/campanhas-server";
 import { itemCompleto, quantidadeFaltando, valorPotencialCentavos } from "@/lib/campanhas";
 import { diaCobertoHoje } from "@/lib/assinaturas";
+import { LABEL_TIPO_META, formatarValorMeta, calcularNiveisAtingidos, nivelAtual, proximoNivel } from "@/lib/metas";
+import { calcularProgressoMeta } from "@/lib/metas-server";
 import { AutoRefresh } from "./auto-refresh";
 import { AtendendoAgora } from "./atendendo-agora";
 import { ThemeToggle } from "../theme-toggle";
@@ -111,13 +113,17 @@ export default async function FilaPage({
     qtd: number;
     clientes: { nome: string; servicos: string[] }[];
   } | null = null;
-  let metaInfo: {
-    comissaoMesCentavos: number;
-    metaComissaoCentavos: number;
-    percentualMeta: number;
-    bateuMeta: boolean;
-    bonificacaoCentavos: number | null;
-  } | null = null;
+  type MinhaMeta = {
+    id: string;
+    tipo: string;
+    valorAtual: number;
+    escopoTexto: string | null;
+    niveisComProgresso: { ordem: number; nome: string; valorAlvo: number; bonificacaoCentavos: number; atingido: boolean }[];
+    atual: { nome: string } | null;
+    proximo: { nome: string; valorAlvo: number } | null;
+    percentualAteProximo: number;
+  };
+  let minhasMetas: MinhaMeta[] = [];
   const campanhasAtivas = session.barbeiroId ? await buscarCampanhasAtivasComProgresso(session.barbeiroId) : [];
   const itensFaltandoCampanha = campanhasAtivas.flatMap((c) => c.itens.filter((i) => !itemCompleto(i)));
   const potencialCampanhaCentavos = valorPotencialCentavos(itensFaltandoCampanha);
@@ -125,9 +131,7 @@ export default async function FilaPage({
   if (session.barbeiroId) {
     const intervaloSelecionado =
       personalizado ?? (periodoFila === "ontem" ? intervaloOntem(agora) : calcularIntervalo(periodoFila, agora));
-    const mes = calcularIntervalo("mes", agora);
-    const precisaBuscarMesSeparado = !!personalizado || periodoFila !== "mes";
-    const [barbeiro, atendimentosPeriodo, atendimentosMes, vendasProdutoPeriodo, vendasProdutoMes] = await Promise.all([
+    const [barbeiro, atendimentosPeriodo, vendasProdutoPeriodo, metasBarbeiro] = await Promise.all([
       prisma.barbeiro.findUnique({ where: { id: session.barbeiroId } }),
       prisma.atendimento.findMany({
         where: {
@@ -138,23 +142,17 @@ export default async function FilaPage({
         include: { servicos: true, cliente: true },
         orderBy: { concluidoEm: "desc" },
       }),
-      precisaBuscarMesSeparado
-        ? prisma.atendimento.findMany({
-            where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim } },
-            include: { servicos: true },
-          })
-        : Promise.resolve(null),
       prisma.vendaProduto.findMany({
         where: {
           barbeiroId: session.barbeiroId,
           criadoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
         },
       }),
-      precisaBuscarMesSeparado
-        ? prisma.vendaProduto.findMany({
-            where: { barbeiroId: session.barbeiroId, criadoEm: { gte: mes.inicio, lte: mes.fim } },
-          })
-        : Promise.resolve(null),
+      prisma.meta.findMany({
+        where: { barbeiroId: session.barbeiroId, ativa: true },
+        include: { niveis: true, servico: true, produto: true },
+        orderBy: { criadoEm: "asc" },
+      }),
     ]);
     const comissaoCentavos =
       atendimentosPeriodo.reduce((soma, a) => soma + comissaoServicos(a.servicos, barbeiro?.comissaoPercentual ?? 0), 0) +
@@ -165,21 +163,30 @@ export default async function FilaPage({
     }));
     comissaoPeriodo = { comissaoCentavos, qtd: atendimentosPeriodo.length, clientes };
 
-    if (barbeiro?.metaFaturamentoCentavos && barbeiro.metaFaturamentoCentavos > 0) {
-      const baseMesAtendimentos = atendimentosMes ?? atendimentosPeriodo;
-      const baseMesVendas = vendasProdutoMes ?? vendasProdutoPeriodo;
-      const comissaoMesCentavos =
-        baseMesAtendimentos.reduce((soma, a) => soma + comissaoServicos(a.servicos, barbeiro?.comissaoPercentual ?? 0), 0) +
-        comissaoProdutos(baseMesVendas);
-      const percentualMeta = Math.min((comissaoMesCentavos / barbeiro.metaFaturamentoCentavos) * 100, 999);
-      metaInfo = {
-        comissaoMesCentavos,
-        metaComissaoCentavos: barbeiro.metaFaturamentoCentavos,
-        percentualMeta,
-        bateuMeta: percentualMeta >= 100,
-        bonificacaoCentavos: barbeiro.bonificacaoCentavos,
+    const comissaoPadrao = barbeiro?.comissaoPercentual ?? 0;
+    const progressosMeta = await Promise.all(metasBarbeiro.map((m) => calcularProgressoMeta(m, comissaoPadrao)));
+    minhasMetas = metasBarbeiro.map((m, i) => {
+      const valorAtual = progressosMeta[i];
+      const niveisComProgresso = calcularNiveisAtingidos(m.niveis, valorAtual);
+      const atual = nivelAtual(niveisComProgresso);
+      const proximo = proximoNivel(niveisComProgresso);
+      const ultimoNivel = niveisComProgresso[niveisComProgresso.length - 1];
+      const percentualAteProximo = proximo
+        ? Math.min((valorAtual / proximo.valorAlvo) * 100, 100)
+        : ultimoNivel
+          ? 100
+          : 0;
+      return {
+        id: m.id,
+        tipo: m.tipo,
+        valorAtual,
+        escopoTexto: m.tipo === "VENDAS_PRODUTO" ? (m.produto?.nome ?? null) : (m.servico?.nome ?? null),
+        niveisComProgresso,
+        atual,
+        proximo,
+        percentualAteProximo,
       };
-    }
+    });
   }
 
   const mostrarAvisoCampanha = !!session.barbeiroId && itensFaltandoCampanha.length > 0;
@@ -227,7 +234,7 @@ export default async function FilaPage({
         />
       ) : (
         <>
-          {session.barbeiroId && (comissaoPeriodo || metaInfo) && (
+          {session.barbeiroId && (comissaoPeriodo || minhasMetas.length > 0) && (
             <div className="mb-6">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 {(["hoje", "ontem", "semana", "mes"] as const).map((p) => (
@@ -309,40 +316,44 @@ export default async function FilaPage({
                   </details>
                 )}
 
-                {metaInfo && (
-                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+                {minhasMetas.map((m) => (
+                  <div key={m.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-3">
                       <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Minha meta de comissão do mês</p>
+                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                        {LABEL_TIPO_META[m.tipo]}
+                        {m.escopoTexto ? ` — ${m.escopoTexto}` : ""}
+                      </p>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-                      <span>
-                        {formatarReais(metaInfo.comissaoMesCentavos)} de {formatarReais(metaInfo.metaComissaoCentavos)}
-                      </span>
-                      <span className={`font-semibold ${metaInfo.bateuMeta ? "text-green-600" : "text-slate-500 dark:text-slate-400"}`}>
-                        {metaInfo.percentualMeta.toFixed(0)}%
-                      </span>
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {m.niveisComProgresso.map((n) => (
+                        <span
+                          key={n.ordem}
+                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                            n.atingido
+                              ? "bg-green-100 dark:bg-green-900 text-green-700"
+                              : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                          }`}
+                        >
+                          {n.atingido ? "✓" : "○"} {n.nome} — {formatarValorMeta(m.tipo, n.valorAlvo)}
+                          {n.bonificacaoCentavos > 0 && ` (bônus ${formatarReais(n.bonificacaoCentavos)})`}
+                        </span>
+                      ))}
                     </div>
-                    <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
                       <div
-                        className={`h-full rounded-full ${metaInfo.bateuMeta ? "bg-green-500" : "bg-blue-500"}`}
-                        style={{ width: `${Math.min(metaInfo.percentualMeta, 100)}%` }}
+                        className={`h-full rounded-full ${m.atual ? "bg-green-500" : "bg-blue-500"}`}
+                        style={{ width: `${m.percentualAteProximo}%` }}
                       />
                     </div>
-                    {metaInfo.bateuMeta ? (
-                      <p className="text-green-600 text-xs mt-2 font-medium">
-                        🎉 Meta batida!
-                        {metaInfo.bonificacaoCentavos ? ` Bônus: ${formatarReais(metaInfo.bonificacaoCentavos)}` : ""}
-                      </p>
-                    ) : (
-                      <p className="text-slate-500 dark:text-slate-400 text-xs mt-2">
-                        Faltam {(100 - metaInfo.percentualMeta).toFixed(0)}% (
-                        {formatarReais(Math.max(metaInfo.metaComissaoCentavos - metaInfo.comissaoMesCentavos, 0))}) para
-                        bater a meta
-                      </p>
-                    )}
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Atual: {formatarValorMeta(m.tipo, m.valorAtual)}
+                      {m.proximo &&
+                        ` · faltam ${formatarValorMeta(m.tipo, Math.max(m.proximo.valorAlvo - m.valorAtual, 0))} para ${m.proximo.nome}`}
+                      {!m.proximo && m.atual && " · todos os níveis atingidos! 🎉"}
+                    </p>
                   </div>
-                )}
+                ))}
               </div>
             </div>
           )}

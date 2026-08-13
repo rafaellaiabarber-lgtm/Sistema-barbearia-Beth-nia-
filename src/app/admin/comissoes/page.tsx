@@ -5,13 +5,6 @@ import { marcarComissaoPaga, desmarcarComissaoPaga } from "@/lib/actions/comisso
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 
-function inicioDoMes() {
-  const d = new Date();
-  d.setDate(1);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
 export default async function ComissoesPage({
   searchParams,
 }: {
@@ -32,7 +25,7 @@ export default async function ComissoesPage({
   const podeMarcarPago = periodo !== "personalizado";
   const chave = podeMarcarPago ? chavePeriodo(periodo) : "";
 
-  const [atendimentos, servicos, barbeiros, atendimentosMes, vendasProduto] = await Promise.all([
+  const [atendimentos, servicos, barbeiros, vendasProduto] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
         status: "CONCLUIDO",
@@ -45,22 +38,11 @@ export default async function ComissoesPage({
     }),
     prisma.servico.findMany({ orderBy: { nome: "asc" } }),
     prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
-    prisma.atendimento.findMany({
-      where: { status: "CONCLUIDO", concluidoEm: { gte: inicioDoMes() }, barbeiroId: { not: null } },
-      select: { barbeiroId: true, precoTotalCentavos: true },
-    }),
     prisma.vendaProduto.findMany({
       where: { criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
     }),
   ]);
 
-  const faturamentoMesPorBarbeiro = new Map<string, number>();
-  for (const a of atendimentosMes) {
-    faturamentoMesPorBarbeiro.set(
-      a.barbeiroId!,
-      (faturamentoMesPorBarbeiro.get(a.barbeiroId!) ?? 0) + a.precoTotalCentavos
-    );
-  }
   const barbeirosPorId = new Map(barbeiros.map((b) => [b.id, b]));
 
   const porBarbeiro = new Map<
@@ -143,12 +125,6 @@ export default async function ComissoesPage({
       <div className="space-y-2 mb-8">
         {[...porBarbeiro.entries()].map(([id, b]) => {
           const pago = pagosPorBarbeiro.get(id);
-          const metaCentavos = barbeirosPorId.get(id)?.metaFaturamentoCentavos ?? null;
-          const faturamentoMesCentavos = faturamentoMesPorBarbeiro.get(id) ?? 0;
-          const percentualMeta =
-            metaCentavos && metaCentavos > 0
-              ? Math.min((faturamentoMesCentavos / metaCentavos) * 100, 999)
-              : null;
           return (
             <div
               key={id}
@@ -187,25 +163,6 @@ export default async function ComissoesPage({
                   ))}
                 </div>
               </div>
-
-              {percentualMeta !== null && (
-                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-                    <span>
-                      Meta do mês: {formatarReais(faturamentoMesCentavos)} de {formatarReais(metaCentavos!)}
-                    </span>
-                    <span className={`font-semibold ${percentualMeta >= 100 ? "text-green-600" : "text-slate-500 dark:text-slate-400"}`}>
-                      {percentualMeta.toFixed(0)}% {percentualMeta >= 100 ? "— meta batida!" : ""}
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${percentualMeta >= 100 ? "bg-green-500" : "bg-blue-500"}`}
-                      style={{ width: `${Math.min(percentualMeta, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}
