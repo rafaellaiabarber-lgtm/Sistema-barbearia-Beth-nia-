@@ -112,8 +112,8 @@ export default async function FilaPage({
     clientes: { nome: string; servicos: string[] }[];
   } | null = null;
   let metaInfo: {
-    faturamentoMesCentavos: number;
-    metaFaturamentoCentavos: number;
+    comissaoMesCentavos: number;
+    metaComissaoCentavos: number;
     percentualMeta: number;
     bateuMeta: boolean;
     bonificacaoCentavos: number | null;
@@ -126,7 +126,8 @@ export default async function FilaPage({
     const intervaloSelecionado =
       personalizado ?? (periodoFila === "ontem" ? intervaloOntem(agora) : calcularIntervalo(periodoFila, agora));
     const mes = calcularIntervalo("mes", agora);
-    const [barbeiro, atendimentosPeriodo, atendimentosMes, vendasProdutoPeriodo] = await Promise.all([
+    const precisaBuscarMesSeparado = !!personalizado || periodoFila !== "mes";
+    const [barbeiro, atendimentosPeriodo, atendimentosMes, vendasProdutoPeriodo, vendasProdutoMes] = await Promise.all([
       prisma.barbeiro.findUnique({ where: { id: session.barbeiroId } }),
       prisma.atendimento.findMany({
         where: {
@@ -137,17 +138,23 @@ export default async function FilaPage({
         include: { servicos: true, cliente: true },
         orderBy: { concluidoEm: "desc" },
       }),
-      !personalizado && periodoFila === "mes"
-        ? Promise.resolve(null)
-        : prisma.atendimento.findMany({
+      precisaBuscarMesSeparado
+        ? prisma.atendimento.findMany({
             where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim } },
-          }),
+            include: { servicos: true },
+          })
+        : Promise.resolve(null),
       prisma.vendaProduto.findMany({
         where: {
           barbeiroId: session.barbeiroId,
           criadoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
         },
       }),
+      precisaBuscarMesSeparado
+        ? prisma.vendaProduto.findMany({
+            where: { barbeiroId: session.barbeiroId, criadoEm: { gte: mes.inicio, lte: mes.fim } },
+          })
+        : Promise.resolve(null),
     ]);
     const comissaoCentavos =
       atendimentosPeriodo.reduce((soma, a) => soma + comissaoServicos(a.servicos, barbeiro?.comissaoPercentual ?? 0), 0) +
@@ -159,12 +166,15 @@ export default async function FilaPage({
     comissaoPeriodo = { comissaoCentavos, qtd: atendimentosPeriodo.length, clientes };
 
     if (barbeiro?.metaFaturamentoCentavos && barbeiro.metaFaturamentoCentavos > 0) {
-      const baseMes = atendimentosMes ?? atendimentosPeriodo;
-      const faturamentoMesCentavos = baseMes.reduce((s, a) => s + a.precoTotalCentavos, 0);
-      const percentualMeta = Math.min((faturamentoMesCentavos / barbeiro.metaFaturamentoCentavos) * 100, 999);
+      const baseMesAtendimentos = atendimentosMes ?? atendimentosPeriodo;
+      const baseMesVendas = vendasProdutoMes ?? vendasProdutoPeriodo;
+      const comissaoMesCentavos =
+        baseMesAtendimentos.reduce((soma, a) => soma + comissaoServicos(a.servicos, barbeiro?.comissaoPercentual ?? 0), 0) +
+        comissaoProdutos(baseMesVendas);
+      const percentualMeta = Math.min((comissaoMesCentavos / barbeiro.metaFaturamentoCentavos) * 100, 999);
       metaInfo = {
-        faturamentoMesCentavos,
-        metaFaturamentoCentavos: barbeiro.metaFaturamentoCentavos,
+        comissaoMesCentavos,
+        metaComissaoCentavos: barbeiro.metaFaturamentoCentavos,
         percentualMeta,
         bateuMeta: percentualMeta >= 100,
         bonificacaoCentavos: barbeiro.bonificacaoCentavos,
@@ -303,11 +313,11 @@ export default async function FilaPage({
                   <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-3">
                       <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Minha meta do mês</p>
+                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Minha meta de comissão do mês</p>
                     </div>
                     <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
                       <span>
-                        {formatarReais(metaInfo.faturamentoMesCentavos)} de {formatarReais(metaInfo.metaFaturamentoCentavos)}
+                        {formatarReais(metaInfo.comissaoMesCentavos)} de {formatarReais(metaInfo.metaComissaoCentavos)}
                       </span>
                       <span className={`font-semibold ${metaInfo.bateuMeta ? "text-green-600" : "text-slate-500 dark:text-slate-400"}`}>
                         {metaInfo.percentualMeta.toFixed(0)}%
@@ -327,7 +337,7 @@ export default async function FilaPage({
                     ) : (
                       <p className="text-slate-500 dark:text-slate-400 text-xs mt-2">
                         Faltam {(100 - metaInfo.percentualMeta).toFixed(0)}% (
-                        {formatarReais(Math.max(metaInfo.metaFaturamentoCentavos - metaInfo.faturamentoMesCentavos, 0))}) para
+                        {formatarReais(Math.max(metaInfo.metaComissaoCentavos - metaInfo.comissaoMesCentavos, 0))}) para
                         bater a meta
                       </p>
                     )}
