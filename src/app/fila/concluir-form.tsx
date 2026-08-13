@@ -45,7 +45,7 @@ export function ConcluirForm({
               }`}
             >
               <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
-              <span className="block text-lime-600 text-xs">{formatarReais(s.precoCentavos)}</span>
+              <span className="block text-lime-600 dark:text-lime-400 text-xs">{formatarReais(s.precoCentavos)}</span>
             </button>
           );
         })}
@@ -55,7 +55,7 @@ export function ConcluirForm({
       ))}
 
       {totalCentavos > 0 && (
-        <p className="text-lime-600 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
+        <p className="text-lime-600 dark:text-lime-400 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
       )}
 
       <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Forma de pagamento:</p>

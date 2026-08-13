@@ -38,7 +38,7 @@ export default async function IndicacoesPage({
   const totalSemana = indicacoes.filter((i) => i.criadoEm >= semana.inicio && i.criadoEm <= semana.fim).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 p-6">
       <header className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold">Indicações</h1>
@@ -59,7 +59,7 @@ export default async function IndicacoesPage({
 
       <div className="grid grid-cols-2 gap-4 mb-6 max-w-md">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-2xl font-bold text-lime-600">{totalPendentes}</p>
+          <p className="text-2xl font-bold text-lime-600 dark:text-lime-400">{totalPendentes}</p>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Pendente(s)</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
@@ -100,7 +100,7 @@ export default async function IndicacoesPage({
             </select>
           </div>
         )}
-        <button type="submit" className="rounded-lg bg-lime-600 hover:bg-lime-700 text-slate-950 font-semibold px-4 py-2 text-sm">
+        <button type="submit" className="rounded-lg bg-lime-400 hover:bg-lime-300 text-slate-950 font-semibold px-4 py-2 text-sm">
           Filtrar
         </button>
       </form>

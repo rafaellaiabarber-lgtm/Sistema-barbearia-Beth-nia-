@@ -95,7 +95,7 @@ export function AtendendoAgora({
         </p>
       )}
       <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Iniciado às {horaInicio}</p>
-      <p className="text-3xl font-bold text-lime-600 mb-8 tabular-nums">{formatarDuracao(segundos)}</p>
+      <p className="text-3xl font-bold text-lime-600 dark:text-lime-400 mb-8 tabular-nums">{formatarDuracao(segundos)}</p>
 
       {campanhas.map((c) => (
         <div
@@ -127,7 +127,7 @@ export function AtendendoAgora({
       <button
         type="button"
         onClick={() => setFinalizando(true)}
-        className="w-full max-w-sm rounded-xl bg-lime-600 hover:bg-lime-700 text-slate-950 font-bold text-lg py-4 mb-3 transition-colors"
+        className="w-full max-w-sm rounded-xl bg-lime-400 hover:bg-lime-300 text-slate-950 font-bold text-lg py-4 mb-3 transition-colors"
       >
         Finalizar atendimento
       </button>

@@ -99,7 +99,7 @@ export default async function FluxoCaixaPage({
         </div>
         <div
           className={`rounded-xl p-5 shadow-sm ${
-            saldoPeriodoCentavos < 0 ? "bg-red-700 text-white" : "bg-lime-600 text-slate-950"
+            saldoPeriodoCentavos < 0 ? "bg-red-700 text-white" : "bg-lime-400 text-slate-950"
           }`}
         >
           <p className="text-2xl font-bold mb-1">{formatarReais(saldoPeriodoCentavos)}</p>

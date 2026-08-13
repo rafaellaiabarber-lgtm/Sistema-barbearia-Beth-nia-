@@ -107,7 +107,7 @@ export default async function RankingPage({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 p-6">
       <header className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold">Ranking dos barbeiros</h1>
@@ -150,7 +150,7 @@ export default async function RankingPage({
               className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
             />
           </div>
-          <button type="submit" className="rounded-lg bg-lime-600 hover:bg-lime-700 text-slate-950 font-semibold px-4 py-2 text-sm">
+          <button type="submit" className="rounded-lg bg-lime-400 hover:bg-lime-300 text-slate-950 font-semibold px-4 py-2 text-sm">
             Ver ranking
           </button>
           {personalizado && (

@@ -48,14 +48,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={pendente}
-            className="w-full rounded-lg bg-lime-600 hover:bg-lime-700 disabled:opacity-60 text-slate-950 font-semibold py-2 transition-colors"
+            className="w-full rounded-lg bg-lime-400 hover:bg-lime-300 disabled:opacity-60 text-slate-950 font-semibold py-2 transition-colors"
           >
             {pendente ? "Entrando..." : "Entrar"}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <Link href="/totem" className="text-sm text-slate-500 hover:text-lime-600">
+          <Link href="/totem" className="text-sm text-slate-500 hover:text-lime-600 dark:hover:text-lime-400">
             Sou cliente, quero entrar na fila →
           </Link>
         </div>

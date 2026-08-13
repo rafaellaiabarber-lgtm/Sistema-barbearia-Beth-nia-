@@ -128,7 +128,7 @@ export default async function DrePage({
           <div
             key={l.label}
             className={`flex items-center justify-between px-5 py-3 text-sm ${
-              l.subtotal ? "bg-slate-50 dark:bg-slate-950 font-semibold border-t border-b border-slate-200 dark:border-slate-800" : ""
+              l.subtotal ? "bg-slate-50 dark:bg-black font-semibold border-t border-b border-slate-200 dark:border-slate-800" : ""
             } ${l.destaque ? "bg-lime-50 dark:bg-lime-950 font-bold text-base" : ""} ${
               !l.subtotal && !l.destaque ? "border-b border-slate-100 dark:border-slate-800 last:border-b-0" : ""
             }`}
@@ -153,7 +153,7 @@ export default async function DrePage({
 
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
         <p className="text-slate-500 dark:text-slate-400 text-sm">Margem líquida no período</p>
-        <p className={`text-2xl font-bold ${lucroLiquidoCentavos < 0 ? "text-red-600" : "text-lime-600"}`}>
+        <p className={`text-2xl font-bold ${lucroLiquidoCentavos < 0 ? "text-red-600" : "text-lime-600 dark:text-lime-400"}`}>
           {margemPercentual}%
         </p>
       </div>

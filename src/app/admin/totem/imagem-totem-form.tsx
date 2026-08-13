@@ -44,7 +44,7 @@ export function ImagemTotemForm({
           alt={label}
           className={
             aspecto === "logo"
-              ? "h-24 object-contain bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-2 mb-4"
+              ? "h-24 object-contain bg-slate-50 dark:bg-black rounded-lg border border-slate-200 dark:border-slate-800 p-2 mb-4"
               : "w-full h-40 object-cover rounded-lg border border-slate-200 dark:border-slate-800 mb-4"
           }
         />
@@ -60,7 +60,7 @@ export function ImagemTotemForm({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={pendente}
-          className="text-sm rounded-lg bg-lime-600 hover:bg-lime-700 disabled:opacity-60 text-slate-950 font-semibold px-3 py-2"
+          className="text-sm rounded-lg bg-lime-400 hover:bg-lime-300 disabled:opacity-60 text-slate-950 font-semibold px-3 py-2"
         >
           {pendente ? "Enviando..." : imagemUrl ? "Trocar imagem" : "Enviar imagem"}
         </button>
