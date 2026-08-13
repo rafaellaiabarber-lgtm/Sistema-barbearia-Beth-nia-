@@ -32,17 +32,17 @@ export function montarRanking(contagens: ContagemBarbeiro[], pontos: PontosPorAc
     .map((c, i) => ({ ...c, posicao: i + 1 }));
 }
 
-export type PremiosPeriodo = { premio1Centavos: number | null; premio2Centavos: number | null; premio3Centavos: number | null };
+export type PremiosPeriodo = { premio1: string | null; premio2: string | null; premio3: string | null };
 
 export function premioPorPosicao(
   posicao: number,
   pontos: number,
   premios: PremiosPeriodo,
   pontuacaoMinima: number | null
-): number | null {
+): string | null {
   if (pontuacaoMinima !== null && pontos < pontuacaoMinima) return null;
-  if (posicao === 1) return premios.premio1Centavos;
-  if (posicao === 2) return premios.premio2Centavos;
-  if (posicao === 3) return premios.premio3Centavos;
+  if (posicao === 1) return premios.premio1;
+  if (posicao === 2) return premios.premio2;
+  if (posicao === 3) return premios.premio3;
   return null;
 }
