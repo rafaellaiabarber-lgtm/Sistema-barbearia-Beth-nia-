@@ -165,6 +165,7 @@ model Servico {
   duracaoMinutos      Int                  @default(30)
   comissaoPercentual  Int?
   ativo               Boolean              @default(true)
+  pontuaRanking       Boolean              @default(true)
   criadoEm            DateTime             @default(now())
   atendimentoServicos AtendimentoServico[]
   metas               Meta[]

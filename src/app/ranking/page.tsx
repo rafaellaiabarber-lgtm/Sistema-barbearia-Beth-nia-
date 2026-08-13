@@ -12,11 +12,13 @@ async function buscarContagens(
   fim: Date,
   barbeiros: { id: string; nome: string }[]
 ): Promise<ContagemBarbeiro[]> {
-  const [atendimentos, vendas, assinaturas, indicacoes] = await Promise.all([
-    prisma.atendimento.groupBy({
-      by: ["barbeiroId"],
-      where: { status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim }, barbeiroId: { not: null } },
-      _count: { _all: true },
+  const [servicosExtras, vendas, assinaturas, indicacoes] = await Promise.all([
+    prisma.atendimentoServico.findMany({
+      where: {
+        servico: { pontuaRanking: true },
+        atendimento: { status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim }, barbeiroId: { not: null } },
+      },
+      select: { atendimento: { select: { barbeiroId: true } } },
     }),
     prisma.vendaProduto.groupBy({
       by: ["barbeiroId"],
@@ -39,10 +41,14 @@ async function buscarContagens(
     return lista.find((l) => l.barbeiroId === barbeiroId)?._count._all ?? 0;
   }
 
+  function contarServicosExtras(barbeiroId: string) {
+    return servicosExtras.filter((s) => s.atendimento.barbeiroId === barbeiroId).length;
+  }
+
   return barbeiros.map((b) => ({
     barbeiroId: b.id,
     nome: b.nome,
-    qtdAtendimentos: contarPara(atendimentos, b.id),
+    qtdAtendimentos: contarServicosExtras(b.id),
     qtdVendasProduto: contarPara(vendas, b.id),
     qtdAssinaturas: contarPara(assinaturas, b.id),
     qtdIndicacoesConvertidas: contarPara(indicacoes, b.id),
@@ -94,7 +100,7 @@ export default async function RankingPage() {
         <div>
           <h1 className="text-2xl font-bold">Ranking dos barbeiros</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">
-            Pontos por atendimento, venda de produto, assinatura vendida e indicação convertida.
+            Pontos por serviço extra (configurável em Serviços), venda de produto, assinatura vendida e indicação convertida.
           </p>
         </div>
         <div className="flex items-center gap-4">

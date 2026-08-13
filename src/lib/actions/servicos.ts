@@ -106,6 +106,13 @@ export async function atualizarCustoServico(
   return {};
 }
 
+export async function alternarPontuaRanking(id: string, pontuaRanking: boolean) {
+  await requireSession(["ADMIN"]);
+  await prisma.servico.update({ where: { id }, data: { pontuaRanking } });
+  revalidatePath("/admin/servicos");
+  revalidatePath("/ranking");
+}
+
 export async function excluirServico(id: string) {
   await requireSession(["ADMIN"]);
   const emUso = await prisma.atendimentoServico.findFirst({ where: { servicoId: id } });

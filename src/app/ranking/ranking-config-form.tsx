@@ -42,9 +42,13 @@ export function RankingConfigForm({
       <form action={formAction} className="mt-4 space-y-5">
         <div>
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Quantos pontos vale cada ação</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+            "Serviço extra" conta só os serviços marcados como "Conta no ranking" lá em Serviços — dá pra desmarcar corte,
+            barba etc. e deixar só as extras (hidratação, sobrancelha...) valendo ponto.
+          </p>
           <div className="flex flex-wrap gap-3">
             <div>
-              <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Atendimento concluído</label>
+              <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Serviço extra realizado</label>
               <input
                 name="pontosPorAtendimento"
                 type="number"
