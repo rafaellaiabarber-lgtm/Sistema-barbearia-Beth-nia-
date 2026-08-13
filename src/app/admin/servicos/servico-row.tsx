@@ -5,6 +5,7 @@ import type { Servico } from "@prisma/client";
 import {
   atualizarServico,
   alternarAtivoServico,
+  alternarPontuaRanking,
   excluirServico,
   type ServicoState,
 } from "@/lib/actions/servicos";
@@ -120,6 +121,14 @@ export function ServicoRow({ servico }: { servico: Servico }) {
               >
                 Editar
               </button>
+              <form action={alternarPontuaRanking.bind(null, servico.id, !servico.pontuaRanking)}>
+                <button
+                  className={`text-sm ${servico.pontuaRanking ? "text-blue-600 hover:text-blue-800" : "text-slate-400 dark:text-slate-500 hover:text-blue-600"}`}
+                  title="Se conta pontos no Ranking dos barbeiros quando esse serviço é feito"
+                >
+                  {servico.pontuaRanking ? "🏆 Conta no ranking" : "Não conta no ranking"}
+                </button>
+              </form>
               <form action={alternarAtivoServico.bind(null, servico.id, !servico.ativo)}>
                 <button className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600">
                   {servico.ativo ? "Desativar" : "Ativar"}
