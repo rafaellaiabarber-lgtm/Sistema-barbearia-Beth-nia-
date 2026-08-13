@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Servico } from "@prisma/client";
 import { desfazerInicioAtendimento } from "@/lib/actions/fila";
+import { itemCompleto, type ItemProgresso } from "@/lib/campanhas";
 import { ConcluirForm } from "./concluir-form";
 
 function formatarDuracao(segundos: number) {
@@ -16,11 +17,13 @@ export function AtendendoAgora({
   clienteNome,
   chamadoEm,
   servicos,
+  campanhas,
 }: {
   atendimentoId: string;
   clienteNome: string;
   chamadoEm: Date;
   servicos: Servico[];
+  campanhas: { id: string; titulo: string | null; itens: ItemProgresso[] }[];
 }) {
   const [agora, setAgora] = useState(() => Date.now());
   const [finalizando, setFinalizando] = useState(false);
@@ -61,6 +64,33 @@ export function AtendendoAgora({
       <p className="text-4xl font-black text-slate-900 dark:text-white mb-4">{clienteNome}</p>
       <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Iniciado às {horaInicio}</p>
       <p className="text-3xl font-bold text-blue-600 mb-8 tabular-nums">{formatarDuracao(segundos)}</p>
+
+      {campanhas.map((c) => (
+        <div
+          key={c.id}
+          className="w-full max-w-sm bg-amber-50 dark:bg-amber-950 border border-amber-200 rounded-xl p-4 mb-6 text-left"
+        >
+          <p className="text-amber-800 font-semibold text-sm mb-2">
+            💡 {c.titulo ? c.titulo : "Aproveita e ofereça:"}
+          </p>
+          <ul className="space-y-1">
+            {c.itens.map((item) => {
+              const feito = itemCompleto(item);
+              return (
+                <li
+                  key={item.itemId}
+                  className={`flex items-center justify-between text-sm ${feito ? "text-green-700 dark:text-green-400 line-through" : "text-amber-900 dark:text-amber-100"}`}
+                >
+                  <span>{feito ? "✓ " : ""}{item.nome}</span>
+                  <span className="font-semibold tabular-nums">
+                    {item.quantidadeAtual}/{item.quantidadeAlvo}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
 
       <button
         type="button"

@@ -96,6 +96,7 @@ model Barbeiro {
   vendasProduto           VendaProduto[]
   indicacoes              Indicacao[]
   assinaturasVendidas     Assinatura[]
+  campanhasVenda          CampanhaVenda[]
   criadoEm                DateTime            @default(now())
 }
 
@@ -169,6 +170,7 @@ model Servico {
   criadoEm            DateTime             @default(now())
   atendimentoServicos AtendimentoServico[]
   metas               Meta[]
+  itensCampanha       ItemCampanhaVenda[]
 }
 
 model Produto {
@@ -180,6 +182,28 @@ model Produto {
   criadoEm      DateTime       @default(now())
   vendas        VendaProduto[]
   metas         Meta[]
+  itensCampanha ItemCampanhaVenda[]
+}
+
+model CampanhaVenda {
+  id         String              @id @default(cuid())
+  barbeiro   Barbeiro            @relation(fields: [barbeiroId], references: [id])
+  barbeiroId String
+  titulo     String?
+  ativa      Boolean             @default(true)
+  criadoEm   DateTime            @default(now())
+  itens      ItemCampanhaVenda[]
+}
+
+model ItemCampanhaVenda {
+  id             String        @id @default(cuid())
+  campanha       CampanhaVenda @relation(fields: [campanhaId], references: [id], onDelete: Cascade)
+  campanhaId     String
+  produto        Produto?      @relation(fields: [produtoId], references: [id])
+  produtoId      String?
+  servico        Servico?      @relation(fields: [servicoId], references: [id])
+  servicoId      String?
+  quantidadeAlvo Int
 }
 
 model VendaProduto {
