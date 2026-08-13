@@ -2,6 +2,15 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { type ItemProgresso } from "@/lib/campanhas";
 
+export function comissaoPercentualItem(
+  item: { produto: { comissaoPercentual: number | null } | null; servico: { comissaoPercentual: number | null } | null },
+  comissaoPadraoBarbeiro: number
+): number {
+  if (item.produto) return item.produto.comissaoPercentual ?? 0;
+  if (item.servico) return item.servico.comissaoPercentual ?? comissaoPadraoBarbeiro;
+  return 0;
+}
+
 export async function buscarQuantidadeAtualItem(
   item: { produtoId: string | null; servicoId: string | null },
   barbeiroId: string,
@@ -28,7 +37,7 @@ export async function buscarQuantidadeAtualItem(
 export async function buscarCampanhasAtivasComProgresso(barbeiroId: string) {
   const campanhas = await prisma.campanhaVenda.findMany({
     where: { barbeiroId, ativa: true },
-    include: { itens: { include: { produto: true, servico: true } } },
+    include: { barbeiro: true, itens: { include: { produto: true, servico: true } } },
     orderBy: { criadoEm: "asc" },
   });
 
@@ -41,6 +50,7 @@ export async function buscarCampanhasAtivasComProgresso(barbeiroId: string) {
           quantidadeAlvo: item.quantidadeAlvo,
           quantidadeAtual: await buscarQuantidadeAtualItem(item, barbeiroId, c.criadoEm),
           precoCentavos: item.produto?.precoCentavos ?? item.servico?.precoCentavos ?? 0,
+          comissaoPercentual: comissaoPercentualItem(item, c.barbeiro.comissaoPercentual),
         }))
       );
       return { id: c.id, titulo: c.titulo, itens };
@@ -64,6 +74,7 @@ export async function buscarTodasCampanhasAtivasComProgresso() {
           quantidadeAlvo: item.quantidadeAlvo,
           quantidadeAtual: await buscarQuantidadeAtualItem(item, c.barbeiroId, c.criadoEm),
           precoCentavos: item.produto?.precoCentavos ?? item.servico?.precoCentavos ?? 0,
+          comissaoPercentual: comissaoPercentualItem(item, c.barbeiro.comissaoPercentual),
         }))
       );
       return { id: c.id, titulo: c.titulo, barbeiroNome: c.barbeiro.nome, itens };

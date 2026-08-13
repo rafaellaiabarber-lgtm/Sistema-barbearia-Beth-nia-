@@ -13,6 +13,7 @@ export async function criarProduto(_prevState: ProdutoState, formData: FormData)
   const nome = String(formData.get("nome") ?? "").trim();
   const preco = String(formData.get("preco") ?? "");
   const custo = String(formData.get("custo") ?? "").trim();
+  const comissaoRaw = String(formData.get("comissao") ?? "").trim();
 
   if (!nome) return { erro: "Informe o nome do produto." };
   const precoCentavos = reaisParaCentavos(preco);
@@ -21,11 +22,46 @@ export async function criarProduto(_prevState: ProdutoState, formData: FormData)
   const custoCentavos = custo ? reaisParaCentavos(custo) : 0;
   if (custoCentavos < 0) return { erro: "Informe um custo válido." };
 
-  await prisma.produto.create({ data: { nome, precoCentavos, custoCentavos } });
+  let comissaoPercentual: number | null = null;
+  if (comissaoRaw) {
+    comissaoPercentual = Number(comissaoRaw);
+    if (Number.isNaN(comissaoPercentual) || comissaoPercentual < 0 || comissaoPercentual > 100) {
+      return { erro: "Comissão deve ser um número entre 0 e 100." };
+    }
+  }
+
+  await prisma.produto.create({ data: { nome, precoCentavos, custoCentavos, comissaoPercentual } });
 
   revalidatePath("/admin/produtos");
   revalidatePath("/admin/caixa");
   revalidatePath("/admin/metas");
+  return {};
+}
+
+export async function atualizarComissaoProduto(
+  id: string,
+  _prevState: ProdutoState,
+  formData: FormData
+): Promise<ProdutoState> {
+  await requireSession(["ADMIN"]);
+
+  const comissaoRaw = String(formData.get("comissao") ?? "").trim();
+  let comissaoPercentual: number | null = null;
+  if (comissaoRaw) {
+    comissaoPercentual = Number(comissaoRaw);
+    if (Number.isNaN(comissaoPercentual) || comissaoPercentual < 0 || comissaoPercentual > 100) {
+      return { erro: "Comissão deve ser um número entre 0 e 100." };
+    }
+  }
+
+  await prisma.produto.update({ where: { id }, data: { comissaoPercentual } });
+  revalidatePath("/admin/produtos");
+  revalidatePath("/admin/caixa");
+  revalidatePath("/admin/comissoes");
+  revalidatePath("/admin/financeiro");
+  revalidatePath("/admin/dre");
+  revalidatePath("/fila");
+  revalidatePath("/ranking");
   return {};
 }
 

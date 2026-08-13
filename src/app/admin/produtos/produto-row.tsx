@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import type { Produto } from "@prisma/client";
 import { atualizarProduto, alternarAtivoProduto, excluirProduto, type ProdutoState } from "@/lib/actions/produtos";
 import { formatarReais } from "@/lib/format";
+import { ComissaoProdutoForm } from "./comissao-produto-form";
 
 const estadoInicial: ProdutoState = {};
 
@@ -82,10 +83,18 @@ export function ProdutoRow({ produto }: { produto: Produto }) {
               preço {formatarReais(produto.precoCentavos)} · custo {formatarReais(produto.custoCentavos)} · margem{" "}
               <span className={margemCentavos < 0 ? "text-red-600 font-medium" : "text-green-600 font-medium"}>
                 {formatarReais(margemCentavos)}
-              </span>
+              </span>{" "}
+              ·{" "}
+              {produto.comissaoPercentual !== null
+                ? `comissão: ${produto.comissaoPercentual}%`
+                : "sem comissão pro barbeiro"}
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+            <div className="flex flex-col items-start gap-1">
+              <span className="text-xs text-slate-400 dark:text-slate-500">Comissão</span>
+              <ComissaoProdutoForm produtoId={produto.id} comissaoPercentual={produto.comissaoPercentual} />
+            </div>
             <button
               type="button"
               onClick={() => setEditando(true)}

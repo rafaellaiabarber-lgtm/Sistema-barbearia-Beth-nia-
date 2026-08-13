@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo } from "@/lib/periodo";
-import { comissaoServicos } from "@/lib/comissao";
+import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 
 export default async function DrePage({
@@ -21,7 +21,7 @@ export default async function DrePage({
       : "mes";
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
 
-  const [atendimentos, movimentos, servicos, barbeiros, configuracaoFinanceira] = await Promise.all([
+  const [atendimentos, movimentos, servicos, barbeiros, configuracaoFinanceira, vendasProduto] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
         status: "CONCLUIDO",
@@ -34,6 +34,9 @@ export default async function DrePage({
     prisma.servico.findMany({ orderBy: { nome: "asc" } }),
     prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
     prisma.configuracaoFinanceira.findUnique({ where: { id: "singleton" } }),
+    prisma.vendaProduto.findMany({
+      where: { criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
+    }),
   ]);
 
   const faturamentoAtendimentosCentavos = atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
@@ -46,10 +49,9 @@ export default async function DrePage({
     (s, a) => s + a.servicos.reduce((soma, serv) => soma + serv.custoCentavos, 0),
     0
   );
-  const comissoesCentavos = atendimentos.reduce(
-    (s, a) => s + (a.barbeiro ? comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual) : 0),
-    0
-  );
+  const comissoesCentavos =
+    atendimentos.reduce((s, a) => s + (a.barbeiro ? comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual) : 0), 0) +
+    comissaoProdutos(vendasProduto);
 
   const despesasPorCategoria = new Map<string, number>();
   for (const m of movimentos) {

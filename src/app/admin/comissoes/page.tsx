@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo, chavePeriodo } from "@/lib/periodo";
 import { marcarComissaoPaga, desmarcarComissaoPaga } from "@/lib/actions/comissoes";
-import { comissaoServicos } from "@/lib/comissao";
+import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 
 function inicioDoMes() {
@@ -32,7 +32,7 @@ export default async function ComissoesPage({
   const podeMarcarPago = periodo !== "personalizado";
   const chave = podeMarcarPago ? chavePeriodo(periodo) : "";
 
-  const [atendimentos, servicos, barbeiros, atendimentosMes] = await Promise.all([
+  const [atendimentos, servicos, barbeiros, atendimentosMes, vendasProduto] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
         status: "CONCLUIDO",
@@ -48,6 +48,9 @@ export default async function ComissoesPage({
     prisma.atendimento.findMany({
       where: { status: "CONCLUIDO", concluidoEm: { gte: inicioDoMes() }, barbeiroId: { not: null } },
       select: { barbeiroId: true, precoTotalCentavos: true },
+    }),
+    prisma.vendaProduto.findMany({
+      where: { criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
     }),
   ]);
 
@@ -76,6 +79,18 @@ export default async function ComissoesPage({
     atual.comissaoCentavos += comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual);
     atual.qtd += 1;
     porBarbeiro.set(a.barbeiro.id, atual);
+  }
+  const vendasPorBarbeiro = new Map<string, typeof vendasProduto>();
+  for (const v of vendasProduto) {
+    if (!v.barbeiroId) continue;
+    vendasPorBarbeiro.set(v.barbeiroId, [...(vendasPorBarbeiro.get(v.barbeiroId) ?? []), v]);
+  }
+  for (const [barbeiroId, vendas] of vendasPorBarbeiro) {
+    const barbeiro = barbeirosPorId.get(barbeiroId);
+    if (!barbeiro) continue;
+    const atual = porBarbeiro.get(barbeiroId) ?? { nome: barbeiro.nome, totalCentavos: 0, comissaoCentavos: 0, qtd: 0 };
+    atual.comissaoCentavos += comissaoProdutos(vendas);
+    porBarbeiro.set(barbeiroId, atual);
   }
 
   const pagamentos = podeMarcarPago

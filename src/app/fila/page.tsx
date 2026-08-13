@@ -6,7 +6,7 @@ import { chamarProximo, chamarCliente, cancelarAtendimento } from "@/lib/actions
 import { logout } from "@/lib/actions/auth";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo } from "@/lib/periodo";
-import { comissaoServicos } from "@/lib/comissao";
+import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { buscarCampanhasAtivasComProgresso } from "@/lib/campanhas-server";
 import { itemCompleto, quantidadeFaltando, valorPotencialCentavos } from "@/lib/campanhas";
 import { AutoRefresh } from "./auto-refresh";
@@ -95,7 +95,7 @@ export default async function FilaPage({
     const intervaloSelecionado =
       personalizado ?? (periodoFila === "ontem" ? intervaloOntem(agora) : calcularIntervalo(periodoFila, agora));
     const mes = calcularIntervalo("mes", agora);
-    const [barbeiro, atendimentosPeriodo, atendimentosMes] = await Promise.all([
+    const [barbeiro, atendimentosPeriodo, atendimentosMes, vendasProdutoPeriodo] = await Promise.all([
       prisma.barbeiro.findUnique({ where: { id: session.barbeiroId } }),
       prisma.atendimento.findMany({
         where: {
@@ -111,11 +111,16 @@ export default async function FilaPage({
         : prisma.atendimento.findMany({
             where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim } },
           }),
+      prisma.vendaProduto.findMany({
+        where: {
+          barbeiroId: session.barbeiroId,
+          criadoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
+        },
+      }),
     ]);
-    const comissaoCentavos = atendimentosPeriodo.reduce(
-      (soma, a) => soma + comissaoServicos(a.servicos, barbeiro?.comissaoPercentual ?? 0),
-      0
-    );
+    const comissaoCentavos =
+      atendimentosPeriodo.reduce((soma, a) => soma + comissaoServicos(a.servicos, barbeiro?.comissaoPercentual ?? 0), 0) +
+      comissaoProdutos(vendasProdutoPeriodo);
     const clientes = atendimentosPeriodo.map((a) => ({
       nome: a.cliente.nome,
       servicos: a.servicos.map((s) => s.nomeSnapshot),
@@ -405,7 +410,7 @@ export default async function FilaPage({
         <div className="fixed inset-x-0 bottom-0 z-50 bg-red-600 text-white px-4 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.2)]">
           <p className="text-sm max-w-3xl mx-auto">
             🔴 Hoje, se vender {itensFaltandoCampanha.map((i) => `${quantidadeFaltando(i)}x ${i.nome}`).join(", ")}, você
-            aumenta <span className="font-semibold">{formatarReais(potencialCampanhaCentavos)}</span> no seu faturamento.
+            aumenta <span className="font-semibold">{formatarReais(potencialCampanhaCentavos)}</span> na sua comissão.
             Não esqueça de oferecer!
           </p>
         </div>
