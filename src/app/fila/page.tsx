@@ -19,8 +19,31 @@ function tempoEspera(desde: Date) {
   return `há ${minutos} min`;
 }
 
-export default async function FilaPage() {
+type PeriodoFila = "hoje" | "ontem" | "semana" | "mes";
+const LABEL_PERIODO_FILA: Record<PeriodoFila, string> = {
+  hoje: "hoje",
+  ontem: "ontem",
+  semana: "esta semana",
+  mes: "este mês",
+};
+
+function intervaloOntem(agora: Date) {
+  const hoje = calcularIntervalo("hoje", agora);
+  const fim = new Date(hoje.inicio.getTime() - 1);
+  const inicio = new Date(fim);
+  inicio.setHours(0, 0, 0, 0);
+  return { inicio, fim };
+}
+
+export default async function FilaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ periodo?: string }>;
+}) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
+  const { periodo: periodoParam } = await searchParams;
+  const periodoFila: PeriodoFila =
+    periodoParam === "ontem" || periodoParam === "semana" || periodoParam === "mes" ? periodoParam : "hoje";
 
   const [aguardando, emAtendimento, barbeirosAtivos, servicosAtivos] = await Promise.all([
     prisma.atendimento.findMany({
@@ -41,7 +64,7 @@ export default async function FilaPage() {
     ? emAtendimento.find((a) => a.barbeiroId === session.barbeiroId)
     : null;
 
-  let comissaoHoje: { comissaoCentavos: number; totalCentavos: number; qtd: number } | null = null;
+  let comissaoPeriodo: { comissaoCentavos: number; totalCentavos: number; qtd: number } | null = null;
   let metaInfo: {
     faturamentoMesCentavos: number;
     metaFaturamentoCentavos: number;
@@ -52,27 +75,36 @@ export default async function FilaPage() {
   const campanhasAtivas = session.barbeiroId ? await buscarCampanhasAtivasComProgresso(session.barbeiroId) : [];
 
   if (session.barbeiroId) {
-    const hoje = calcularIntervalo("hoje");
-    const mes = calcularIntervalo("mes", new Date());
-    const [barbeiro, atendimentosHoje, atendimentosMes] = await Promise.all([
+    const agora = new Date();
+    const intervaloSelecionado =
+      periodoFila === "ontem" ? intervaloOntem(agora) : calcularIntervalo(periodoFila, agora);
+    const mes = calcularIntervalo("mes", agora);
+    const [barbeiro, atendimentosPeriodo, atendimentosMes] = await Promise.all([
       prisma.barbeiro.findUnique({ where: { id: session.barbeiroId } }),
       prisma.atendimento.findMany({
-        where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: hoje.inicio, lte: hoje.fim } },
+        where: {
+          barbeiroId: session.barbeiroId,
+          status: "CONCLUIDO",
+          concluidoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
+        },
         include: { servicos: true },
       }),
-      prisma.atendimento.findMany({
-        where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim } },
-      }),
+      periodoFila === "mes"
+        ? Promise.resolve(null)
+        : prisma.atendimento.findMany({
+            where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim } },
+          }),
     ]);
-    const totalCentavos = atendimentosHoje.reduce((s, a) => s + a.precoTotalCentavos, 0);
-    const comissaoCentavos = atendimentosHoje.reduce(
+    const totalCentavos = atendimentosPeriodo.reduce((s, a) => s + a.precoTotalCentavos, 0);
+    const comissaoCentavos = atendimentosPeriodo.reduce(
       (soma, a) => soma + comissaoServicos(a.servicos, barbeiro?.comissaoPercentual ?? 0),
       0
     );
-    comissaoHoje = { totalCentavos, qtd: atendimentosHoje.length, comissaoCentavos };
+    comissaoPeriodo = { totalCentavos, qtd: atendimentosPeriodo.length, comissaoCentavos };
 
     if (barbeiro?.metaFaturamentoCentavos && barbeiro.metaFaturamentoCentavos > 0) {
-      const faturamentoMesCentavos = atendimentosMes.reduce((s, a) => s + a.precoTotalCentavos, 0);
+      const baseMes = atendimentosMes ?? atendimentosPeriodo;
+      const faturamentoMesCentavos = baseMes.reduce((s, a) => s + a.precoTotalCentavos, 0);
       const percentualMeta = Math.min((faturamentoMesCentavos / barbeiro.metaFaturamentoCentavos) * 100, 999);
       metaInfo = {
         faturamentoMesCentavos,
@@ -121,55 +153,72 @@ export default async function FilaPage() {
         />
       ) : (
         <>
-          {session.barbeiroId && (comissaoHoje || metaInfo) && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              {comissaoHoje && (
-                <div className="rounded-xl p-5 shadow-sm bg-green-600 text-white flex items-start justify-between">
-                  <div>
-                    <p className="text-3xl font-bold mb-1">{formatarReais(comissaoHoje.comissaoCentavos)}</p>
-                    <p className="text-green-100 text-sm">Sua comissão hoje</p>
-                    <p className="text-green-100 text-xs mt-1">
-                      {comissaoHoje.qtd} atendimento(s) · faturamento {formatarReais(comissaoHoje.totalCentavos)}
-                    </p>
+          {session.barbeiroId && (comissaoPeriodo || metaInfo) && (
+            <div className="mb-6">
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                {(["hoje", "ontem", "semana", "mes"] as const).map((p) => (
+                  <Link
+                    key={p}
+                    href={`/fila?periodo=${p}`}
+                    className={`rounded-lg px-3 py-1.5 text-sm font-medium border ${
+                      periodoFila === p
+                        ? "bg-blue-600 border-blue-600 text-white"
+                        : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-slate-400"
+                    }`}
+                  >
+                    {p === "hoje" ? "Hoje" : p === "ontem" ? "Ontem" : p === "semana" ? "Esta semana" : "Este mês"}
+                  </Link>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {comissaoPeriodo && (
+                  <div className="rounded-xl p-5 shadow-sm bg-green-600 text-white flex items-start justify-between">
+                    <div>
+                      <p className="text-3xl font-bold mb-1">{formatarReais(comissaoPeriodo.comissaoCentavos)}</p>
+                      <p className="text-green-100 text-sm">Sua comissão ({LABEL_PERIODO_FILA[periodoFila]})</p>
+                      <p className="text-green-100 text-xs mt-1">
+                        {comissaoPeriodo.qtd} atendimento(s) · faturamento {formatarReais(comissaoPeriodo.totalCentavos)}
+                      </p>
+                    </div>
+                    <Wallet className="w-8 h-8 text-green-200 shrink-0" />
                   </div>
-                  <Wallet className="w-8 h-8 text-green-200 shrink-0" />
-                </div>
-              )}
+                )}
 
-              {metaInfo && (
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Target className="w-4 h-4 text-blue-600" />
-                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Minha meta do mês</p>
+                {metaInfo && (
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Target className="w-4 h-4 text-blue-600" />
+                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Minha meta do mês</p>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+                      <span>
+                        {formatarReais(metaInfo.faturamentoMesCentavos)} de {formatarReais(metaInfo.metaFaturamentoCentavos)}
+                      </span>
+                      <span className={`font-semibold ${metaInfo.bateuMeta ? "text-green-600" : "text-slate-500 dark:text-slate-400"}`}>
+                        {metaInfo.percentualMeta.toFixed(0)}%
+                      </span>
+                    </div>
+                    <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${metaInfo.bateuMeta ? "bg-green-500" : "bg-blue-500"}`}
+                        style={{ width: `${Math.min(metaInfo.percentualMeta, 100)}%` }}
+                      />
+                    </div>
+                    {metaInfo.bateuMeta ? (
+                      <p className="text-green-600 text-xs mt-2 font-medium">
+                        🎉 Meta batida!
+                        {metaInfo.bonificacaoCentavos ? ` Bônus: ${formatarReais(metaInfo.bonificacaoCentavos)}` : ""}
+                      </p>
+                    ) : (
+                      <p className="text-slate-500 dark:text-slate-400 text-xs mt-2">
+                        Faltam {(100 - metaInfo.percentualMeta).toFixed(0)}% (
+                        {formatarReais(Math.max(metaInfo.metaFaturamentoCentavos - metaInfo.faturamentoMesCentavos, 0))}) para
+                        bater a meta
+                      </p>
+                    )}
                   </div>
-                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-                    <span>
-                      {formatarReais(metaInfo.faturamentoMesCentavos)} de {formatarReais(metaInfo.metaFaturamentoCentavos)}
-                    </span>
-                    <span className={`font-semibold ${metaInfo.bateuMeta ? "text-green-600" : "text-slate-500 dark:text-slate-400"}`}>
-                      {metaInfo.percentualMeta.toFixed(0)}%
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${metaInfo.bateuMeta ? "bg-green-500" : "bg-blue-500"}`}
-                      style={{ width: `${Math.min(metaInfo.percentualMeta, 100)}%` }}
-                    />
-                  </div>
-                  {metaInfo.bateuMeta ? (
-                    <p className="text-green-600 text-xs mt-2 font-medium">
-                      🎉 Meta batida!
-                      {metaInfo.bonificacaoCentavos ? ` Bônus: ${formatarReais(metaInfo.bonificacaoCentavos)}` : ""}
-                    </p>
-                  ) : (
-                    <p className="text-slate-500 dark:text-slate-400 text-xs mt-2">
-                      Faltam {(100 - metaInfo.percentualMeta).toFixed(0)}% (
-                      {formatarReais(Math.max(metaInfo.metaFaturamentoCentavos - metaInfo.faturamentoMesCentavos, 0))}) para
-                      bater a meta
-                    </p>
-                  )}
-                </div>
-              )}
+                )}
+              </div>
             </div>
           )}
 
