@@ -74,7 +74,11 @@ export default async function FilaPage({
     ? emAtendimento.find((a) => a.barbeiroId === session.barbeiroId)
     : null;
 
-  let comissaoPeriodo: { comissaoCentavos: number; totalCentavos: number; qtd: number } | null = null;
+  let comissaoPeriodo: {
+    comissaoCentavos: number;
+    qtd: number;
+    clientes: { nome: string; servicos: string[] }[];
+  } | null = null;
   let metaInfo: {
     faturamentoMesCentavos: number;
     metaFaturamentoCentavos: number;
@@ -96,7 +100,8 @@ export default async function FilaPage({
           status: "CONCLUIDO",
           concluidoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
         },
-        include: { servicos: true },
+        include: { servicos: true, cliente: true },
+        orderBy: { concluidoEm: "desc" },
       }),
       !personalizado && periodoFila === "mes"
         ? Promise.resolve(null)
@@ -104,12 +109,15 @@ export default async function FilaPage({
             where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim } },
           }),
     ]);
-    const totalCentavos = atendimentosPeriodo.reduce((s, a) => s + a.precoTotalCentavos, 0);
     const comissaoCentavos = atendimentosPeriodo.reduce(
       (soma, a) => soma + comissaoServicos(a.servicos, barbeiro?.comissaoPercentual ?? 0),
       0
     );
-    comissaoPeriodo = { totalCentavos, qtd: atendimentosPeriodo.length, comissaoCentavos };
+    const clientes = atendimentosPeriodo.map((a) => ({
+      nome: a.cliente.nome,
+      servicos: a.servicos.map((s) => s.nomeSnapshot),
+    }));
+    comissaoPeriodo = { comissaoCentavos, qtd: atendimentosPeriodo.length, clientes };
 
     if (barbeiro?.metaFaturamentoCentavos && barbeiro.metaFaturamentoCentavos > 0) {
       const baseMes = atendimentosMes ?? atendimentosPeriodo;
@@ -220,16 +228,28 @@ export default async function FilaPage({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {comissaoPeriodo && (
-                  <div className="rounded-xl p-5 shadow-sm bg-green-600 text-white flex items-start justify-between">
-                    <div>
-                      <p className="text-3xl font-bold mb-1">{formatarReais(comissaoPeriodo.comissaoCentavos)}</p>
-                      <p className="text-green-100 text-sm">Sua comissão ({labelPeriodoFila})</p>
-                      <p className="text-green-100 text-xs mt-1">
-                        {comissaoPeriodo.qtd} atendimento(s) · faturamento {formatarReais(comissaoPeriodo.totalCentavos)}
-                      </p>
+                  <details className="rounded-xl p-5 shadow-sm bg-green-600 text-white">
+                    <summary className="cursor-pointer flex items-start justify-between select-none">
+                      <div>
+                        <p className="text-3xl font-bold mb-1">{formatarReais(comissaoPeriodo.comissaoCentavos)}</p>
+                        <p className="text-green-100 text-sm">Sua comissão ({labelPeriodoFila})</p>
+                        <p className="text-green-100 text-xs mt-1">{comissaoPeriodo.qtd} atendimento(s)</p>
+                      </div>
+                      <Wallet className="w-8 h-8 text-green-200 shrink-0" />
+                    </summary>
+                    <div className="mt-3 pt-3 border-t border-green-500/50 space-y-1.5">
+                      {comissaoPeriodo.clientes.length === 0 ? (
+                        <p className="text-green-100 text-sm">Nenhum atendimento nesse período.</p>
+                      ) : (
+                        comissaoPeriodo.clientes.map((c, i) => (
+                          <div key={i} className="text-sm flex items-center justify-between gap-2">
+                            <span>{c.nome}</span>
+                            <span className="text-green-200 text-xs text-right">{c.servicos.join(", ")}</span>
+                          </div>
+                        ))
+                      )}
                     </div>
-                    <Wallet className="w-8 h-8 text-green-200 shrink-0" />
-                  </div>
+                  </details>
                 )}
 
                 {metaInfo && (
