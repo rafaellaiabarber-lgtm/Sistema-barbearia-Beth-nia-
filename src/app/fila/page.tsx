@@ -35,15 +35,25 @@ function intervaloOntem(agora: Date) {
   return { inicio, fim };
 }
 
+function formatarDataBR(data: string) {
+  const [ano, mes, dia] = data.split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+
 export default async function FilaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ periodo?: string }>;
+  searchParams: Promise<{ periodo?: string; dataInicio?: string; dataFim?: string }>;
 }) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
-  const { periodo: periodoParam } = await searchParams;
+  const { periodo: periodoParam, dataInicio, dataFim } = await searchParams;
   const periodoFila: PeriodoFila =
     periodoParam === "ontem" || periodoParam === "semana" || periodoParam === "mes" ? periodoParam : "hoje";
+  const agora = new Date();
+  const personalizado = dataInicio ? calcularIntervalo("personalizado", agora, { dataInicio, dataFim }) : null;
+  const labelPeriodoFila = personalizado
+    ? `${formatarDataBR(dataInicio!)}${dataFim ? ` até ${formatarDataBR(dataFim)}` : ""}`
+    : LABEL_PERIODO_FILA[periodoFila];
 
   const [aguardando, emAtendimento, barbeirosAtivos, servicosAtivos] = await Promise.all([
     prisma.atendimento.findMany({
@@ -75,9 +85,8 @@ export default async function FilaPage({
   const campanhasAtivas = session.barbeiroId ? await buscarCampanhasAtivasComProgresso(session.barbeiroId) : [];
 
   if (session.barbeiroId) {
-    const agora = new Date();
     const intervaloSelecionado =
-      periodoFila === "ontem" ? intervaloOntem(agora) : calcularIntervalo(periodoFila, agora);
+      personalizado ?? (periodoFila === "ontem" ? intervaloOntem(agora) : calcularIntervalo(periodoFila, agora));
     const mes = calcularIntervalo("mes", agora);
     const [barbeiro, atendimentosPeriodo, atendimentosMes] = await Promise.all([
       prisma.barbeiro.findUnique({ where: { id: session.barbeiroId } }),
@@ -89,7 +98,7 @@ export default async function FilaPage({
         },
         include: { servicos: true },
       }),
-      periodoFila === "mes"
+      !personalizado && periodoFila === "mes"
         ? Promise.resolve(null)
         : prisma.atendimento.findMany({
             where: { barbeiroId: session.barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim } },
@@ -161,7 +170,7 @@ export default async function FilaPage({
                     key={p}
                     href={`/fila?periodo=${p}`}
                     className={`rounded-lg px-3 py-1.5 text-sm font-medium border ${
-                      periodoFila === p
+                      !personalizado && periodoFila === p
                         ? "bg-blue-600 border-blue-600 text-white"
                         : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-slate-400"
                     }`}
@@ -170,12 +179,46 @@ export default async function FilaPage({
                   </Link>
                 ))}
               </div>
+
+              <form
+                method="get"
+                className="flex flex-wrap items-end gap-3 mb-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3"
+              >
+                <div>
+                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">De</label>
+                  <input
+                    type="date"
+                    name="dataInicio"
+                    defaultValue={dataInicio}
+                    required
+                    className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Até</label>
+                  <input
+                    type="date"
+                    name="dataFim"
+                    defaultValue={dataFim}
+                    className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+                  />
+                </div>
+                <button type="submit" className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
+                  Ver por data
+                </button>
+                {personalizado && (
+                  <Link href="/fila" className="text-slate-400 dark:text-slate-500 hover:text-slate-700 text-sm">
+                    Limpar
+                  </Link>
+                )}
+              </form>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {comissaoPeriodo && (
                   <div className="rounded-xl p-5 shadow-sm bg-green-600 text-white flex items-start justify-between">
                     <div>
                       <p className="text-3xl font-bold mb-1">{formatarReais(comissaoPeriodo.comissaoCentavos)}</p>
-                      <p className="text-green-100 text-sm">Sua comissão ({LABEL_PERIODO_FILA[periodoFila]})</p>
+                      <p className="text-green-100 text-sm">Sua comissão ({labelPeriodoFila})</p>
                       <p className="text-green-100 text-xs mt-1">
                         {comissaoPeriodo.qtd} atendimento(s) · faturamento {formatarReais(comissaoPeriodo.totalCentavos)}
                       </p>
