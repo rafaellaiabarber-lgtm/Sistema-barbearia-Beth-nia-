@@ -5,7 +5,6 @@ import { put } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { hashSenha } from "@/lib/auth";
-import { reaisParaCentavos } from "@/lib/format";
 
 export type BarbeiroState = { erro?: string; sucesso?: boolean };
 
@@ -97,33 +96,6 @@ export async function atualizarBarbeiro(
 
   revalidatePath("/admin/barbeiros");
   revalidatePath("/totem");
-  return { sucesso: true };
-}
-
-export async function atualizarMetaBonificacao(
-  id: string,
-  _prevState: BarbeiroState,
-  formData: FormData
-): Promise<BarbeiroState> {
-  await requireSession(["ADMIN"]);
-
-  const meta = String(formData.get("meta") ?? "").trim();
-  const bonificacao = String(formData.get("bonificacao") ?? "").trim();
-
-  const metaCentavos = meta ? reaisParaCentavos(meta) : null;
-  if (metaCentavos !== null && metaCentavos < 0) return { erro: "Informe uma meta válida." };
-
-  const bonificacaoCentavos = bonificacao ? reaisParaCentavos(bonificacao) : null;
-  if (bonificacaoCentavos !== null && bonificacaoCentavos < 0) {
-    return { erro: "Informe uma bonificação válida." };
-  }
-
-  await prisma.barbeiro.update({
-    where: { id },
-    data: { metaFaturamentoCentavos: metaCentavos, bonificacaoCentavos },
-  });
-
-  revalidatePath("/admin/barbeiros");
   return { sucesso: true };
 }
 

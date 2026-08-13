@@ -3,10 +3,8 @@ import { Trophy } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo, type Periodo } from "@/lib/periodo";
-import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { NovoBarbeiroForm } from "./novo-barbeiro-form";
 import { BarbeiroRow } from "./barbeiro-row";
-import { MetaBonificacaoForm } from "./meta-bonificacao-form";
 import { JornadaForm } from "./jornada-form";
 
 const LABEL_PERIODO: Record<string, string> = { hoje: "hoje", semana: "esta semana", mes: "este mês" };
@@ -20,37 +18,21 @@ export default async function BarbeirosPage({
   const periodo: Periodo = periodoParam === "hoje" || periodoParam === "semana" ? periodoParam : "mes";
   const agora = new Date();
   const intervaloSelecionado = calcularIntervalo(periodo, agora);
-  const mes = calcularIntervalo("mes", agora);
 
-  const [barbeiros, atendimentosPeriodo, atendimentosMesSeparado, vendasProdutoPeriodo, vendasProdutoMesSeparado] =
-    await Promise.all([
-      prisma.barbeiro.findMany({
-        orderBy: [{ ativo: "desc" }, { nome: "asc" }],
-        include: { usuario: true, jornadas: true },
-      }),
-      prisma.atendimento.findMany({
-        where: {
-          status: "CONCLUIDO",
-          concluidoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
-          barbeiroId: { not: null },
-        },
-        include: { servicos: true },
-      }),
-      periodo === "mes"
-        ? Promise.resolve(null)
-        : prisma.atendimento.findMany({
-            where: { status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim }, barbeiroId: { not: null } },
-            select: { barbeiroId: true, servicos: { select: { precoCentavos: true, comissaoPercentual: true } } },
-          }),
-      prisma.vendaProduto.findMany({
-        where: { criadoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim }, barbeiroId: { not: null } },
-      }),
-      periodo === "mes"
-        ? Promise.resolve(null)
-        : prisma.vendaProduto.findMany({
-            where: { criadoEm: { gte: mes.inicio, lte: mes.fim }, barbeiroId: { not: null } },
-          }),
-    ]);
+  const [barbeiros, atendimentosPeriodo] = await Promise.all([
+    prisma.barbeiro.findMany({
+      orderBy: [{ ativo: "desc" }, { nome: "asc" }],
+      include: { usuario: true, jornadas: true },
+    }),
+    prisma.atendimento.findMany({
+      where: {
+        status: "CONCLUIDO",
+        concluidoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
+        barbeiroId: { not: null },
+      },
+      include: { servicos: true },
+    }),
+  ]);
 
   const producaoPorBarbeiro = new Map<
     string,
@@ -71,35 +53,13 @@ export default async function BarbeirosPage({
     producaoPorBarbeiro.set(a.barbeiroId, atual);
   }
 
-  const listaAtendimentosMes = atendimentosMesSeparado ?? atendimentosPeriodo;
-  const listaVendasMes = vendasProdutoMesSeparado ?? vendasProdutoPeriodo;
-
-  const comissaoMesPorBarbeiro = new Map<string, number>();
-  for (const a of listaAtendimentosMes) {
-    if (!a.barbeiroId) continue;
-    const comissaoPadrao = barbeiros.find((b) => b.id === a.barbeiroId)?.comissaoPercentual ?? 0;
-    const atual = comissaoMesPorBarbeiro.get(a.barbeiroId) ?? 0;
-    comissaoMesPorBarbeiro.set(a.barbeiroId, atual + comissaoServicos(a.servicos, comissaoPadrao));
-  }
-  for (const v of listaVendasMes) {
-    if (!v.barbeiroId) continue;
-    const atual = comissaoMesPorBarbeiro.get(v.barbeiroId) ?? 0;
-    comissaoMesPorBarbeiro.set(v.barbeiroId, atual + comissaoProdutos([v]));
-  }
-
   const barbeirosComMetricas = barbeiros.map((b) => {
     const producao = producaoPorBarbeiro.get(b.id) ?? {
       faturamentoCentavos: 0,
       qtd: 0,
       servicos: new Map<string, number>(),
     };
-    const comissaoMesCentavos = comissaoMesPorBarbeiro.get(b.id) ?? 0;
     const ticketMedioCentavos = producao.qtd > 0 ? Math.round(producao.faturamentoCentavos / producao.qtd) : 0;
-    const percentualMeta =
-      b.metaFaturamentoCentavos && b.metaFaturamentoCentavos > 0
-        ? Math.min((comissaoMesCentavos / b.metaFaturamentoCentavos) * 100, 999)
-        : null;
-    const bateuMeta = percentualMeta !== null && percentualMeta >= 100;
     const servicosRealizados = [...producao.servicos.entries()]
       .map(([nome, qtd]) => ({ nome, qtd }))
       .sort((x, y) => y.qtd - x.qtd);
@@ -107,11 +67,8 @@ export default async function BarbeirosPage({
     return {
       barbeiro: b,
       faturamentoCentavos: producao.faturamentoCentavos,
-      comissaoMesCentavos,
       qtdAtendimentos: producao.qtd,
       ticketMedioCentavos,
-      percentualMeta,
-      bateuMeta,
       servicosRealizados,
     };
   });
@@ -197,36 +154,9 @@ export default async function BarbeirosPage({
                 </div>
               </div>
 
-              {m.percentualMeta !== null && (
-                <div className="mb-4">
-                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-                    <span>
-                      Meta de comissão do mês: {formatarReais(m.comissaoMesCentavos)} de{" "}
-                      {formatarReais(m.barbeiro.metaFaturamentoCentavos!)}
-                    </span>
-                    <span className={bateuMetaClasse(m.bateuMeta)}>
-                      {m.percentualMeta.toFixed(0)}% {m.bateuMeta ? "— meta batida!" : ""}
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${m.bateuMeta ? "bg-green-500" : "bg-blue-500"}`}
-                      style={{ width: `${Math.min(m.percentualMeta, 100)}%` }}
-                    />
-                  </div>
-                  {m.bateuMeta && m.barbeiro.bonificacaoCentavos ? (
-                    <p className="text-green-600 text-xs mt-1 font-medium">
-                      🎉 Bônus liberado: {formatarReais(m.barbeiro.bonificacaoCentavos)}
-                    </p>
-                  ) : null}
-                </div>
-              )}
-
-              <MetaBonificacaoForm
-                barbeiroId={m.barbeiro.id}
-                metaFaturamentoCentavos={m.barbeiro.metaFaturamentoCentavos}
-                bonificacaoCentavos={m.barbeiro.bonificacaoCentavos}
-              />
+              <Link href="/admin/metas" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                Configurar metas e bonificação →
+              </Link>
 
               <JornadaForm barbeiroId={m.barbeiro.id} jornadas={m.barbeiro.jornadas} />
 
@@ -265,8 +195,4 @@ export default async function BarbeirosPage({
       )}
     </div>
   );
-}
-
-function bateuMetaClasse(bateu: boolean) {
-  return `font-semibold ${bateu ? "text-green-600" : "text-slate-500 dark:text-slate-400"}`;
 }
