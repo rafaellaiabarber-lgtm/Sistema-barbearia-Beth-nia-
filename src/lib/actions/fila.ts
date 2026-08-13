@@ -181,6 +181,8 @@ export async function concluirAtendimento(
 
   revalidatePath("/fila");
   revalidatePath("/admin/financeiro");
+  revalidatePath("/ranking");
+  revalidatePath("/admin/campanhas");
   return {};
 }
 

@@ -8,6 +8,7 @@ export type IndicacaoState = { erro?: string };
 
 function revalidar() {
   revalidatePath("/indicacoes");
+  revalidatePath("/ranking");
 }
 
 export async function criarIndicacao(_prevState: IndicacaoState, formData: FormData): Promise<IndicacaoState> {

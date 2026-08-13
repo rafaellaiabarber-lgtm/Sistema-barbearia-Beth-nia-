@@ -12,6 +12,9 @@ function revalidarRelatorios() {
   revalidatePath("/admin/fluxo-caixa");
   revalidatePath("/admin/dre");
   revalidatePath("/admin/metas");
+  revalidatePath("/ranking");
+  revalidatePath("/admin/campanhas");
+  revalidatePath("/fila");
 }
 
 export async function registrarVendaProduto(
