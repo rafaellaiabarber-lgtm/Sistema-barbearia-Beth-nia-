@@ -17,6 +17,13 @@ function premioCentavos(formData: FormData, campo: string) {
   return valor ? reaisParaCentavos(valor) : null;
 }
 
+function inteiroOuNulo(formData: FormData, campo: string) {
+  const valor = String(formData.get(campo) ?? "").trim();
+  if (!valor) return null;
+  const numero = Number.parseInt(valor, 10);
+  return Number.isFinite(numero) && numero >= 0 ? numero : null;
+}
+
 export async function atualizarConfiguracaoRanking(
   _prevState: ConfiguracaoRankingState,
   formData: FormData
@@ -34,6 +41,7 @@ export async function atualizarConfiguracaoRanking(
     premio1LugarMensalCentavos: premioCentavos(formData, "premio1LugarMensal"),
     premio2LugarMensalCentavos: premioCentavos(formData, "premio2LugarMensal"),
     premio3LugarMensalCentavos: premioCentavos(formData, "premio3LugarMensal"),
+    pontuacaoMinimaPremio: inteiroOuNulo(formData, "pontuacaoMinimaPremio"),
   };
 
   await prisma.configuracaoRanking.upsert({

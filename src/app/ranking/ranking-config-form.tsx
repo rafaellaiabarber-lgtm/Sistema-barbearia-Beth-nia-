@@ -20,6 +20,7 @@ export function RankingConfigForm({
   premio1LugarMensalCentavos,
   premio2LugarMensalCentavos,
   premio3LugarMensalCentavos,
+  pontuacaoMinimaPremio,
 }: {
   pontosPorAtendimento: number;
   pontosPorVendaProduto: number;
@@ -31,6 +32,7 @@ export function RankingConfigForm({
   premio1LugarMensalCentavos: number | null;
   premio2LugarMensalCentavos: number | null;
   premio3LugarMensalCentavos: number | null;
+  pontuacaoMinimaPremio: number | null;
 }) {
   const [estado, formAction, pendente] = useActionState(atualizarConfiguracaoRanking, estadoInicial);
 
@@ -154,6 +156,23 @@ export function RankingConfigForm({
               />
             </div>
           </div>
+        </div>
+
+        <div>
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Pontuação mínima pra valer o prêmio</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+            Se o 1º/2º/3º lugar não bater esse mínimo de pontos no período, o prêmio não é mostrado pra ele. Vale pro
+            semanal, mensal e pro período personalizado (que usa o mesmo prêmio semanal). Deixa em branco pra não ter
+            mínimo.
+          </p>
+          <input
+            name="pontuacaoMinimaPremio"
+            type="number"
+            min={0}
+            placeholder="sem mínimo"
+            defaultValue={pontuacaoMinimaPremio ?? ""}
+            className="w-32 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+          />
         </div>
 
         <div className="flex items-center gap-3">

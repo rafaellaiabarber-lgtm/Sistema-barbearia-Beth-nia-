@@ -90,7 +90,7 @@ export default async function RankingPage({
   const rankingSemanal = montarRanking(contagensSemana, pontos);
   const rankingMensal = montarRanking(contagensMes, pontos);
   const rankingPersonalizado = contagensPersonalizado ? montarRanking(contagensPersonalizado, pontos) : null;
-  const premiosVazio = { premio1Centavos: null, premio2Centavos: null, premio3Centavos: null };
+  const pontuacaoMinimaPremio = configuracao?.pontuacaoMinimaPremio ?? null;
 
   const premiosSemanal = {
     premio1Centavos: configuracao?.premio1LugarSemanalCentavos ?? null,
@@ -155,7 +155,7 @@ export default async function RankingPage({
           )}
         </form>
         {rankingPersonalizado ? (
-          <RankingLista ranking={rankingPersonalizado} premios={premiosVazio} />
+          <RankingLista ranking={rankingPersonalizado} premios={premiosSemanal} pontuacaoMinima={pontuacaoMinimaPremio} />
         ) : (
           <p className="text-slate-400 dark:text-slate-500 text-sm">
             Escolhe uma data de início pra ver o ranking só daquele período — de sexta a domingo, de uma semana específica, etc.
@@ -165,12 +165,12 @@ export default async function RankingPage({
 
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">Ranking da semana</h2>
-        <RankingLista ranking={rankingSemanal} premios={premiosSemanal} />
+        <RankingLista ranking={rankingSemanal} premios={premiosSemanal} pontuacaoMinima={pontuacaoMinimaPremio} />
       </section>
 
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">Ranking do mês</h2>
-        <RankingLista ranking={rankingMensal} premios={premiosMensal} />
+        <RankingLista ranking={rankingMensal} premios={premiosMensal} pontuacaoMinima={pontuacaoMinimaPremio} />
       </section>
 
       {souAdmin && (
@@ -186,6 +186,7 @@ export default async function RankingPage({
             premio1LugarMensalCentavos={configuracao?.premio1LugarMensalCentavos ?? null}
             premio2LugarMensalCentavos={configuracao?.premio2LugarMensalCentavos ?? null}
             premio3LugarMensalCentavos={configuracao?.premio3LugarMensalCentavos ?? null}
+            pontuacaoMinimaPremio={pontuacaoMinimaPremio}
           />
         </section>
       )}
