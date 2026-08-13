@@ -6,6 +6,7 @@ import { calcularIntervalo, type Periodo } from "@/lib/periodo";
 import { NovoBarbeiroForm } from "./novo-barbeiro-form";
 import { BarbeiroRow } from "./barbeiro-row";
 import { MetaBonificacaoForm } from "./meta-bonificacao-form";
+import { JornadaForm } from "./jornada-form";
 
 const LABEL_PERIODO: Record<string, string> = { hoje: "hoje", semana: "esta semana", mes: "este mês" };
 
@@ -23,7 +24,7 @@ export default async function BarbeirosPage({
   const [barbeiros, atendimentosPeriodo, atendimentosMesSeparado] = await Promise.all([
     prisma.barbeiro.findMany({
       orderBy: [{ ativo: "desc" }, { nome: "asc" }],
-      include: { usuario: true },
+      include: { usuario: true, jornadas: true },
     }),
     prisma.atendimento.findMany({
       where: {
@@ -212,6 +213,8 @@ export default async function BarbeirosPage({
                 metaFaturamentoCentavos={m.barbeiro.metaFaturamentoCentavos}
                 bonificacaoCentavos={m.barbeiro.bonificacaoCentavos}
               />
+
+              <JornadaForm barbeiroId={m.barbeiro.id} jornadas={m.barbeiro.jornadas} />
 
               {m.servicosRealizados.length > 0 && (
                 <details className="mt-4">
