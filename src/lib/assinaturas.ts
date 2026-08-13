@@ -36,3 +36,14 @@ export function estaInadimplente(diaVencimento: number, pagouCompetenciaAtual: b
   if (pagouCompetenciaAtual) return false;
   return agora.getDate() > diaVencimento;
 }
+
+export const NOMES_DIAS_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+export function diaCobertoHoje(diasSemana: number[], agora: Date = new Date()): boolean {
+  return diasSemana.length === 0 || diasSemana.includes(agora.getDay());
+}
+
+export function formatarDiasSemana(diasSemana: number[]): string {
+  if (diasSemana.length === 0 || diasSemana.length === 7) return "todos os dias";
+  return [...diasSemana].sort((a, b) => a - b).map((d) => NOMES_DIAS_SEMANA[d]).join(", ");
+}

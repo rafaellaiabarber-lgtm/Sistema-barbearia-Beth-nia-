@@ -9,6 +9,7 @@ import { calcularIntervalo } from "@/lib/periodo";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { buscarCampanhasAtivasComProgresso } from "@/lib/campanhas-server";
 import { itemCompleto, quantidadeFaltando, valorPotencialCentavos } from "@/lib/campanhas";
+import { diaCobertoHoje } from "@/lib/assinaturas";
 import { AutoRefresh } from "./auto-refresh";
 import { AtendendoAgora } from "./atendendo-agora";
 import { ThemeToggle } from "../theme-toggle";
@@ -18,6 +19,22 @@ function tempoEspera(desde: Date) {
   if (minutos === 0) return "agora mesmo";
   if (minutos === 1) return "há 1 min";
   return `há ${minutos} min`;
+}
+
+function BadgeAssinante({ info }: { info: { nome: string; cobertoHoje: boolean } | undefined }) {
+  if (!info) return null;
+  if (info.cobertoHoje) {
+    return (
+      <span className="ml-2 inline-block rounded-full bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 text-xs font-medium px-2 py-0.5 align-middle">
+        🎫 Assinante
+      </span>
+    );
+  }
+  return (
+    <span className="ml-2 inline-block rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 text-xs font-medium px-2 py-0.5 align-middle">
+      🎫 Assinante (hoje é avulso)
+    </span>
+  );
 }
 
 type PeriodoFila = "hoje" | "ontem" | "semana" | "mes";
@@ -82,9 +99,11 @@ export default async function FilaPage({
         include: { plano: true },
       })
     : [];
-  const planoAtivoPorCliente = new Map<string, string>();
+  const planoInfoPorCliente = new Map<string, { nome: string; cobertoHoje: boolean }>();
   for (const a of assinaturasAtivas) {
-    if (!planoAtivoPorCliente.has(a.clienteId)) planoAtivoPorCliente.set(a.clienteId, a.plano.nome);
+    if (!planoInfoPorCliente.has(a.clienteId)) {
+      planoInfoPorCliente.set(a.clienteId, { nome: a.plano.nome, cobertoHoje: diaCobertoHoje(a.plano.diasSemana) });
+    }
   }
 
   let comissaoPeriodo: {
@@ -194,7 +213,7 @@ export default async function FilaPage({
           servicos={servicosAtivos}
           campanhas={campanhasAtivas}
           comAvisoFixo={mostrarAvisoCampanha}
-          planoAtivo={planoAtivoPorCliente.get(meuAtendimento.clienteId) ?? null}
+          planoInfo={planoInfoPorCliente.get(meuAtendimento.clienteId) ?? null}
         />
       ) : (
         <>
@@ -353,11 +372,7 @@ export default async function FilaPage({
                     <div key={a.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
                       <p className="font-semibold">
                         {a.cliente.nome}
-                        {planoAtivoPorCliente.has(a.clienteId) && (
-                          <span className="ml-2 inline-block rounded-full bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 text-xs font-medium px-2 py-0.5 align-middle">
-                            🎫 Assinante
-                          </span>
-                        )}{" "}
+                        <BadgeAssinante info={planoInfoPorCliente.get(a.clienteId)} />{" "}
                         <span className="text-slate-500 dark:text-slate-400 text-sm">com {a.barbeiro?.nome}</span>
                       </p>
                       <p className="text-blue-600 text-sm">{formatarReais(a.precoTotalCentavos)}</p>
@@ -399,11 +414,7 @@ export default async function FilaPage({
                       <div>
                         <p className="font-semibold">
                           {a.cliente.nome}
-                          {planoAtivoPorCliente.has(a.clienteId) && (
-                            <span className="ml-2 inline-block rounded-full bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 text-xs font-medium px-2 py-0.5 align-middle">
-                              🎫 Assinante
-                            </span>
-                          )}
+                          <BadgeAssinante info={planoInfoPorCliente.get(a.clienteId)} />
                         </p>
                         <p className="text-slate-500 dark:text-slate-400 text-sm">
                           {a.barbeiroPreferido ? `Pediu: ${a.barbeiroPreferido.nome}` : "Sem preferência de barbeiro"}
