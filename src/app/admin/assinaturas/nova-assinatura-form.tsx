@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import type { Plano } from "@prisma/client";
+import type { Barbeiro, Plano } from "@prisma/client";
 import { criarAssinatura, type AssinaturaState } from "@/lib/actions/assinaturas";
 import { buscarNomePorTelefone } from "@/lib/actions/fila";
 import { buscarClientesPorNome, type SugestaoCliente } from "@/lib/actions/atendimentos";
@@ -9,7 +9,7 @@ import { formatarReais } from "@/lib/format";
 
 const estadoInicial: AssinaturaState = {};
 
-export function NovaAssinaturaForm({ planos }: { planos: Plano[] }) {
+export function NovaAssinaturaForm({ planos, barbeiros }: { planos: Plano[]; barbeiros: Barbeiro[] }) {
   const [estado, formAction, pendente] = useActionState(criarAssinatura, estadoInicial);
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -174,6 +174,21 @@ export function NovaAssinaturaForm({ planos }: { planos: Plano[] }) {
               required
               className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-20"
             />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Vendido por (opcional)</label>
+            <select
+              name="barbeiroId"
+              defaultValue=""
+              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+            >
+              <option value="">Sem vendedor</option>
+              {barbeiros.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.nome}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

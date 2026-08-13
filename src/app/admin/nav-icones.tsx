@@ -18,6 +18,7 @@ import {
   Package,
   UserPlus,
   Sparkles,
+  Trophy,
   type LucideIcon,
 } from "lucide-react";
 
@@ -30,6 +31,7 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   produtos: Package,
   atendimentos: Clock,
   indicacoes: UserPlus,
+  ranking: Trophy,
   assinaturas: CreditCard,
   planos: Layers,
   caixa: Wallet,

@@ -42,6 +42,16 @@ export async function alternarContatada(indicacaoId: string, contatada: boolean)
   revalidar();
 }
 
+export async function alternarConvertida(indicacaoId: string, convertida: boolean) {
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
+  const escopo = session.role === "ADMIN" ? {} : { barbeiroId: session.barbeiroId ?? "__nenhum__" };
+  await prisma.indicacao.updateMany({
+    where: { id: indicacaoId, ...escopo },
+    data: { convertida, convertidaEm: convertida ? new Date() : null },
+  });
+  revalidar();
+}
+
 export async function excluirIndicacao(indicacaoId: string) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
   const escopo = session.role === "ADMIN" ? {} : { barbeiroId: session.barbeiroId ?? "__nenhum__" };

@@ -95,6 +95,9 @@ export default async function FilaPage() {
           <Link href="/indicacoes" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
             Indicações
           </Link>
+          <Link href="/ranking" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
+            Ranking
+          </Link>
           {session.role === "ADMIN" && (
             <Link href="/admin" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
               Painel admin

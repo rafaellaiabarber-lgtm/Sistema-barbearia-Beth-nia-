@@ -95,18 +95,21 @@ model Barbeiro {
   metas                   Meta[]
   vendasProduto           VendaProduto[]
   indicacoes              Indicacao[]
+  assinaturasVendidas     Assinatura[]
   criadoEm                DateTime            @default(now())
 }
 
 model Indicacao {
-  id          String    @id @default(cuid())
-  barbeiro    Barbeiro  @relation(fields: [barbeiroId], references: [id])
-  barbeiroId  String
-  nome        String
-  telefone    String
-  contatada   Boolean   @default(false)
-  contatadaEm DateTime?
-  criadoEm    DateTime  @default(now())
+  id           String    @id @default(cuid())
+  barbeiro     Barbeiro  @relation(fields: [barbeiroId], references: [id])
+  barbeiroId   String
+  nome         String
+  telefone     String
+  contatada    Boolean   @default(false)
+  contatadaEm  DateTime?
+  convertida   Boolean   @default(false)
+  convertidaEm DateTime?
+  criadoEm     DateTime  @default(now())
 }
 
 // Sem @@unique de (barbeiroId, tipo): agora um barbeiro pode ter várias metas do
@@ -259,6 +262,8 @@ model Assinatura {
   clienteId     String
   plano         Plano                 @relation(fields: [planoId], references: [id])
   planoId       String
+  barbeiro      Barbeiro?             @relation(fields: [barbeiroId], references: [id])
+  barbeiroId    String?
   status        StatusAssinatura      @default(ATIVA)
   diaVencimento Int
   criadoEm      DateTime              @default(now())
@@ -291,6 +296,21 @@ model ConfiguracaoFinanceira {
   taxaCartaoPercentualX100      Int?
   metaFaturamentoMensalCentavos Int?
   atualizadoEm                  DateTime @updatedAt
+}
+
+model ConfiguracaoRanking {
+  id                           String   @id @default("singleton")
+  pontosPorAtendimento         Int      @default(1)
+  pontosPorVendaProduto        Int      @default(1)
+  pontosPorAssinatura          Int      @default(1)
+  pontosPorIndicacaoConvertida Int      @default(1)
+  premio1LugarSemanalCentavos  Int?
+  premio2LugarSemanalCentavos  Int?
+  premio3LugarSemanalCentavos  Int?
+  premio1LugarMensalCentavos   Int?
+  premio2LugarMensalCentavos   Int?
+  premio3LugarMensalCentavos   Int?
+  atualizadoEm                 DateTime @updatedAt
 }
 
 model ContaFinanceira {
