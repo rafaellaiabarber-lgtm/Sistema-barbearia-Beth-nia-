@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { normalizarTelefone } from "@/lib/format";
+import { diaCobertoHoje, formatarDiasSemana } from "@/lib/assinaturas";
 
 export async function buscarNomePorTelefone(telefone: string): Promise<string | null> {
   if (!telefone) return null;
@@ -11,17 +12,25 @@ export async function buscarNomePorTelefone(telefone: string): Promise<string | 
   return cliente?.nome ?? null;
 }
 
-export type ClienteInfo = { nome: string | null; planoAtivo: string | null };
+export type ClienteInfo = {
+  nome: string | null;
+  planoAtivo: string | null;
+  planoCobertoHoje: boolean;
+  planoDiasTexto: string | null;
+};
 
 export async function buscarClienteInfoPorTelefone(telefone: string): Promise<ClienteInfo> {
-  if (!telefone) return { nome: null, planoAtivo: null };
+  if (!telefone) return { nome: null, planoAtivo: null, planoCobertoHoje: true, planoDiasTexto: null };
   const cliente = await prisma.cliente.findUnique({
     where: { telefone: normalizarTelefone(telefone) },
     include: { assinaturas: { where: { status: "ATIVA" }, include: { plano: true }, take: 1 } },
   });
+  const plano = cliente?.assinaturas[0]?.plano;
   return {
     nome: cliente?.nome ?? null,
-    planoAtivo: cliente?.assinaturas[0]?.plano.nome ?? null,
+    planoAtivo: plano?.nome ?? null,
+    planoCobertoHoje: plano ? diaCobertoHoje(plano.diasSemana) : true,
+    planoDiasTexto: plano ? formatarDiasSemana(plano.diasSemana) : null,
   };
 }
 

@@ -9,6 +9,7 @@ import {
   type PlanoState,
 } from "@/lib/actions/planos";
 import { formatarReais } from "@/lib/format";
+import { NOMES_DIAS_SEMANA, formatarDiasSemana } from "@/lib/assinaturas";
 
 const estadoInicial: PlanoState = {};
 
@@ -65,6 +66,28 @@ export function PlanoRow({ plano }: { plano: Plano }) {
               className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-20"
             />
           </div>
+          <div className="w-full">
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
+              Dias que o plano cobre (deixe tudo desmarcado pra valer todo dia)
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {NOMES_DIAS_SEMANA.map((nome, i) => (
+                <label
+                  key={i}
+                  className="flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 px-2.5 py-1.5 text-sm cursor-pointer has-[:checked]:bg-blue-50 has-[:checked]:border-blue-400 dark:has-[:checked]:bg-blue-950"
+                >
+                  <input
+                    type="checkbox"
+                    name="diasSemana"
+                    value={i}
+                    defaultChecked={plano.diasSemana.includes(i)}
+                    className="accent-blue-600"
+                  />
+                  {nome}
+                </label>
+              ))}
+            </div>
+          </div>
           <button
             type="submit"
             disabled={pendente}
@@ -87,7 +110,7 @@ export function PlanoRow({ plano }: { plano: Plano }) {
             <p className="font-semibold">{plano.nome}</p>
             <p className="text-slate-500 dark:text-slate-400 text-sm">
               {formatarReais(plano.precoCentavos)}/mês · {plano.servicosIncluidosPorMes} serviço(s)
-              incluído(s) por mês
+              incluído(s) por mês · cobre {formatarDiasSemana(plano.diasSemana)}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-4">

@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { criarPlano, type PlanoState } from "@/lib/actions/planos";
+import { NOMES_DIAS_SEMANA } from "@/lib/assinaturas";
 
 const estadoInicial: PlanoState = {};
 
@@ -49,6 +50,22 @@ export function NovoPlanoForm() {
           placeholder="4"
           className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-32"
         />
+      </div>
+      <div className="w-full">
+        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
+          Dias que o plano cobre (deixe tudo desmarcado pra valer todo dia)
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {NOMES_DIAS_SEMANA.map((nome, i) => (
+            <label
+              key={i}
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 px-2.5 py-1.5 text-sm cursor-pointer has-[:checked]:bg-blue-50 has-[:checked]:border-blue-400 dark:has-[:checked]:bg-blue-950"
+            >
+              <input type="checkbox" name="diasSemana" value={i} className="accent-blue-600" />
+              {nome}
+            </label>
+          ))}
+        </div>
       </div>
       <button
         type="submit"

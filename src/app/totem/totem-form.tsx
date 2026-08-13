@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import type { Barbeiro } from "@prisma/client";
-import { entrarNaFila, buscarClienteInfoPorTelefone, type EntrarFilaState } from "@/lib/actions/fila";
+import { entrarNaFila, buscarClienteInfoPorTelefone, type ClienteInfo, type EntrarFilaState } from "@/lib/actions/fila";
 import { TecladoNumerico } from "./teclado-numerico";
 
 const estadoInicial: EntrarFilaState = {};
@@ -18,10 +18,18 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
   const [erroLocal, setErroLocal] = useState("");
   const [buscandoNome, setBuscandoNome] = useState(false);
   const [boasVindas, setBoasVindas] = useState(false);
-  const [planoAtivo, setPlanoAtivo] = useState<string | null>(null);
+  const [clienteInfo, setClienteInfo] = useState<ClienteInfo | null>(null);
   const [temAcompanhante, setTemAcompanhante] = useState<boolean | null>(null);
   const [acompanhanteNome, setAcompanhanteNome] = useState("");
   const [acompanhanteTelefone, setAcompanhanteTelefone] = useState("");
+
+  useEffect(() => {
+    if (!estado.sucesso) return;
+    const timer = setTimeout(() => {
+      window.location.href = "/totem";
+    }, 15000);
+    return () => clearTimeout(timer);
+  }, [estado.sucesso]);
 
   if (estado.sucesso) {
     return (
@@ -91,7 +99,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
                 setNome("");
                 setBoasVindas(false);
               }
-              setPlanoAtivo(info.planoAtivo);
+              setClienteInfo(info);
               setEtapa("nome");
             }}
             className="w-full rounded-xl bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-bold text-lg py-4 transition-colors mt-6"
@@ -111,9 +119,15 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               Bem-vindo(a) de volta! Confirme ou edite seu nome abaixo.
             </p>
           )}
-          {planoAtivo && (
+          {clienteInfo?.planoAtivo && clienteInfo.planoCobertoHoje && (
             <p className="text-green-400 text-sm font-semibold mb-3 text-center">
-              🎫 Você tem o plano {planoAtivo} ativo!
+              🎫 Você tem o plano {clienteInfo.planoAtivo} ativo!
+            </p>
+          )}
+          {clienteInfo?.planoAtivo && !clienteInfo.planoCobertoHoje && (
+            <p className="text-amber-400 text-sm font-semibold mb-3 text-center px-2">
+              🎫 Você tem o plano {clienteInfo.planoAtivo}, mas hoje não é dia coberto (cobre {clienteInfo.planoDiasTexto})
+              — hoje seria cobrado avulso.
             </p>
           )}
           <input
