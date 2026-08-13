@@ -1,30 +1,51 @@
+import Link from "next/link";
 import { Trophy } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
-import { calcularIntervalo } from "@/lib/periodo";
+import { calcularIntervalo, type Periodo } from "@/lib/periodo";
 import { NovoBarbeiroForm } from "./novo-barbeiro-form";
 import { BarbeiroRow } from "./barbeiro-row";
 import { MetaBonificacaoForm } from "./meta-bonificacao-form";
 
-export default async function BarbeirosPage() {
-  const mes = calcularIntervalo("mes", new Date());
+const LABEL_PERIODO: Record<string, string> = { hoje: "hoje", semana: "esta semana", mes: "este mês" };
 
-  const [barbeiros, atendimentosMes] = await Promise.all([
+export default async function BarbeirosPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ periodo?: string }>;
+}) {
+  const { periodo: periodoParam } = await searchParams;
+  const periodo: Periodo = periodoParam === "hoje" || periodoParam === "semana" ? periodoParam : "mes";
+  const agora = new Date();
+  const intervaloSelecionado = calcularIntervalo(periodo, agora);
+  const mes = calcularIntervalo("mes", agora);
+
+  const [barbeiros, atendimentosPeriodo, atendimentosMesSeparado] = await Promise.all([
     prisma.barbeiro.findMany({
       orderBy: [{ ativo: "desc" }, { nome: "asc" }],
       include: { usuario: true },
     }),
     prisma.atendimento.findMany({
-      where: { status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim }, barbeiroId: { not: null } },
+      where: {
+        status: "CONCLUIDO",
+        concluidoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
+        barbeiroId: { not: null },
+      },
       include: { servicos: true },
     }),
+    periodo === "mes"
+      ? Promise.resolve(null)
+      : prisma.atendimento.findMany({
+          where: { status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim }, barbeiroId: { not: null } },
+          select: { barbeiroId: true, precoTotalCentavos: true },
+        }),
   ]);
 
   const producaoPorBarbeiro = new Map<
     string,
     { faturamentoCentavos: number; qtd: number; servicos: Map<string, number> }
   >();
-  for (const a of atendimentosMes) {
+  for (const a of atendimentosPeriodo) {
     if (!a.barbeiroId) continue;
     const atual = producaoPorBarbeiro.get(a.barbeiroId) ?? {
       faturamentoCentavos: 0,
@@ -39,16 +60,29 @@ export default async function BarbeirosPage() {
     producaoPorBarbeiro.set(a.barbeiroId, atual);
   }
 
+  const faturamentoMesPorBarbeiro = new Map<string, number>();
+  if (atendimentosMesSeparado) {
+    for (const a of atendimentosMesSeparado) {
+      if (!a.barbeiroId) continue;
+      faturamentoMesPorBarbeiro.set(a.barbeiroId, (faturamentoMesPorBarbeiro.get(a.barbeiroId) ?? 0) + a.precoTotalCentavos);
+    }
+  } else {
+    for (const [barbeiroId, dados] of producaoPorBarbeiro) {
+      faturamentoMesPorBarbeiro.set(barbeiroId, dados.faturamentoCentavos);
+    }
+  }
+
   const barbeirosComMetricas = barbeiros.map((b) => {
     const producao = producaoPorBarbeiro.get(b.id) ?? {
       faturamentoCentavos: 0,
       qtd: 0,
       servicos: new Map<string, number>(),
     };
+    const faturamentoMesCentavos = faturamentoMesPorBarbeiro.get(b.id) ?? 0;
     const ticketMedioCentavos = producao.qtd > 0 ? Math.round(producao.faturamentoCentavos / producao.qtd) : 0;
     const percentualMeta =
       b.metaFaturamentoCentavos && b.metaFaturamentoCentavos > 0
-        ? Math.min((producao.faturamentoCentavos / b.metaFaturamentoCentavos) * 100, 999)
+        ? Math.min((faturamentoMesCentavos / b.metaFaturamentoCentavos) * 100, 999)
         : null;
     const bateuMeta = percentualMeta !== null && percentualMeta >= 100;
     const servicosRealizados = [...producao.servicos.entries()]
@@ -58,6 +92,7 @@ export default async function BarbeirosPage() {
     return {
       barbeiro: b,
       faturamentoCentavos: producao.faturamentoCentavos,
+      faturamentoMesCentavos,
       qtdAtendimentos: producao.qtd,
       ticketMedioCentavos,
       percentualMeta,
@@ -75,11 +110,27 @@ export default async function BarbeirosPage() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Barbeiros</h1>
 
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        {(["hoje", "semana", "mes"] as const).map((p) => (
+          <Link
+            key={p}
+            href={`/admin/barbeiros?periodo=${p}`}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium border ${
+              periodo === p
+                ? "bg-blue-600 border-blue-600 text-white"
+                : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-slate-400"
+            }`}
+          >
+            {p === "hoje" ? "Hoje" : p === "semana" ? "Esta semana" : "Este mês"}
+          </Link>
+        ))}
+      </div>
+
       {ranking.length > 0 && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm mb-6">
           <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-2">
             <Trophy className="w-4 h-4 text-amber-500" />
-            Ranking de desempenho (mês) — por faturamento
+            Ranking de desempenho ({LABEL_PERIODO[periodo]}) — por faturamento
           </h2>
           <div className="space-y-2">
             {ranking.map((m, i) => (
@@ -118,15 +169,15 @@ export default async function BarbeirosPage() {
             >
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
                 <div>
-                  <p className="text-slate-400 dark:text-slate-500 text-xs">Faturamento (mês)</p>
+                  <p className="text-slate-400 dark:text-slate-500 text-xs">Faturamento ({LABEL_PERIODO[periodo]})</p>
                   <p className="font-semibold text-blue-600">{formatarReais(m.faturamentoCentavos)}</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 dark:text-slate-500 text-xs">Atendimentos (mês)</p>
+                  <p className="text-slate-400 dark:text-slate-500 text-xs">Atendimentos ({LABEL_PERIODO[periodo]})</p>
                   <p className="font-semibold">{m.qtdAtendimentos}</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 dark:text-slate-500 text-xs">Ticket médio (mês)</p>
+                  <p className="text-slate-400 dark:text-slate-500 text-xs">Ticket médio ({LABEL_PERIODO[periodo]})</p>
                   <p className="font-semibold">{formatarReais(m.ticketMedioCentavos)}</p>
                 </div>
               </div>
@@ -135,7 +186,7 @@ export default async function BarbeirosPage() {
                 <div className="mb-4">
                   <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
                     <span>
-                      Meta do mês: {formatarReais(m.faturamentoCentavos)} de{" "}
+                      Meta do mês: {formatarReais(m.faturamentoMesCentavos)} de{" "}
                       {formatarReais(m.barbeiro.metaFaturamentoCentavos!)}
                     </span>
                     <span className={bateuMetaClasse(m.bateuMeta)}>
@@ -165,7 +216,7 @@ export default async function BarbeirosPage() {
               {m.servicosRealizados.length > 0 && (
                 <details className="mt-4">
                   <summary className="cursor-pointer text-sm text-blue-600 hover:underline select-none">
-                    Serviços realizados no mês ({m.qtdAtendimentos})
+                    Serviços realizados ({LABEL_PERIODO[periodo]}) — {m.qtdAtendimentos}
                   </summary>
                   <div className="mt-2 space-y-1">
                     {m.servicosRealizados.map((s) => (
