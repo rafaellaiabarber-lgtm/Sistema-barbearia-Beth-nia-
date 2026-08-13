@@ -75,6 +75,18 @@ export default async function FilaPage({
     ? emAtendimento.find((a) => a.barbeiroId === session.barbeiroId)
     : null;
 
+  const clienteIdsNaFila = [...new Set([...aguardando, ...emAtendimento].map((a) => a.clienteId))];
+  const assinaturasAtivas = clienteIdsNaFila.length
+    ? await prisma.assinatura.findMany({
+        where: { clienteId: { in: clienteIdsNaFila }, status: "ATIVA" },
+        include: { plano: true },
+      })
+    : [];
+  const planoAtivoPorCliente = new Map<string, string>();
+  for (const a of assinaturasAtivas) {
+    if (!planoAtivoPorCliente.has(a.clienteId)) planoAtivoPorCliente.set(a.clienteId, a.plano.nome);
+  }
+
   let comissaoPeriodo: {
     comissaoCentavos: number;
     qtd: number;
@@ -182,6 +194,7 @@ export default async function FilaPage({
           servicos={servicosAtivos}
           campanhas={campanhasAtivas}
           comAvisoFixo={mostrarAvisoCampanha}
+          planoAtivo={planoAtivoPorCliente.get(meuAtendimento.clienteId) ?? null}
         />
       ) : (
         <>
@@ -339,7 +352,13 @@ export default async function FilaPage({
                   {emAtendimento.map((a) => (
                     <div key={a.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
                       <p className="font-semibold">
-                        {a.cliente.nome} <span className="text-slate-500 dark:text-slate-400 text-sm">com {a.barbeiro?.nome}</span>
+                        {a.cliente.nome}
+                        {planoAtivoPorCliente.has(a.clienteId) && (
+                          <span className="ml-2 inline-block rounded-full bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 text-xs font-medium px-2 py-0.5 align-middle">
+                            🎫 Assinante
+                          </span>
+                        )}{" "}
+                        <span className="text-slate-500 dark:text-slate-400 text-sm">com {a.barbeiro?.nome}</span>
                       </p>
                       <p className="text-blue-600 text-sm">{formatarReais(a.precoTotalCentavos)}</p>
                     </div>
@@ -378,7 +397,14 @@ export default async function FilaPage({
                     <div className="flex items-center gap-4">
                       <span className="text-2xl font-black text-blue-600 w-10 text-center">{i + 1}º</span>
                       <div>
-                        <p className="font-semibold">{a.cliente.nome}</p>
+                        <p className="font-semibold">
+                          {a.cliente.nome}
+                          {planoAtivoPorCliente.has(a.clienteId) && (
+                            <span className="ml-2 inline-block rounded-full bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 text-xs font-medium px-2 py-0.5 align-middle">
+                              🎫 Assinante
+                            </span>
+                          )}
+                        </p>
                         <p className="text-slate-500 dark:text-slate-400 text-sm">
                           {a.barbeiroPreferido ? `Pediu: ${a.barbeiroPreferido.nome}` : "Sem preferência de barbeiro"}
                           {" · "}

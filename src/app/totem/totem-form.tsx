@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import type { Barbeiro } from "@prisma/client";
-import { entrarNaFila, buscarNomePorTelefone, type EntrarFilaState } from "@/lib/actions/fila";
+import { entrarNaFila, buscarClienteInfoPorTelefone, type EntrarFilaState } from "@/lib/actions/fila";
 import { TecladoNumerico } from "./teclado-numerico";
 
 const estadoInicial: EntrarFilaState = {};
@@ -18,6 +18,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
   const [erroLocal, setErroLocal] = useState("");
   const [buscandoNome, setBuscandoNome] = useState(false);
   const [boasVindas, setBoasVindas] = useState(false);
+  const [planoAtivo, setPlanoAtivo] = useState<string | null>(null);
   const [temAcompanhante, setTemAcompanhante] = useState<boolean | null>(null);
   const [acompanhanteNome, setAcompanhanteNome] = useState("");
   const [acompanhanteTelefone, setAcompanhanteTelefone] = useState("");
@@ -81,15 +82,16 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               }
               setErroLocal("");
               setBuscandoNome(true);
-              const nomeExistente = await buscarNomePorTelefone(telefone);
+              const info = await buscarClienteInfoPorTelefone(telefone);
               setBuscandoNome(false);
-              if (nomeExistente) {
-                setNome(nomeExistente);
+              if (info.nome) {
+                setNome(info.nome);
                 setBoasVindas(true);
               } else {
                 setNome("");
                 setBoasVindas(false);
               }
+              setPlanoAtivo(info.planoAtivo);
               setEtapa("nome");
             }}
             className="w-full rounded-xl bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-bold text-lg py-4 transition-colors mt-6"
@@ -107,6 +109,11 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
           {boasVindas && (
             <p className="text-blue-400 text-sm mb-3 text-center">
               Bem-vindo(a) de volta! Confirme ou edite seu nome abaixo.
+            </p>
+          )}
+          {planoAtivo && (
+            <p className="text-green-400 text-sm font-semibold mb-3 text-center">
+              🎫 Você tem o plano {planoAtivo} ativo!
             </p>
           )}
           <input

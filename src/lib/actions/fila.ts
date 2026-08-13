@@ -10,6 +10,20 @@ export async function buscarNomePorTelefone(telefone: string): Promise<string | 
   return cliente?.nome ?? null;
 }
 
+export type ClienteInfo = { nome: string | null; planoAtivo: string | null };
+
+export async function buscarClienteInfoPorTelefone(telefone: string): Promise<ClienteInfo> {
+  if (!telefone) return { nome: null, planoAtivo: null };
+  const cliente = await prisma.cliente.findUnique({
+    where: { telefone },
+    include: { assinaturas: { where: { status: "ATIVA" }, include: { plano: true }, take: 1 } },
+  });
+  return {
+    nome: cliente?.nome ?? null,
+    planoAtivo: cliente?.assinaturas[0]?.plano.nome ?? null,
+  };
+}
+
 export type EntrarFilaState = {
   erro?: string;
   sucesso?: boolean;
