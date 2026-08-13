@@ -1,6 +1,12 @@
 import { formatarReais } from "@/lib/format";
 
-export function GraficoBarras({ dados }: { dados: { label: string; valor: number }[] }) {
+export function GraficoBarras({
+  dados,
+  formatarValor = formatarReais,
+}: {
+  dados: { label: string; valor: number }[];
+  formatarValor?: (valor: number) => string;
+}) {
   const max = Math.max(...dados.map((d) => d.valor), 1);
   const alturaContainer = 160;
 
@@ -16,7 +22,7 @@ export function GraficoBarras({ dados }: { dados: { label: string; valor: number
                 style={{ height: alturaPx }}
               />
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-slate-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
-                {d.label}: {formatarReais(d.valor)}
+                {d.label}: {formatarValor(d.valor)}
               </div>
             </div>
           );

@@ -97,7 +97,19 @@ model Barbeiro {
   indicacoes              Indicacao[]
   assinaturasVendidas     Assinatura[]
   campanhasVenda          CampanhaVenda[]
+  jornadas                JornadaTrabalho[]
   criadoEm                DateTime            @default(now())
+}
+
+model JornadaTrabalho {
+  id         String   @id @default(cuid())
+  barbeiro   Barbeiro @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
+  barbeiroId String
+  diaSemana  Int
+  horaInicio String
+  horaFim    String
+
+  @@unique([barbeiroId, diaSemana])
 }
 
 model Indicacao {
