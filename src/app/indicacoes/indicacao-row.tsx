@@ -37,7 +37,7 @@ export function IndicacaoRow({
         <span
           className={`inline-block mt-1 rounded-full text-xs px-2 py-0.5 ${
             convertida
-              ? "bg-lime-100 dark:bg-lime-900 text-lime-700"
+              ? "bg-blue-100 dark:bg-blue-900 text-blue-700"
               : contatada
                 ? "bg-green-100 dark:bg-green-900 text-green-700"
                 : "bg-amber-100 dark:bg-amber-900 text-amber-700"
@@ -57,12 +57,12 @@ export function IndicacaoRow({
           WhatsApp
         </a>
         <form action={alternarContatada.bind(null, id, !contatada)}>
-          <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400">
+          <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">
             {contatada ? "Marcar pendente" : "Marcar contatada"}
           </button>
         </form>
         <form action={alternarConvertida.bind(null, id, !convertida)}>
-          <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400">
+          <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">
             {convertida ? "Desfazer conversão" : "Marcar que virou cliente"}
           </button>
         </form>

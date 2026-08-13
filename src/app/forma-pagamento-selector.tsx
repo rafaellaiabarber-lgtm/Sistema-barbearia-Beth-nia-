@@ -25,7 +25,7 @@ export function SeletorFormaPagamento({
             onClick={() => setSelecionado(op)}
             className={`flex-1 rounded-lg border-2 px-3 py-2 text-sm font-semibold transition-colors ${
               selecionado === op
-                ? "border-lime-600 bg-lime-50 text-lime-700"
+                ? "border-blue-600 bg-blue-50 text-blue-700"
                 : "border-slate-200 text-slate-600 hover:border-slate-300"
             }`}
           >

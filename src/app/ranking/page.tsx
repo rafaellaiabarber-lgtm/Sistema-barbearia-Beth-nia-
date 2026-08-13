@@ -117,10 +117,10 @@ export default async function RankingPage({
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggle className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800" />
-          <Link href="/indicacoes" className="text-lime-600 dark:text-lime-400 hover:underline text-sm">
+          <Link href="/indicacoes" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
             Indicações
           </Link>
-          <Link href={session.role === "ADMIN" ? "/admin" : "/fila"} className="text-lime-600 dark:text-lime-400 hover:underline text-sm">
+          <Link href={session.role === "ADMIN" ? "/admin" : "/fila"} className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
             {session.role === "ADMIN" ? "Painel admin" : "Voltar pra fila"}
           </Link>
         </div>
@@ -150,7 +150,7 @@ export default async function RankingPage({
               className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
             />
           </div>
-          <button type="submit" className="rounded-lg bg-lime-400 hover:bg-lime-300 text-slate-950 font-semibold px-4 py-2 text-sm">
+          <button type="submit" className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
             Ver ranking
           </button>
           {personalizado && (

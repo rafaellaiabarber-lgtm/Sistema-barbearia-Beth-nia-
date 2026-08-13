@@ -59,9 +59,9 @@ export function NovoPlanoForm() {
           {NOMES_DIAS_SEMANA.map((nome, i) => (
             <label
               key={i}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 px-2.5 py-1.5 text-sm cursor-pointer has-[:checked]:bg-lime-50 has-[:checked]:border-lime-400 dark:has-[:checked]:bg-lime-950"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 px-2.5 py-1.5 text-sm cursor-pointer has-[:checked]:bg-blue-50 has-[:checked]:border-blue-400 dark:has-[:checked]:bg-blue-950"
             >
-              <input type="checkbox" name="diasSemana" value={i} className="accent-lime-600" />
+              <input type="checkbox" name="diasSemana" value={i} className="accent-blue-600" />
               {nome}
             </label>
           ))}
@@ -70,7 +70,7 @@ export function NovoPlanoForm() {
       <button
         type="submit"
         disabled={pendente}
-        className="rounded-lg bg-lime-400 hover:bg-lime-300 disabled:opacity-60 text-slate-950 font-semibold px-4 py-2 text-sm"
+        className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
       >
         {pendente ? "Adicionando..." : "Adicionar plano"}
       </button>

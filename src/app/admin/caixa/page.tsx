@@ -86,7 +86,7 @@ export default async function CaixaPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Total no caixa hoje</p>
-          <p className={`text-3xl font-bold ${totalDoDia < 0 ? "text-red-600" : "text-lime-600 dark:text-lime-400"}`}>
+          <p className={`text-3xl font-bold ${totalDoDia < 0 ? "text-red-600" : "text-blue-600 dark:text-blue-400"}`}>
             {formatarReais(totalDoDia)}
           </p>
         </div>
@@ -99,7 +99,7 @@ export default async function CaixaPage() {
               {[...porFormaPagamento.entries()].map(([forma, valor]) => (
                 <div key={forma} className="flex items-center justify-between text-sm">
                   <span className="text-slate-600 dark:text-slate-300">{LABEL_FORMA_PAGAMENTO[forma] ?? forma}</span>
-                  <span className="font-semibold text-lime-600 dark:text-lime-400">{formatarReais(valor)}</span>
+                  <span className="font-semibold text-blue-600 dark:text-blue-400">{formatarReais(valor)}</span>
                 </div>
               ))}
             </div>
