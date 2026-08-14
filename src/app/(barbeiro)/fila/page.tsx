@@ -417,7 +417,21 @@ export default async function FilaPage({
                           <BadgeAssinante info={planoInfoPorCliente.get(a.clienteId)} />
                         </p>
                         <p className="text-slate-500 dark:text-slate-400 text-sm">
-                          {a.barbeiroPreferido ? `Pediu: ${a.barbeiroPreferido.nome}` : "Sem preferência de barbeiro"}
+                          {a.barbeiroPreferido ? (
+                            <span
+                              className={
+                                session.barbeiroId && a.barbeiroPreferidoId === session.barbeiroId
+                                  ? "text-green-600 dark:text-green-400 font-medium"
+                                  : session.barbeiroId
+                                    ? "text-red-600 dark:text-red-400 font-medium"
+                                    : ""
+                              }
+                            >
+                              Pediu: {a.barbeiroPreferido.nome}
+                            </span>
+                          ) : (
+                            "Sem preferência de barbeiro"
+                          )}
                           {" · "}
                           {tempoEspera(a.criadoEm)}
                         </p>
