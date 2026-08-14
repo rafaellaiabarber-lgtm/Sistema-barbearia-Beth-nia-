@@ -36,6 +36,16 @@ export default async function TreinamentoPage() {
                 Abrir material →
               </a>
             )}
+            {m.tipo === "ARQUIVO" && (
+              <a
+                href={m.conteudo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+              >
+                Baixar arquivo →
+              </a>
+            )}
             {m.tipo === "VIDEO" &&
               (urlEmbedVideo(m.conteudo) ? (
                 <div className="aspect-video w-full max-w-xl">

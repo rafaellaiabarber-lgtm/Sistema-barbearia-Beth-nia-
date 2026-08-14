@@ -52,7 +52,7 @@ export function NovoMaterialForm() {
         </div>
       </div>
 
-      {tipo === "TEXTO" ? (
+      {tipo === "TEXTO" && (
         <div>
           <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Texto</label>
           <textarea
@@ -63,7 +63,8 @@ export function NovoMaterialForm() {
             className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-full"
           />
         </div>
-      ) : (
+      )}
+      {(tipo === "LINK" || tipo === "VIDEO") && (
         <div>
           <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
             {tipo === "VIDEO" ? "Link do vídeo (YouTube ou Google Drive)" : "Link (planilha, PDF, etc.)"}
@@ -73,6 +74,19 @@ export function NovoMaterialForm() {
             required
             placeholder="https://..."
             className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-full"
+          />
+        </div>
+      )}
+      {tipo === "ARQUIVO" && (
+        <div>
+          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
+            Arquivo (planilha, PDF, etc. — até 20MB)
+          </label>
+          <input
+            name="arquivo"
+            type="file"
+            required
+            className="block text-sm text-slate-600 dark:text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white file:px-3 file:py-2 file:text-sm file:font-semibold hover:file:bg-blue-700"
           />
         </div>
       )}
