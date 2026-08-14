@@ -135,7 +135,7 @@ export function identificarJanelaBaixaOcupacao(
   return { horaInicio: maior.inicio, horaFim: maior.fim + 1 };
 }
 
-function formatarHora(h: number): string {
+export function formatarHora(h: number): string {
   return `${String(h).padStart(2, "0")}h`;
 }
 
@@ -196,6 +196,32 @@ export function gerarRecomendacoesDia(input: {
   }
 
   return recomendacoes;
+}
+
+export function gerarDicasPessoais(input: {
+  qtdClientesSumidos: number;
+  janelaBaixaOcupacao: { horaInicio: number; horaFim: number } | null;
+}): string[] {
+  const dicas: string[] = [];
+
+  if (input.qtdClientesSumidos > 0) {
+    const plural = input.qtdClientesSumidos > 1 ? "s" : "";
+    dicas.push(
+      `Você tem ${input.qtdClientesSumidos} cliente${plural} seu${plural} que não volta${
+        input.qtdClientesSumidos > 1 ? "m" : ""
+      } há um tempo. Que tal mandar uma mensagem chamando de volta?`
+    );
+  }
+
+  if (input.janelaBaixaOcupacao) {
+    dicas.push(
+      `Seus horários das ${formatarHora(input.janelaBaixaOcupacao.horaInicio)} às ${formatarHora(
+        input.janelaBaixaOcupacao.horaFim
+      )} costumam ficar mais vazios. Aproveite pra divulgar esses horários pros seus clientes.`
+    );
+  }
+
+  return dicas;
 }
 
 export type Previsao = {
