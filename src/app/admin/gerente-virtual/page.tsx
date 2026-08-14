@@ -16,6 +16,7 @@ import {
 import { minutosDisponiveis } from "@/lib/jornada";
 import { MetaMensalForm } from "./meta-mensal-form";
 import { ClienteInativoRow } from "./cliente-inativo-row";
+import { Valor } from "../../valor";
 
 async function buscarComparativo(inicio: Date, fim: Date): Promise<ComparativoMes> {
   const [atendimentos, movimentos, clientesNovos, vendasProduto] = await Promise.all([
@@ -172,7 +173,7 @@ export default async function GerenteVirtualPage({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
             <p className="text-slate-500 dark:text-slate-400 text-xs">Faturamento</p>
-            <p className="text-xl font-bold text-blue-600 dark:text-blue-400">{formatarReais(comparativoAtual.faturamentoCentavos)}</p>
+            <p className="text-xl font-bold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(comparativoAtual.faturamentoCentavos)}</Valor></p>
           </div>
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
             <p className="text-slate-500 dark:text-slate-400 text-xs">Margem</p>
@@ -182,7 +183,7 @@ export default async function GerenteVirtualPage({
           </div>
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
             <p className="text-slate-500 dark:text-slate-400 text-xs">Ticket médio</p>
-            <p className="text-xl font-bold text-blue-600 dark:text-blue-400">{formatarReais(ticketMedioAtual)}</p>
+            <p className="text-xl font-bold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(ticketMedioAtual)}</Valor></p>
           </div>
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
             <p className="text-slate-500 dark:text-slate-400 text-xs">Clientes novos</p>
@@ -215,17 +216,17 @@ export default async function GerenteVirtualPage({
         <h2 className="text-lg font-semibold mb-3">Previsão de faturamento</h2>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm mb-3">
           <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">
-            No ritmo atual ({formatarReais(previsao.ritmoDiarioCentavos)}/dia), você deve fechar o mês em:
+            No ritmo atual (<Valor>{formatarReais(previsao.ritmoDiarioCentavos)}</Valor>/dia), você deve fechar o mês em:
           </p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-3">{formatarReais(previsao.previsaoFechamentoCentavos)}</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-3"><Valor>{formatarReais(previsao.previsaoFechamentoCentavos)}</Valor></p>
 
           {metaCentavos !== null ? (
             <p className="text-slate-600 dark:text-slate-300 text-sm">
-              Meta do mês: {formatarReais(metaCentavos)}.{" "}
+              Meta do mês: <Valor>{formatarReais(metaCentavos)}</Valor>.{" "}
               {previsao.faltamPorDiaCentavos !== null && previsao.faltamPorDiaCentavos > 0 ? (
                 <>
-                  Faltam {formatarReais(metaCentavos - comparativoAtual.faturamentoCentavos)} — precisa fazer{" "}
-                  <span className="font-semibold">{formatarReais(previsao.faltamPorDiaCentavos)}/dia</span> nos
+                  Faltam <Valor>{formatarReais(metaCentavos - comparativoAtual.faturamentoCentavos)}</Valor> — precisa fazer{" "}
+                  <span className="font-semibold"><Valor>{formatarReais(previsao.faltamPorDiaCentavos)}</Valor>/dia</span> nos
                   próximos {previsao.diasRestantes} dia(s) pra bater.
                 </>
               ) : (

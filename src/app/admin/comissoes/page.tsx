@@ -4,6 +4,7 @@ import { type Periodo, calcularIntervalo, chavePeriodo } from "@/lib/periodo";
 import { marcarComissaoPaga, desmarcarComissaoPaga } from "@/lib/actions/comissoes";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
+import { Valor } from "../../valor";
 
 export default async function ComissoesPage({
   searchParams,
@@ -134,11 +135,11 @@ export default async function ComissoesPage({
                 <div>
                   <p className="font-semibold">{b.nome}</p>
                   <p className="text-slate-500 dark:text-slate-400 text-sm">
-                    {b.qtd} atendimento(s) · faturamento {formatarReais(b.totalCentavos)}
+                    {b.qtd} atendimento(s) · faturamento <Valor>{formatarReais(b.totalCentavos)}</Valor>
                   </p>
                 </div>
                 <div className="text-right flex items-center gap-3">
-                  <p className="text-blue-600 dark:text-blue-400 font-bold text-lg">{formatarReais(b.comissaoCentavos)}</p>
+                  <p className="text-blue-600 dark:text-blue-400 font-bold text-lg"><Valor>{formatarReais(b.comissaoCentavos)}</Valor></p>
                   {podeMarcarPago &&
                     (pago ? (
                       <form action={desmarcarComissaoPaga.bind(null, id, periodo as "hoje" | "semana" | "mes", chave)}>
@@ -182,7 +183,7 @@ export default async function ComissoesPage({
             </div>
             <div className="text-right">
               <p className="font-semibold">{r.qtd}x</p>
-              <p className="text-slate-400 dark:text-slate-500 text-xs">{formatarReais(r.totalCentavos)}</p>
+              <p className="text-slate-400 dark:text-slate-500 text-xs"><Valor>{formatarReais(r.totalCentavos)}</Valor></p>
             </div>
           </div>
         ))}

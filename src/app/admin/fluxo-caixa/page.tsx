@@ -3,6 +3,7 @@ import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo } from "@/lib/periodo";
 import { FiltroRelatorio } from "../filtro-relatorio";
 import { GraficoBarras } from "../grafico-barras";
+import { Valor } from "../../valor";
 
 function chaveDia(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -90,11 +91,11 @@ export default async function FluxoCaixaPage({
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div className="rounded-xl p-5 shadow-sm bg-green-600 text-white">
-          <p className="text-2xl font-bold mb-1">{formatarReais(totalEntradasCentavos)}</p>
+          <p className="text-2xl font-bold mb-1"><Valor>{formatarReais(totalEntradasCentavos)}</Valor></p>
           <p className="text-green-100 text-sm">Total de entradas</p>
         </div>
         <div className="rounded-xl p-5 shadow-sm bg-red-600 text-white">
-          <p className="text-2xl font-bold mb-1">{formatarReais(totalSaidasCentavos)}</p>
+          <p className="text-2xl font-bold mb-1"><Valor>{formatarReais(totalSaidasCentavos)}</Valor></p>
           <p className="text-red-100 text-sm">Total de saídas</p>
         </div>
         <div
@@ -102,7 +103,7 @@ export default async function FluxoCaixaPage({
             saldoPeriodoCentavos < 0 ? "bg-red-700 text-white" : "bg-blue-600 text-white"
           }`}
         >
-          <p className="text-2xl font-bold mb-1">{formatarReais(saldoPeriodoCentavos)}</p>
+          <p className="text-2xl font-bold mb-1"><Valor>{formatarReais(saldoPeriodoCentavos)}</Valor></p>
           <p className={`text-sm ${saldoPeriodoCentavos < 0 ? "text-red-100" : "text-blue-100"}`}>Saldo do período</p>
         </div>
       </div>
@@ -126,12 +127,12 @@ export default async function FluxoCaixaPage({
             >
               <p className="font-medium">{formatarChaveDia(l.chave)}</p>
               <div className="flex items-center gap-6 text-sm">
-                <span className="text-green-600 font-semibold">+{formatarReais(l.entradas)}</span>
-                <span className="text-red-600 font-semibold">-{formatarReais(l.saidas)}</span>
+                <span className="text-green-600 font-semibold">+<Valor>{formatarReais(l.entradas)}</Valor></span>
+                <span className="text-red-600 font-semibold">-<Valor>{formatarReais(l.saidas)}</Valor></span>
                 <span className="text-slate-500 dark:text-slate-400">
                   saldo acumulado:{" "}
                   <span className={`font-semibold ${l.saldoAcumulado < 0 ? "text-red-600" : "text-slate-700 dark:text-slate-200"}`}>
-                    {formatarReais(l.saldoAcumulado)}
+                    <Valor>{formatarReais(l.saldoAcumulado)}</Valor>
                   </span>
                 </span>
               </div>

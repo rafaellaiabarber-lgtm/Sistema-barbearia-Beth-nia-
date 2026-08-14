@@ -3,6 +3,7 @@ import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo } from "@/lib/periodo";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
+import { Valor } from "../../valor";
 
 export default async function DrePage({
   searchParams,
@@ -145,7 +146,7 @@ export default async function DrePage({
                     : "text-slate-800 dark:text-slate-100"
               }
             >
-              {formatarReais(l.valorCentavos)}
+              <Valor>{formatarReais(l.valorCentavos)}</Valor>
             </span>
           </div>
         ))}

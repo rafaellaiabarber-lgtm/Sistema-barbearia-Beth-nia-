@@ -6,6 +6,7 @@ import { calcularIntervalo, type Periodo } from "@/lib/periodo";
 import { NovoBarbeiroForm } from "./novo-barbeiro-form";
 import { BarbeiroRow } from "./barbeiro-row";
 import { JornadaForm } from "./jornada-form";
+import { Valor } from "../../valor";
 
 const LABEL_PERIODO: Record<string, string> = { hoje: "hoje", semana: "esta semana", mes: "este mês" };
 
@@ -116,9 +117,9 @@ export default async function BarbeirosPage({
                   <span className="font-medium">{m.barbeiro.nome}</span>
                 </div>
                 <div className="text-right">
-                  <span className="font-semibold text-blue-600 dark:text-blue-400">{formatarReais(m.faturamentoCentavos)}</span>
+                  <span className="font-semibold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(m.faturamentoCentavos)}</Valor></span>
                   <span className="text-slate-400 dark:text-slate-500 text-xs ml-2">
-                    {m.qtdAtendimentos} atend. · ticket médio {formatarReais(m.ticketMedioCentavos)}
+                    {m.qtdAtendimentos} atend. · ticket médio <Valor>{formatarReais(m.ticketMedioCentavos)}</Valor>
                   </span>
                 </div>
               </div>
@@ -142,7 +143,7 @@ export default async function BarbeirosPage({
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
                 <div>
                   <p className="text-slate-400 dark:text-slate-500 text-xs">Faturamento ({LABEL_PERIODO[periodo]})</p>
-                  <p className="font-semibold text-blue-600 dark:text-blue-400">{formatarReais(m.faturamentoCentavos)}</p>
+                  <p className="font-semibold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(m.faturamentoCentavos)}</Valor></p>
                 </div>
                 <div>
                   <p className="text-slate-400 dark:text-slate-500 text-xs">Atendimentos ({LABEL_PERIODO[periodo]})</p>
@@ -150,7 +151,7 @@ export default async function BarbeirosPage({
                 </div>
                 <div>
                   <p className="text-slate-400 dark:text-slate-500 text-xs">Ticket médio ({LABEL_PERIODO[periodo]})</p>
-                  <p className="font-semibold">{formatarReais(m.ticketMedioCentavos)}</p>
+                  <p className="font-semibold"><Valor>{formatarReais(m.ticketMedioCentavos)}</Valor></p>
                 </div>
               </div>
 

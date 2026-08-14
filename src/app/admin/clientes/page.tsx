@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
+import { Valor } from "../../valor";
 
 export default async function ClientesPage() {
   const clientes = await prisma.cliente.findMany({
@@ -28,7 +29,7 @@ export default async function ClientesPage() {
                   <span className="text-slate-500 dark:text-slate-400 text-sm">{c.telefone ?? "sem telefone"}</span>
                 </span>
                 <span className="text-slate-500 dark:text-slate-400 text-sm">
-                  {c.atendimentos.length} atendimento(s) · {formatarReais(totalGasto)}
+                  {c.atendimentos.length} atendimento(s) · <Valor>{formatarReais(totalGasto)}</Valor>
                 </span>
               </summary>
               <div className="mt-3 space-y-2">
@@ -39,7 +40,7 @@ export default async function ClientesPage() {
                   <div key={a.id} className="text-sm border-t border-slate-200 dark:border-slate-800 pt-2">
                     <p className="text-slate-700 dark:text-slate-200">
                       {a.concluidoEm?.toLocaleDateString("pt-BR")} — {a.barbeiro?.nome ?? "—"} —{" "}
-                      {formatarReais(a.precoTotalCentavos)}
+                      <Valor>{formatarReais(a.precoTotalCentavos)}</Valor>
                     </p>
                     <p className="text-slate-400 dark:text-slate-500">{a.servicos.map((s) => s.nomeSnapshot).join(", ")}</p>
                   </div>

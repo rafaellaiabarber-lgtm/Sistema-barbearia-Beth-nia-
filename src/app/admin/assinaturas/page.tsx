@@ -8,6 +8,7 @@ import {
   desmarcarPagamentoAssinatura,
 } from "@/lib/actions/assinaturas";
 import { NovaAssinaturaForm } from "./nova-assinatura-form";
+import { Valor } from "../../valor";
 
 export default async function AssinaturasPage() {
   const competencia = competenciaAtual();
@@ -62,7 +63,7 @@ export default async function AssinaturasPage() {
               <div>
                 <p className="font-semibold">{a.cliente.nome}</p>
                 <p className="text-slate-500 dark:text-slate-400 text-sm">
-                  {a.plano.nome} — {formatarReais(a.plano.precoCentavos)}/mês · vence dia {a.diaVencimento}
+                  {a.plano.nome} — <Valor>{formatarReais(a.plano.precoCentavos)}</Valor>/mês · vence dia {a.diaVencimento}
                   {a.barbeiro ? ` · vendido por ${a.barbeiro.nome}` : ""} ·{" "}
                   {a.status === "CANCELADA" ? (
                     <span className="text-slate-400 dark:text-slate-500">cancelada</span>

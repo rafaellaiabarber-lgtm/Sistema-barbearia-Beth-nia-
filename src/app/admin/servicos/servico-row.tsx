@@ -12,6 +12,7 @@ import {
 import { formatarReais } from "@/lib/format";
 import { ComissaoServicoForm } from "./comissao-servico-form";
 import { CustoServicoForm } from "./custo-servico-form";
+import { Valor } from "../../valor";
 
 const estadoInicial: ServicoState = {};
 
@@ -93,10 +94,10 @@ export function ServicoRow({ servico }: { servico: Servico }) {
           <div>
             <p className="font-semibold">{servico.nome}</p>
             <p className="text-slate-500 dark:text-slate-400 text-sm">
-              preço {formatarReais(servico.precoCentavos)} · custo {formatarReais(servico.custoCentavos)} ·
+              preço <Valor>{formatarReais(servico.precoCentavos)}</Valor> · custo <Valor>{formatarReais(servico.custoCentavos)}</Valor> ·
               margem{" "}
               <span className={margemCentavos < 0 ? "text-red-600 font-medium" : "text-green-600 font-medium"}>
-                {formatarReais(margemCentavos)}
+                <Valor>{formatarReais(margemCentavos)}</Valor>
               </span>{" "}
               · {servico.duracaoMinutos} min ·{" "}
               {servico.comissaoPercentual !== null

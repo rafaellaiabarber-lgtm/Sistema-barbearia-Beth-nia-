@@ -25,6 +25,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               if (tema !== 'claro') {
                 document.documentElement.classList.add('dark');
               }
+              if (localStorage.getItem('valoresOcultos') === 'sim') {
+                document.documentElement.classList.add('ocultar-valores');
+              }
             } catch (e) {}`,
           }}
         />

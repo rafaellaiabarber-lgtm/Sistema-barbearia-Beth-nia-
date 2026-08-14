@@ -5,6 +5,7 @@ import type { ContaFinanceira } from "@prisma/client";
 import { marcarContaPaga, excluirConta, type ContaState } from "@/lib/actions/contas";
 import { formatarReais, LABEL_CATEGORIA_DESPESA } from "@/lib/format";
 import { SeletorFormaPagamento } from "../../forma-pagamento-selector";
+import { Valor } from "../../valor";
 
 const estadoInicial: ContaState = {};
 
@@ -29,7 +30,7 @@ export function ContaRow({ conta, atrasada }: { conta: ContaFinanceira; atrasada
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-semibold text-slate-700 dark:text-slate-200">{formatarReais(conta.valorCentavos)}</span>
+          <span className="font-semibold text-slate-700 dark:text-slate-200"><Valor>{formatarReais(conta.valorCentavos)}</Valor></span>
           {conta.status === "PENDENTE" && !pagando && (
             <button
               type="button"

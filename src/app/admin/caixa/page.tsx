@@ -5,6 +5,7 @@ import { NovoMovimentoForm } from "./novo-movimento-form";
 import { NovoAtendimentoForm } from "./novo-atendimento-form";
 import { NovaVendaProdutoForm } from "./nova-venda-produto-form";
 import { BotaoExcluirAtendimento } from "../excluir-atendimento-button";
+import { Valor } from "../../valor";
 
 function inicioDoDia() {
   const d = new Date();
@@ -87,7 +88,7 @@ export default async function CaixaPage() {
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Total no caixa hoje</p>
           <p className={`text-3xl font-bold ${totalDoDia < 0 ? "text-red-600" : "text-blue-600 dark:text-blue-400"}`}>
-            {formatarReais(totalDoDia)}
+            <Valor>{formatarReais(totalDoDia)}</Valor>
           </p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
@@ -99,7 +100,7 @@ export default async function CaixaPage() {
               {[...porFormaPagamento.entries()].map(([forma, valor]) => (
                 <div key={forma} className="flex items-center justify-between text-sm">
                   <span className="text-slate-600 dark:text-slate-300">{LABEL_FORMA_PAGAMENTO[forma] ?? forma}</span>
-                  <span className="font-semibold text-blue-600 dark:text-blue-400">{formatarReais(valor)}</span>
+                  <span className="font-semibold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(valor)}</Valor></span>
                 </div>
               ))}
             </div>
@@ -120,7 +121,7 @@ export default async function CaixaPage() {
                 <p className="font-medium">{l.descricao}</p>
                 <p className="text-slate-400 dark:text-slate-500 text-xs">
                   {l.horario.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })} · saldo:{" "}
-                  {formatarReais(l.saldo)}
+                  <Valor>{formatarReais(l.saldo)}</Valor>
                 </p>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {l.formaPagamento && (
@@ -138,7 +139,7 @@ export default async function CaixaPage() {
               <div className="flex items-center gap-3">
                 <span className={`font-semibold ${l.valorCentavos < 0 ? "text-red-600" : "text-green-600"}`}>
                   {l.valorCentavos < 0 ? "-" : "+"}
-                  {formatarReais(Math.abs(l.valorCentavos))}
+                  <Valor>{formatarReais(Math.abs(l.valorCentavos))}</Valor>
                 </span>
                 {l.tipo === "atendimento" ? (
                   <BotaoExcluirAtendimento atendimentoId={l.id} />

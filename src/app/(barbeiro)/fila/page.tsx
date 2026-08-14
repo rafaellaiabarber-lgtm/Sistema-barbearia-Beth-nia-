@@ -14,6 +14,7 @@ import { calcularProgressoMeta } from "@/lib/metas-server";
 import { fraseDoDia } from "@/lib/frases";
 import { AutoRefresh } from "./auto-refresh";
 import { AtendendoAgora } from "./atendendo-agora";
+import { Valor } from "../../valor";
 
 function tempoEspera(desde: Date) {
   const minutos = Math.max(0, Math.floor((Date.now() - desde.getTime()) / 60000));
@@ -330,7 +331,7 @@ export default async function FilaPage({
                   <details className="rounded-xl p-5 shadow-sm bg-green-600 text-white">
                     <summary className="cursor-pointer flex items-start justify-between select-none">
                       <div>
-                        <p className="text-3xl font-bold mb-1">{formatarReais(comissaoPeriodo.comissaoCentavos)}</p>
+                        <p className="text-3xl font-bold mb-1"><Valor>{formatarReais(comissaoPeriodo.comissaoCentavos)}</Valor></p>
                         <p className="text-green-100 text-sm">Sua comissão líquida ({labelPeriodoFila})</p>
                         <p className="text-green-100 text-xs mt-1">{comissaoPeriodo.qtd} atendimento(s)</p>
                       </div>
@@ -428,7 +429,7 @@ export default async function FilaPage({
                           </button>
                         </form>
                       </div>
-                      <p className="text-blue-600 dark:text-blue-400 text-sm">{formatarReais(a.precoTotalCentavos)}</p>
+                      <p className="text-blue-600 dark:text-blue-400 text-sm"><Valor>{formatarReais(a.precoTotalCentavos)}</Valor></p>
                     </div>
                   ))}
                 </div>
@@ -505,7 +506,7 @@ export default async function FilaPage({
         <div className="fixed inset-x-0 bottom-0 z-50 bg-red-600 text-white px-4 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.2)]">
           <p className="text-sm max-w-3xl mx-auto">
             🔴 Hoje, se vender {itensFaltandoCampanha.map((i) => `${quantidadeFaltando(i)}x ${i.nome}`).join(", ")}, você
-            aumenta <span className="font-semibold">{formatarReais(potencialCampanhaCentavos)}</span> na sua comissão
+            aumenta <span className="font-semibold"><Valor>{formatarReais(potencialCampanhaCentavos)}</Valor></span> na sua comissão
             líquida. Não esqueça de oferecer!
           </p>
         </div>
