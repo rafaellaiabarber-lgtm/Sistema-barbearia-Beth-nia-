@@ -55,18 +55,17 @@ export async function entrarNaFila(
   if (!telefone) return { erro: "Informe seu telefone." };
   if (!nome) return { erro: "Informe seu nome." };
 
-  if (barbeiroPreferidoId) {
-    const barbeiro = await prisma.barbeiro.findFirst({
-      where: { id: barbeiroPreferidoId, ativo: true },
-    });
-    if (!barbeiro) return { erro: "Barbeiro inválido." };
-  }
-
-  const cliente = await prisma.cliente.upsert({
-    where: { telefone },
-    update: { nome },
-    create: { nome, telefone },
-  });
+  const [barbeiro, cliente] = await Promise.all([
+    barbeiroPreferidoId
+      ? prisma.barbeiro.findFirst({ where: { id: barbeiroPreferidoId, ativo: true } })
+      : Promise.resolve(null),
+    prisma.cliente.upsert({
+      where: { telefone },
+      update: { nome },
+      create: { nome, telefone },
+    }),
+  ]);
+  if (barbeiroPreferidoId && !barbeiro) return { erro: "Barbeiro inválido." };
 
   await prisma.atendimento.create({
     data: {
@@ -76,18 +75,21 @@ export async function entrarNaFila(
     },
   });
 
-  const posicao = await prisma.atendimento.count({ where: { status: "AGUARDANDO" } });
+  const [posicao, acompanhanteCliente] = await Promise.all([
+    prisma.atendimento.count({ where: { status: "AGUARDANDO" } }),
+    acompanhanteNome
+      ? acompanhanteTelefone
+        ? prisma.cliente.upsert({
+            where: { telefone: acompanhanteTelefone },
+            update: { nome: acompanhanteNome },
+            create: { nome: acompanhanteNome, telefone: acompanhanteTelefone },
+          })
+        : prisma.cliente.create({ data: { nome: acompanhanteNome, telefone: null } })
+      : Promise.resolve(null),
+  ]);
 
   let acompanhantePosicao: number | undefined;
-  if (acompanhanteNome) {
-    const acompanhanteCliente = acompanhanteTelefone
-      ? await prisma.cliente.upsert({
-          where: { telefone: acompanhanteTelefone },
-          update: { nome: acompanhanteNome },
-          create: { nome: acompanhanteNome, telefone: acompanhanteTelefone },
-        })
-      : await prisma.cliente.create({ data: { nome: acompanhanteNome, telefone: null } });
-
+  if (acompanhanteCliente) {
     await prisma.atendimento.create({
       data: {
         clienteId: acompanhanteCliente.id,
