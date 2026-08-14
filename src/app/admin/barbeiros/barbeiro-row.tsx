@@ -60,6 +60,29 @@ export function BarbeiroRow({ barbeiro }: { barbeiro: Barbeiro & { usuario: Usua
               className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-20"
             />
           </div>
+          {barbeiro.usuario && (
+            <>
+              <div>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Usuário (login)</label>
+                <input
+                  name="login"
+                  required
+                  defaultValue={barbeiro.usuario.login}
+                  className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-32"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Nova senha</label>
+                <input
+                  name="senha"
+                  type="password"
+                  placeholder="deixe em branco pra manter"
+                  autoComplete="new-password"
+                  className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-44"
+                />
+              </div>
+            </>
+          )}
           <button
             type="submit"
             disabled={pendente}
