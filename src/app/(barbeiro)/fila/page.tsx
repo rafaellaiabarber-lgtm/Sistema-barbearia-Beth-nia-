@@ -100,7 +100,7 @@ export default async function FilaPage({
     ? `${formatarDataBR(dataInicio!)}${dataFim ? ` até ${formatarDataBR(dataFim)}` : ""}`
     : LABEL_PERIODO_FILA[periodoFila];
 
-  const [aguardando, emAtendimento, barbeirosAtivos, servicosAtivos] = await Promise.all([
+  const [aguardando, emAtendimento, barbeirosAtivos, servicosAtivos, produtosAtivos] = await Promise.all([
     prisma.atendimento.findMany({
       where: { status: "AGUARDANDO" },
       orderBy: { criadoEm: "asc" },
@@ -113,6 +113,7 @@ export default async function FilaPage({
     }),
     prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
     prisma.servico.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.produto.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
   ]);
 
   const meuAtendimento = session.barbeiroId
@@ -326,6 +327,7 @@ export default async function FilaPage({
           clienteNome={meuAtendimento.cliente.nome}
           chamadoEm={meuAtendimento.chamadoEm ?? meuAtendimento.criadoEm}
           servicos={servicosAtivos}
+          produtos={produtosAtivos}
           campanhas={campanhasAtivas}
           comAvisoFixo={mostrarAvisoCampanha}
           planoInfo={planoInfoPorCliente.get(meuAtendimento.clienteId) ?? null}

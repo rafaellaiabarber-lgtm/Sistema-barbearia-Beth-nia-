@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Servico } from "@prisma/client";
+import type { Servico, Produto } from "@prisma/client";
 import { desfazerInicioAtendimento } from "@/lib/actions/fila";
 import { itemCompleto, type ItemProgresso } from "@/lib/campanhas";
 import { ConcluirForm } from "./concluir-form";
@@ -17,6 +17,7 @@ export function AtendendoAgora({
   clienteNome,
   chamadoEm,
   servicos,
+  produtos,
   campanhas,
   comAvisoFixo,
   planoInfo,
@@ -25,6 +26,7 @@ export function AtendendoAgora({
   clienteNome: string;
   chamadoEm: Date;
   servicos: Servico[];
+  produtos: Produto[];
   campanhas: { id: string; titulo: string | null; itens: ItemProgresso[] }[];
   comAvisoFixo?: boolean;
   planoInfo: { nome: string; cobertoHoje: boolean } | null;
@@ -66,7 +68,7 @@ export function AtendendoAgora({
             </div>
           )}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
-            <ConcluirForm atendimentoId={atendimentoId} servicos={servicos} />
+            <ConcluirForm atendimentoId={atendimentoId} servicos={servicos} produtos={produtos} />
           </div>
           <button
             type="button"
