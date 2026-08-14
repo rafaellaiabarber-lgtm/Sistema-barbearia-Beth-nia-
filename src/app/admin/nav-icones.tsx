@@ -20,6 +20,7 @@ import {
   Sparkles,
   Trophy,
   ListChecks,
+  GraduationCap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -28,6 +29,7 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   gerenteVirtual: Sparkles,
   clientes: Users,
   barbeiros: Scissors,
+  treinamento: GraduationCap,
   servicos: Tag,
   produtos: Package,
   atendimentos: Clock,

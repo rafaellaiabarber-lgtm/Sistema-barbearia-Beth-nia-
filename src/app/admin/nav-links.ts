@@ -20,7 +20,10 @@ export const gruposNav: NavGrupo[] = [
   {
     titulo: "Barbeiros",
     icone: "barbeiros",
-    links: [{ href: "/admin/barbeiros", label: "Barbeiros", icone: "barbeiros" }],
+    links: [
+      { href: "/admin/barbeiros", label: "Barbeiros", icone: "barbeiros" },
+      { href: "/admin/treinamento", label: "Treinamento", icone: "treinamento" },
+    ],
   },
   {
     titulo: "Serviços",
