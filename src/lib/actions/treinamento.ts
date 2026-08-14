@@ -55,12 +55,16 @@ export async function criarMaterial(_prevState: MaterialState, formData: FormDat
   const resultado = await extrairConteudo(formData, tipo as TipoMaterial);
   if ("erro" in resultado) return resultado;
 
-  const ultimo = await prisma.materialTreinamento.findFirst({ orderBy: { ordem: "desc" } });
-  const ordem = (ultimo?.ordem ?? -1) + 1;
+  try {
+    const ultimo = await prisma.materialTreinamento.findFirst({ orderBy: { ordem: "desc" } });
+    const ordem = (ultimo?.ordem ?? -1) + 1;
 
-  await prisma.materialTreinamento.create({
-    data: { titulo, tipo: tipo as TipoMaterial, conteudo: resultado.conteudo, ordem },
-  });
+    await prisma.materialTreinamento.create({
+      data: { titulo, tipo: tipo as TipoMaterial, conteudo: resultado.conteudo, ordem },
+    });
+  } catch {
+    return { erro: "Não foi possível salvar. Fale com o suporte técnico — pode faltar rodar uma atualização no banco." };
+  }
 
   revalidatePath("/admin/treinamento");
   revalidatePath("/treinamento");
@@ -79,16 +83,25 @@ export async function atualizarMaterial(
   if (!titulo) return { erro: "Informe um título." };
   if (!TIPOS_VALIDOS.includes(tipo as TipoMaterial)) return { erro: "Tipo inválido." };
 
-  const materialAtual = await prisma.materialTreinamento.findUnique({ where: { id } });
+  let materialAtual;
+  try {
+    materialAtual = await prisma.materialTreinamento.findUnique({ where: { id } });
+  } catch {
+    return { erro: "Não foi possível salvar. Fale com o suporte técnico — pode faltar rodar uma atualização no banco." };
+  }
   const conteudoAtual = materialAtual?.tipo === tipo ? materialAtual.conteudo : undefined;
 
   const resultado = await extrairConteudo(formData, tipo as TipoMaterial, conteudoAtual);
   if ("erro" in resultado) return resultado;
 
-  await prisma.materialTreinamento.update({
-    where: { id },
-    data: { titulo, tipo: tipo as TipoMaterial, conteudo: resultado.conteudo },
-  });
+  try {
+    await prisma.materialTreinamento.update({
+      where: { id },
+      data: { titulo, tipo: tipo as TipoMaterial, conteudo: resultado.conteudo },
+    });
+  } catch {
+    return { erro: "Não foi possível salvar. Fale com o suporte técnico — pode faltar rodar uma atualização no banco." };
+  }
 
   revalidatePath("/admin/treinamento");
   revalidatePath("/treinamento");
