@@ -38,6 +38,30 @@ function BadgeAssinante({ info }: { info: { nome: string; cobertoHoje: boolean }
   );
 }
 
+function BadgePreferencia({
+  preferidoId,
+  preferidoNome,
+  meuId,
+}: {
+  preferidoId: string | null;
+  preferidoNome: string | null;
+  meuId: string | null;
+}) {
+  if (!preferidoId || !preferidoNome || !meuId) return null;
+  if (preferidoId === meuId) {
+    return (
+      <span className="ml-2 inline-block rounded-full bg-green-600 text-white text-xs font-bold px-2.5 py-0.5 align-middle">
+        ⭐ Seu cliente
+      </span>
+    );
+  }
+  return (
+    <span className="ml-2 inline-block rounded-full bg-red-600 text-white text-xs font-bold px-2.5 py-0.5 align-middle">
+      Pediu {preferidoNome}
+    </span>
+  );
+}
+
 type PeriodoFila = "hoje" | "ontem" | "semana" | "mes";
 const LABEL_PERIODO_FILA: Record<PeriodoFila, string> = {
   hoje: "hoje",
@@ -415,23 +439,14 @@ export default async function FilaPage({
                         <p className="font-semibold">
                           {a.cliente.nome}
                           <BadgeAssinante info={planoInfoPorCliente.get(a.clienteId)} />
+                          <BadgePreferencia
+                            preferidoId={a.barbeiroPreferidoId}
+                            preferidoNome={a.barbeiroPreferido?.nome ?? null}
+                            meuId={session.barbeiroId}
+                          />
                         </p>
                         <p className="text-slate-500 dark:text-slate-400 text-sm">
-                          {a.barbeiroPreferido ? (
-                            <span
-                              className={
-                                session.barbeiroId && a.barbeiroPreferidoId === session.barbeiroId
-                                  ? "text-green-600 dark:text-green-400 font-medium"
-                                  : session.barbeiroId
-                                    ? "text-red-600 dark:text-red-400 font-medium"
-                                    : ""
-                              }
-                            >
-                              Pediu: {a.barbeiroPreferido.nome}
-                            </span>
-                          ) : (
-                            "Sem preferência de barbeiro"
-                          )}
+                          {a.barbeiroPreferido ? `Pediu: ${a.barbeiroPreferido.nome}` : "Sem preferência de barbeiro"}
                           {" · "}
                           {tempoEspera(a.criadoEm)}
                         </p>
