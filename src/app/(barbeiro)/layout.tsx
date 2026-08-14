@@ -29,7 +29,7 @@ export default async function FilaLayout({ children }: { children: React.ReactNo
           <div className="flex items-center gap-2 min-w-0">
             {logoUrl && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="" className="w-9 h-9 rounded-lg object-contain bg-white shrink-0" />
+              <img src={logoUrl} alt="" className="h-10 w-auto max-w-10 rounded-md object-contain shrink-0" />
             )}
             <div className="min-w-0">
               <p className="font-bold text-lg text-white">Barbearia Bethânia</p>

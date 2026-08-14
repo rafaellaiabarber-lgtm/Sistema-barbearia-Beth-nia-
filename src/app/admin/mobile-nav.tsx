@@ -27,7 +27,7 @@ export function MobileNav({ grupos, nome, logoUrl }: { grupos: NavGrupo[]; nome:
           </button>
           {logoUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt="" className="w-8 h-8 rounded-lg object-contain bg-white shrink-0" />
+            <img src={logoUrl} alt="" className="h-9 w-auto max-w-9 rounded-md object-contain shrink-0" />
           )}
           <div className="min-w-0">
             <p className="font-bold text-lg text-white">Barbearia Bethânia</p>
