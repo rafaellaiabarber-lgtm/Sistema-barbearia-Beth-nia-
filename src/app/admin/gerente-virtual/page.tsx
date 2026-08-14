@@ -9,9 +9,11 @@ import {
   calcularPrevisao,
   identificarBarbeirosAbaixoMedia,
   identificarJanelaBaixaOcupacao,
+  identificarBarbeirosSobrecarregados,
   gerarRecomendacoesDia,
   type ComparativoMes,
 } from "@/lib/gerente-virtual";
+import { minutosDisponiveis } from "@/lib/jornada";
 import { MetaMensalForm } from "./meta-mensal-form";
 import { ClienteInativoRow } from "./cliente-inativo-row";
 
@@ -62,10 +64,10 @@ export default async function GerenteVirtualPage({
         where: { atendimentos: { some: { status: "CONCLUIDO" } } },
         include: { atendimentos: { where: { status: "CONCLUIDO" }, select: { concluidoEm: true } } },
       }),
-      prisma.barbeiro.findMany({ where: { ativo: true } }),
+      prisma.barbeiro.findMany({ where: { ativo: true }, include: { jornadas: true } }),
       prisma.atendimento.findMany({
         where: { criadoEm: { gte: mesAtual.inicio, lte: mesAtual.fim } },
-        select: { criadoEm: true, barbeiroId: true, status: true },
+        select: { criadoEm: true, chamadoEm: true, concluidoEm: true, barbeiroId: true, status: true },
       }),
     ]);
 
@@ -116,10 +118,26 @@ export default async function GerenteVirtualPage({
   }
   const janelaBaixaOcupacao = identificarJanelaBaixaOcupacao(contagemPorHora, horaMin, horaMax);
 
+  const minutosAtendendoPorBarbeiro = new Map<string, number>();
+  for (const a of atendimentosMesTodos) {
+    if (a.status !== "CONCLUIDO" || !a.barbeiroId || !a.chamadoEm || !a.concluidoEm) continue;
+    const minutos = (a.concluidoEm.getTime() - a.chamadoEm.getTime()) / 60000;
+    minutosAtendendoPorBarbeiro.set(a.barbeiroId, (minutosAtendendoPorBarbeiro.get(a.barbeiroId) ?? 0) + minutos);
+  }
+  const ocupacaoPorBarbeiro = barbeirosAtivos.map((b) => {
+    const minDisponiveis = minutosDisponiveis(b.jornadas, mesAtual.inicio, mesAtual.fim);
+    const minAtendendo = minutosAtendendoPorBarbeiro.get(b.id) ?? 0;
+    return { nome: b.nome, percentual: minDisponiveis > 0 ? (minAtendendo / minDisponiveis) * 100 : null };
+  });
+  const barbeirosSobrecarregados = identificarBarbeirosSobrecarregados(ocupacaoPorBarbeiro);
+
   const recomendacoesDia = gerarRecomendacoesDia({
     qtdClientesSumidos: clientesSumidos.length,
     barbeirosAbaixoMedia,
     janelaBaixaOcupacao,
+    metaCentavos,
+    previsaoFechamentoCentavos: previsao.previsaoFechamentoCentavos,
+    barbeirosSobrecarregados,
   });
 
   return (
