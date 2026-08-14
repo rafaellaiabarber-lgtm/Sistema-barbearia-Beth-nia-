@@ -136,7 +136,7 @@ export default async function FilaPage({
   let comissaoPeriodo: {
     comissaoCentavos: number;
     qtd: number;
-    clientes: { nome: string; servicos: string[]; valorCentavos: number }[];
+    clientes: { nome: string; servicos: string[]; comissaoAtendimentoCentavos: number }[];
   } | null = null;
   type MinhaMeta = {
     id: string;
@@ -187,7 +187,7 @@ export default async function FilaPage({
     const clientes = atendimentosPeriodo.map((a) => ({
       nome: a.cliente.nome,
       servicos: a.servicos.map((s) => s.nomeSnapshot),
-      valorCentavos: a.precoTotalCentavos,
+      comissaoAtendimentoCentavos: comissaoServicos(a.servicos, barbeiro?.comissaoPercentual ?? 0),
     }));
     comissaoPeriodo = { comissaoCentavos, qtd: atendimentosPeriodo.length, clientes };
     pausadoHoje = estaPausadoHoje(barbeiro?.pausadoEm ?? null, agora);
@@ -407,7 +407,7 @@ export default async function FilaPage({
                           <div key={i} className="text-sm flex items-center justify-between gap-2">
                             <span>{c.nome}</span>
                             <span className="text-green-200 text-xs text-right">
-                              {c.servicos.join(", ")} · <Valor>{formatarReais(c.valorCentavos)}</Valor>
+                              {c.servicos.join(", ")} · <Valor>{formatarReais(c.comissaoAtendimentoCentavos)}</Valor>
                             </span>
                           </div>
                         ))
