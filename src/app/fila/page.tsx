@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Wallet, Target } from "lucide-react";
+import { Wallet, Target, Quote } from "lucide-react";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { chamarProximo, chamarCliente, cancelarAtendimento } from "@/lib/actions/fila";
@@ -12,6 +12,7 @@ import { itemCompleto, quantidadeFaltando, valorPotencialCentavos } from "@/lib/
 import { diaCobertoHoje } from "@/lib/assinaturas";
 import { LABEL_TIPO_META, formatarValorMeta, calcularNiveisAtingidos, nivelAtual, proximoNivel } from "@/lib/metas";
 import { calcularProgressoMeta } from "@/lib/metas-server";
+import { fraseDoDia } from "@/lib/frases";
 import { AutoRefresh } from "./auto-refresh";
 import { AtendendoAgora } from "./atendendo-agora";
 import { ThemeToggle } from "../theme-toggle";
@@ -221,6 +222,13 @@ export default async function FilaPage({
           </form>
         </div>
       </header>
+
+      {session.barbeiroId && (
+        <div className="mb-8 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm flex items-start gap-3">
+          <Quote className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-slate-600 dark:text-slate-300 italic">{fraseDoDia()}</p>
+        </div>
+      )}
 
       {session.barbeiroId && meuAtendimento ? (
         <AtendendoAgora
