@@ -5,6 +5,7 @@ import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 import { BotaoExcluirAtendimento } from "../excluir-atendimento-button";
 import { TaxaCartaoForm } from "./taxa-cartao-form";
+import { Valor } from "../../valor";
 
 export default async function FinanceiroPage({
   searchParams,
@@ -118,7 +119,7 @@ export default async function FinanceiroPage({
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Faturamento total</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{formatarReais(totalCentavos)}</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(totalCentavos)}</Valor></p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Atendimentos concluídos</p>
@@ -126,7 +127,7 @@ export default async function FinanceiroPage({
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Despesas no período</p>
-          <p className="text-2xl font-bold text-red-600">{formatarReais(totalDespesasCentavos)}</p>
+          <p className="text-2xl font-bold text-red-600"><Valor>{formatarReais(totalDespesasCentavos)}</Valor></p>
         </div>
       </div>
 
@@ -141,12 +142,12 @@ export default async function FinanceiroPage({
                 <div key={forma}>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-slate-600 dark:text-slate-300">{LABEL_FORMA_PAGAMENTO[forma] ?? forma}</span>
-                    <span className="font-semibold text-blue-600 dark:text-blue-400">{formatarReais(valor)}</span>
+                    <span className="font-semibold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(valor)}</Valor></span>
                   </div>
                   {forma === "CARTAO" && taxaCartaoEstimadaCentavos !== null && (
                     <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 pl-2">
                       <span>Taxa estimada da maquininha</span>
-                      <span>-{formatarReais(taxaCartaoEstimadaCentavos)}</span>
+                      <span>-<Valor>{formatarReais(taxaCartaoEstimadaCentavos)}</Valor></span>
                     </div>
                   )}
                 </div>
@@ -166,7 +167,7 @@ export default async function FinanceiroPage({
               {[...despesasPorCategoria.entries()].map(([categoria, valor]) => (
                 <div key={categoria} className="flex items-center justify-between text-sm">
                   <span className="text-slate-600 dark:text-slate-300">{LABEL_CATEGORIA_DESPESA[categoria] ?? categoria}</span>
-                  <span className="font-semibold text-red-600">{formatarReais(valor)}</span>
+                  <span className="font-semibold text-red-600"><Valor>{formatarReais(valor)}</Valor></span>
                 </div>
               ))}
             </div>
@@ -186,8 +187,8 @@ export default async function FinanceiroPage({
               <p className="text-slate-500 dark:text-slate-400 text-sm">{b.qtd} atendimento(s)</p>
             </div>
             <div className="text-right">
-              <p className="text-blue-600 dark:text-blue-400 font-semibold">{formatarReais(b.totalCentavos)}</p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">comissão: {formatarReais(b.comissaoCentavos)}</p>
+              <p className="text-blue-600 dark:text-blue-400 font-semibold"><Valor>{formatarReais(b.totalCentavos)}</Valor></p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">comissão: <Valor>{formatarReais(b.comissaoCentavos)}</Valor></p>
             </div>
           </div>
         ))}
@@ -207,7 +208,7 @@ export default async function FinanceiroPage({
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <p className="text-blue-600 dark:text-blue-400 font-semibold">{formatarReais(a.precoTotalCentavos)}</p>
+              <p className="text-blue-600 dark:text-blue-400 font-semibold"><Valor>{formatarReais(a.precoTotalCentavos)}</Valor></p>
               <BotaoExcluirAtendimento atendimentoId={a.id} />
             </div>
           </div>

@@ -4,6 +4,7 @@ import { MobileNav } from "./mobile-nav";
 import { SidebarNav } from "./sidebar-nav";
 import { gruposNav } from "./nav-links";
 import { ThemeToggle } from "../theme-toggle";
+import { ValoresToggle } from "../valores-toggle";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await requireSession(["ADMIN"]);
@@ -18,7 +19,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <p className="font-bold text-lg text-white">Barbearia Bethânia</p>
             <p className="text-blue-400 text-sm">Olá, {session.nome}</p>
           </div>
-          <ThemeToggle className="text-blue-400 hover:text-white hover:bg-blue-500/10 shrink-0" />
+          <div className="flex items-center gap-1 shrink-0">
+            <ValoresToggle className="text-blue-400 hover:text-white hover:bg-blue-500/10" />
+            <ThemeToggle className="text-blue-400 hover:text-white hover:bg-blue-500/10" />
+          </div>
         </div>
 
         <SidebarNav grupos={gruposNav} />

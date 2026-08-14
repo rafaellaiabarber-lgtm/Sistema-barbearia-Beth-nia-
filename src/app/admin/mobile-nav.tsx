@@ -7,6 +7,7 @@ import { logout } from "@/lib/actions/auth";
 import type { NavGrupo } from "./nav-links";
 import { ICONES_NAV } from "./nav-icones";
 import { ThemeToggle } from "../theme-toggle";
+import { ValoresToggle } from "../valores-toggle";
 
 export function MobileNav({ grupos, nome }: { grupos: NavGrupo[]; nome: string }) {
   const [aberto, setAberto] = useState(false);
@@ -29,7 +30,10 @@ export function MobileNav({ grupos, nome }: { grupos: NavGrupo[]; nome: string }
             <p className="text-blue-400 text-sm">Olá, {nome}</p>
           </div>
         </div>
-        <ThemeToggle className="text-blue-400 hover:text-white hover:bg-blue-500/10 shrink-0" />
+        <div className="flex items-center gap-1 shrink-0">
+          <ValoresToggle className="text-blue-400 hover:text-white hover:bg-blue-500/10" />
+          <ThemeToggle className="text-blue-400 hover:text-white hover:bg-blue-500/10" />
+        </div>
       </div>
 
       {aberto && (

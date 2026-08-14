@@ -4,6 +4,7 @@ import { calcularIntervalo } from "@/lib/periodo";
 import { competenciaAtual, estaInadimplente } from "@/lib/assinaturas";
 import { NovoPlanoForm } from "./novo-plano-form";
 import { PlanoRow } from "./plano-row";
+import { Valor } from "../../valor";
 
 function formatarPercentual(valor: number | null) {
   if (valor === null) return "—";
@@ -132,7 +133,7 @@ export default async function PlanosPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Receita recorrente (MRR)</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{formatarReais(mrrTotalCentavos)}</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(mrrTotalCentavos)}</Valor></p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Assinantes ativos</p>
@@ -181,7 +182,7 @@ export default async function PlanosPage() {
                 </div>
                 <div>
                   <p className="text-slate-400 dark:text-slate-500 text-xs">Receita recorrente (MRR)</p>
-                  <p className="font-semibold text-blue-600 dark:text-blue-400">{formatarReais(m.mrrCentavos)}</p>
+                  <p className="font-semibold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(m.mrrCentavos)}</Valor></p>
                 </div>
                 <div>
                   <p className="text-slate-400 dark:text-slate-500 text-xs">Inadimplência</p>
@@ -191,12 +192,12 @@ export default async function PlanosPage() {
                 </div>
                 <div>
                   <p className="text-slate-400 dark:text-slate-500 text-xs">Custo médio/assinante (mês)</p>
-                  <p className="font-semibold">{formatarReais(m.custoMedioPorAssinante)}</p>
+                  <p className="font-semibold"><Valor>{formatarReais(m.custoMedioPorAssinante)}</Valor></p>
                 </div>
                 <div>
                   <p className="text-slate-400 dark:text-slate-500 text-xs">Rentabilidade (mês)</p>
                   <p className={`font-semibold ${m.rentabilidadeCentavos < 0 ? "text-red-600" : "text-green-600"}`}>
-                    {formatarReais(m.rentabilidadeCentavos)}
+                    <Valor>{formatarReais(m.rentabilidadeCentavos)}</Valor>
                   </p>
                 </div>
               </div>

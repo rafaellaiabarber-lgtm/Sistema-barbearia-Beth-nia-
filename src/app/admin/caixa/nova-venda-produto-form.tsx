@@ -5,6 +5,7 @@ import type { Barbeiro, Produto } from "@prisma/client";
 import { registrarVendaProduto, type VendaProdutoState } from "@/lib/actions/vendas-produto";
 import { formatarReais } from "@/lib/format";
 import { SeletorFormaPagamento } from "../../forma-pagamento-selector";
+import { Valor } from "../../valor";
 
 const estadoInicial: VendaProdutoState = {};
 
@@ -90,7 +91,7 @@ export function NovaVendaProdutoForm({ barbeiros, produtos }: { barbeiros: Barbe
 
         {produtoSelecionado && (
           <p className="text-blue-600 dark:text-blue-400 font-semibold mb-3">
-            Preço unitário: {formatarReais(produtoSelecionado.precoCentavos)}
+            Preço unitário: <Valor>{formatarReais(produtoSelecionado.precoCentavos)}</Valor>
           </p>
         )}
 

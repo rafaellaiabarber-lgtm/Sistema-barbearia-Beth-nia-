@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { NovaContaForm } from "./nova-conta-form";
 import { ContaRow } from "./conta-row";
+import { Valor } from "../../valor";
 
 function inicioDoDia() {
   const d = new Date();
@@ -34,13 +35,13 @@ export default async function ContasPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <div className="rounded-xl p-5 shadow-sm bg-red-600 text-white">
-          <p className="text-2xl font-bold mb-1">{formatarReais(pagar.totalPendenteCentavos)}</p>
+          <p className="text-2xl font-bold mb-1"><Valor>{formatarReais(pagar.totalPendenteCentavos)}</Valor></p>
           <p className="text-red-100 text-sm">
             A pagar {pagar.atrasadas.length > 0 && `· ${pagar.atrasadas.length} atrasada(s)`}
           </p>
         </div>
         <div className="rounded-xl p-5 shadow-sm bg-green-600 text-white">
-          <p className="text-2xl font-bold mb-1">{formatarReais(receber.totalPendenteCentavos)}</p>
+          <p className="text-2xl font-bold mb-1"><Valor>{formatarReais(receber.totalPendenteCentavos)}</Valor></p>
           <p className="text-green-100 text-sm">
             A receber {receber.atrasadas.length > 0 && `· ${receber.atrasadas.length} atrasada(s)`}
           </p>

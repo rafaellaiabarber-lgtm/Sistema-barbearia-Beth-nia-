@@ -10,6 +10,7 @@ import {
 } from "@/lib/actions/planos";
 import { formatarReais } from "@/lib/format";
 import { NOMES_DIAS_SEMANA, formatarDiasSemana } from "@/lib/assinaturas";
+import { Valor } from "../../valor";
 
 const estadoInicial: PlanoState = {};
 
@@ -109,7 +110,7 @@ export function PlanoRow({ plano }: { plano: Plano }) {
           <div>
             <p className="font-semibold">{plano.nome}</p>
             <p className="text-slate-500 dark:text-slate-400 text-sm">
-              {formatarReais(plano.precoCentavos)}/mês · {plano.servicosIncluidosPorMes} serviço(s)
+              <Valor>{formatarReais(plano.precoCentavos)}</Valor>/mês · {plano.servicosIncluidosPorMes} serviço(s)
               incluído(s) por mês · cobre {formatarDiasSemana(plano.diasSemana)}
             </p>
           </div>

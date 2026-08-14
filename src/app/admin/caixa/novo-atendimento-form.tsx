@@ -11,6 +11,7 @@ import {
 import { buscarNomePorTelefone } from "@/lib/actions/fila";
 import { formatarReais } from "@/lib/format";
 import { SeletorFormaPagamento } from "../../forma-pagamento-selector";
+import { Valor } from "../../valor";
 
 const estadoInicial: LancarAtendimentoState = {};
 
@@ -203,7 +204,7 @@ export function NovoAtendimentoForm({
                 }`}
               >
                 <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
-                <span className="block text-blue-600 dark:text-blue-400 text-xs">{formatarReais(s.precoCentavos)}</span>
+                <span className="block text-blue-600 dark:text-blue-400 text-xs"><Valor>{formatarReais(s.precoCentavos)}</Valor></span>
               </button>
             );
           })}
@@ -213,7 +214,7 @@ export function NovoAtendimentoForm({
         ))}
 
         {totalCentavos > 0 && (
-          <p className="text-blue-600 dark:text-blue-400 font-semibold mb-3">Total: {formatarReais(totalCentavos)}</p>
+          <p className="text-blue-600 dark:text-blue-400 font-semibold mb-3">Total: <Valor>{formatarReais(totalCentavos)}</Valor></p>
         )}
 
         <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Forma de pagamento:</p>

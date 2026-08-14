@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { logout } from "@/lib/actions/auth";
 import { ThemeToggle } from "../theme-toggle";
+import { ValoresToggle } from "../valores-toggle";
 import { BarbeiroSidebarNav } from "./sidebar-nav";
 import { BarbeiroMobileNav } from "./mobile-nav";
 import { barbeiroNavLinks } from "./nav-links";
@@ -19,7 +20,10 @@ export default async function FilaLayout({ children }: { children: React.ReactNo
             <p className="font-bold text-lg text-white">Barbearia Bethânia</p>
             <p className="text-blue-400 text-sm">Olá, {session.nome}</p>
           </div>
-          <ThemeToggle className="text-blue-400 hover:text-white hover:bg-blue-500/10 shrink-0" />
+          <div className="flex items-center gap-1 shrink-0">
+            <ValoresToggle className="text-blue-400 hover:text-white hover:bg-blue-500/10" />
+            <ThemeToggle className="text-blue-400 hover:text-white hover:bg-blue-500/10" />
+          </div>
         </div>
 
         <BarbeiroSidebarNav links={barbeiroNavLinks} />

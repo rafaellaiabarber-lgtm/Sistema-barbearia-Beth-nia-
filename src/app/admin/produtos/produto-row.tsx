@@ -5,6 +5,7 @@ import type { Produto } from "@prisma/client";
 import { atualizarProduto, alternarAtivoProduto, excluirProduto, type ProdutoState } from "@/lib/actions/produtos";
 import { formatarReais } from "@/lib/format";
 import { ComissaoProdutoForm } from "./comissao-produto-form";
+import { Valor } from "../../valor";
 
 const estadoInicial: ProdutoState = {};
 
@@ -80,9 +81,9 @@ export function ProdutoRow({ produto }: { produto: Produto }) {
           <div>
             <p className="font-semibold">{produto.nome}</p>
             <p className="text-slate-500 dark:text-slate-400 text-sm">
-              preço {formatarReais(produto.precoCentavos)} · custo {formatarReais(produto.custoCentavos)} · margem{" "}
+              preço <Valor>{formatarReais(produto.precoCentavos)}</Valor> · custo <Valor>{formatarReais(produto.custoCentavos)}</Valor> · margem{" "}
               <span className={margemCentavos < 0 ? "text-red-600 font-medium" : "text-green-600 font-medium"}>
-                {formatarReais(margemCentavos)}
+                <Valor>{formatarReais(margemCentavos)}</Valor>
               </span>{" "}
               ·{" "}
               {produto.comissaoPercentual !== null

@@ -6,6 +6,7 @@ import { criarAssinatura, type AssinaturaState } from "@/lib/actions/assinaturas
 import { buscarNomePorTelefone } from "@/lib/actions/fila";
 import { buscarClientesPorNome, type SugestaoCliente } from "@/lib/actions/atendimentos";
 import { formatarReais } from "@/lib/format";
+import { Valor } from "../../valor";
 
 const estadoInicial: AssinaturaState = {};
 

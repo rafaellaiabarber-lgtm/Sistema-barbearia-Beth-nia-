@@ -7,6 +7,7 @@ import { lucroServicos } from "@/lib/comissao";
 import { competenciaAtual, estaInadimplente } from "@/lib/assinaturas";
 import { Variacao } from "./variacao";
 import { GraficoBarras } from "./grafico-barras";
+import { Valor } from "../valor";
 
 function chaveDia(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -154,7 +155,7 @@ export default async function AdminHomePage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="rounded-xl p-5 shadow-sm bg-blue-600 text-white flex items-start justify-between">
           <div>
-            <p className="text-2xl font-bold mb-1">{formatarReais(faturamentoHoje)}</p>
+            <p className="text-2xl font-bold mb-1"><Valor>{formatarReais(faturamentoHoje)}</Valor></p>
             <p className="text-blue-100 text-sm mb-2">Faturamento hoje</p>
             <Variacao atual={faturamentoHoje} anterior={faturamentoDiaAnterior} claro />
           </div>
@@ -162,7 +163,7 @@ export default async function AdminHomePage() {
         </div>
         <div className="rounded-xl p-5 shadow-sm bg-amber-500 text-white flex items-start justify-between">
           <div>
-            <p className="text-2xl font-bold mb-1">{formatarReais(faturamentoMes)}</p>
+            <p className="text-2xl font-bold mb-1"><Valor>{formatarReais(faturamentoMes)}</Valor></p>
             <p className="text-amber-100 text-sm mb-2">Faturamento do mês</p>
             <Variacao atual={faturamentoMes} anterior={faturamentoMesAnterior} claro />
           </div>
@@ -220,13 +221,13 @@ export default async function AdminHomePage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Faturamento da semana</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">{formatarReais(faturamentoSemana)}</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1"><Valor>{formatarReais(faturamentoSemana)}</Valor></p>
           <Variacao atual={faturamentoSemana} anterior={faturamentoSemanaAnterior} />
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Lucro estimado</p>
           <p className={`text-2xl font-bold mb-1 ${lucroMes < 0 ? "text-red-600" : "text-green-600"}`}>
-            {formatarReais(lucroMes)}
+            <Valor>{formatarReais(lucroMes)}</Valor>
           </p>
           <Variacao atual={lucroMes} anterior={lucroMesAnterior} />
         </div>
@@ -237,7 +238,7 @@ export default async function AdminHomePage() {
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Ticket médio</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">{formatarReais(ticketMedioMes)}</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1"><Valor>{formatarReais(ticketMedioMes)}</Valor></p>
           <Variacao atual={ticketMedioMes} anterior={ticketMedioMesAnterior} />
         </div>
       </div>
@@ -271,7 +272,7 @@ export default async function AdminHomePage() {
             >
               <span className="font-medium">{b.nome}</span>
               <div className="text-right">
-                <p className="font-semibold text-blue-600 dark:text-blue-400">{formatarReais(b.totalCentavos)}</p>
+                <p className="font-semibold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(b.totalCentavos)}</Valor></p>
                 <p className="text-slate-400 dark:text-slate-500 text-xs">{b.qtd} atendimento(s)</p>
               </div>
             </div>
