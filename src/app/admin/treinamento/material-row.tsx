@@ -64,7 +64,7 @@ export function MaterialRow({
             </div>
           </div>
 
-          {tipo === "TEXTO" ? (
+          {tipo === "TEXTO" && (
             <textarea
               name="conteudo"
               required
@@ -72,14 +72,30 @@ export function MaterialRow({
               defaultValue={material.tipo === "TEXTO" ? material.conteudo : ""}
               className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-full"
             />
-          ) : (
+          )}
+          {(tipo === "LINK" || tipo === "VIDEO") && (
             <input
               name="conteudo"
               required
-              defaultValue={material.tipo !== "TEXTO" ? material.conteudo : ""}
+              defaultValue={material.tipo === "LINK" || material.tipo === "VIDEO" ? material.conteudo : ""}
               placeholder="https://..."
               className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-full"
             />
+          )}
+          {tipo === "ARQUIVO" && (
+            <div>
+              {material.tipo === "ARQUIVO" && (
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                  Já tem um arquivo enviado. Escolha um novo só se quiser substituir.
+                </p>
+              )}
+              <input
+                name="arquivo"
+                type="file"
+                required={material.tipo !== "ARQUIVO"}
+                className="block text-sm text-slate-600 dark:text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white file:px-3 file:py-2 file:text-sm file:font-semibold hover:file:bg-blue-700"
+              />
+            </div>
           )}
 
           <div className="flex items-center gap-3">

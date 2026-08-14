@@ -1,9 +1,10 @@
-export type TipoMaterial = "TEXTO" | "LINK" | "VIDEO";
+export type TipoMaterial = "TEXTO" | "LINK" | "VIDEO" | "ARQUIVO";
 
 export const LABEL_TIPO_MATERIAL: Record<TipoMaterial, string> = {
   TEXTO: "Texto",
   LINK: "Link (planilha, PDF, etc.)",
   VIDEO: "Vídeo (YouTube ou Google Drive)",
+  ARQUIVO: "Arquivo pra baixar (planilha, PDF, etc.)",
 };
 
 export function urlEmbedVideo(url: string): string | null {
