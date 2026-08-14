@@ -219,6 +219,22 @@ export async function cancelarAtendimento(atendimentoId: string) {
   revalidatePath("/fila");
 }
 
+export async function pausarDisponibilidadeHoje() {
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
+  if (!session.barbeiroId) return;
+  await prisma.barbeiro.update({ where: { id: session.barbeiroId }, data: { pausadoEm: new Date() } });
+  revalidatePath("/fila");
+  revalidatePath("/totem");
+}
+
+export async function retomarDisponibilidadeHoje() {
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
+  if (!session.barbeiroId) return;
+  await prisma.barbeiro.update({ where: { id: session.barbeiroId }, data: { pausadoEm: null } });
+  revalidatePath("/fila");
+  revalidatePath("/totem");
+}
+
 export async function desfazerInicioAtendimento(atendimentoId: string) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
 

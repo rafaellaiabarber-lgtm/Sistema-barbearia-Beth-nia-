@@ -2,9 +2,9 @@ import Link from "next/link";
 import { Wallet, Target, Quote } from "lucide-react";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { chamarProximo, chamarCliente, cancelarAtendimento } from "@/lib/actions/fila";
+import { chamarProximo, chamarCliente, cancelarAtendimento, pausarDisponibilidadeHoje, retomarDisponibilidadeHoje } from "@/lib/actions/fila";
 import { formatarReais } from "@/lib/format";
-import { calcularIntervalo } from "@/lib/periodo";
+import { calcularIntervalo, estaPausadoHoje } from "@/lib/periodo";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { buscarCampanhasAtivasComProgresso } from "@/lib/campanhas-server";
 import { itemCompleto, quantidadeFaltando, valorPotencialCentavos } from "@/lib/campanhas";
@@ -147,6 +147,7 @@ export default async function FilaPage({
     percentualAteProximo: number;
   };
   let minhasMetas: MinhaMeta[] = [];
+  let pausadoHoje = false;
   const campanhasAtivas = session.barbeiroId ? await buscarCampanhasAtivasComProgresso(session.barbeiroId) : [];
   const itensFaltandoCampanha = campanhasAtivas.flatMap((c) => c.itens.filter((i) => !itemCompleto(i)));
   const potencialCampanhaCentavos = valorPotencialCentavos(itensFaltandoCampanha);
@@ -185,6 +186,7 @@ export default async function FilaPage({
       servicos: a.servicos.map((s) => s.nomeSnapshot),
     }));
     comissaoPeriodo = { comissaoCentavos, qtd: atendimentosPeriodo.length, clientes };
+    pausadoHoje = estaPausadoHoje(barbeiro?.pausadoEm ?? null, agora);
 
     const comissaoPadrao = barbeiro?.comissaoPercentual ?? 0;
     const progressosMeta = await Promise.all(metasBarbeiro.map((m) => calcularProgressoMeta(m, comissaoPadrao)));
@@ -225,6 +227,33 @@ export default async function FilaPage({
         <div className="mb-8 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm flex items-start gap-3">
           <Quote className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
           <p className="text-sm text-slate-600 dark:text-slate-300 italic">{fraseDoDia()}</p>
+        </div>
+      )}
+
+      {session.barbeiroId && (
+        <div
+          className={`mb-8 rounded-xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3 ${
+            pausadoHoje
+              ? "bg-amber-100 dark:bg-amber-950 border border-amber-300 dark:border-amber-800"
+              : "border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+          }`}
+        >
+          <p className={`text-sm ${pausadoHoje ? "text-amber-800 dark:text-amber-300 font-medium" : "text-slate-500 dark:text-slate-400"}`}>
+            {pausadoHoje
+              ? "Você está marcado como indisponível hoje — não aparece no totem."
+              : "Você aparece no totem hoje. Não vai atender?"}
+          </p>
+          <form action={pausadoHoje ? retomarDisponibilidadeHoje : pausarDisponibilidadeHoje}>
+            <button
+              className={`rounded-lg font-semibold text-sm px-3 py-1.5 ${
+                pausadoHoje
+                  ? "bg-green-600 hover:bg-green-700 text-white"
+                  : "bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300"
+              }`}
+            >
+              {pausadoHoje ? "Voltar a atender hoje" : "Não vou atender hoje"}
+            </button>
+          </form>
         </div>
       )}
 
