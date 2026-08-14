@@ -12,6 +12,7 @@ import { diaCobertoHoje } from "@/lib/assinaturas";
 import { LABEL_TIPO_META, formatarValorMeta, calcularNiveisAtingidos, nivelAtual, proximoNivel } from "@/lib/metas";
 import { calcularProgressoMeta } from "@/lib/metas-server";
 import { fraseDoDia } from "@/lib/frases";
+import { identificarJanelaBaixaOcupacao, gerarDicasPessoais } from "@/lib/gerente-virtual";
 import { AutoRefresh } from "./auto-refresh";
 import { AtendendoAgora } from "./atendendo-agora";
 import { Valor } from "../../valor";
@@ -149,6 +150,7 @@ export default async function FilaPage({
   };
   let minhasMetas: MinhaMeta[] = [];
   let pausadoHoje = false;
+  let dicasPessoais: string[] = [];
   const campanhasAtivas = session.barbeiroId ? await buscarCampanhasAtivasComProgresso(session.barbeiroId) : [];
   const itensFaltandoCampanha = campanhasAtivas.flatMap((c) => c.itens.filter((i) => !itemCompleto(i)));
   const potencialCampanhaCentavos = valorPotencialCentavos(itensFaltandoCampanha);
@@ -188,6 +190,49 @@ export default async function FilaPage({
     }));
     comissaoPeriodo = { comissaoCentavos, qtd: atendimentosPeriodo.length, clientes };
     pausadoHoje = estaPausadoHoje(barbeiro?.pausadoEm ?? null, agora);
+
+    const DIAS_SUMIDO_PESSOAL = 45;
+    const limiteSumidoPessoal = new Date(agora);
+    limiteSumidoPessoal.setDate(limiteSumidoPessoal.getDate() - DIAS_SUMIDO_PESSOAL);
+    const mesAtualIntervalo = calcularIntervalo("mes", agora);
+    const [clientesAtendidosPorMim, atendimentosMesBarbeiro] = await Promise.all([
+      prisma.cliente.findMany({
+        where: { atendimentos: { some: { status: "CONCLUIDO", barbeiroId: session.barbeiroId } } },
+        include: {
+          atendimentos: { where: { status: "CONCLUIDO", barbeiroId: session.barbeiroId }, select: { concluidoEm: true } },
+        },
+      }),
+      prisma.atendimento.findMany({
+        where: { barbeiroId: session.barbeiroId, criadoEm: { gte: mesAtualIntervalo.inicio, lte: mesAtualIntervalo.fim } },
+        select: { criadoEm: true },
+      }),
+    ]);
+    const qtdClientesSumidosPessoal = clientesAtendidosPorMim.filter((c) => {
+      const ultimaVisita = c.atendimentos.reduce<Date | null>(
+        (max, a) => (!a.concluidoEm ? max : !max || a.concluidoEm > max ? a.concluidoEm : max),
+        null
+      );
+      return ultimaVisita && ultimaVisita < limiteSumidoPessoal;
+    }).length;
+
+    const contagemPorHoraPessoal = new Array(24).fill(0) as number[];
+    for (const a of atendimentosMesBarbeiro) contagemPorHoraPessoal[a.criadoEm.getHours()]++;
+    const horasComMovimentoPessoal = contagemPorHoraPessoal.map((c, h) => ({ c, h })).filter((x) => x.c > 0);
+    let horaMinPessoal = 8;
+    let horaMaxPessoal = 20;
+    if (horasComMovimentoPessoal.length > 0) {
+      horaMinPessoal = Math.max(0, Math.min(...horasComMovimentoPessoal.map((x) => x.h)) - 1);
+      horaMaxPessoal = Math.min(23, Math.max(...horasComMovimentoPessoal.map((x) => x.h)) + 1);
+    }
+    const AMOSTRA_MINIMA_JANELA = 8; // com poucos atendimentos no mês, a janela sai larga demais pra ser útil
+    const janelaBaixaOcupacaoPessoal =
+      atendimentosMesBarbeiro.length >= AMOSTRA_MINIMA_JANELA
+        ? identificarJanelaBaixaOcupacao(contagemPorHoraPessoal, horaMinPessoal, horaMaxPessoal)
+        : null;
+    dicasPessoais = gerarDicasPessoais({
+      qtdClientesSumidos: qtdClientesSumidosPessoal,
+      janelaBaixaOcupacao: janelaBaixaOcupacaoPessoal,
+    });
 
     const comissaoPadrao = barbeiro?.comissaoPercentual ?? 0;
     const progressosMeta = await Promise.all(metasBarbeiro.map((m) => calcularProgressoMeta(m, comissaoPadrao)));
@@ -256,6 +301,22 @@ export default async function FilaPage({
             </button>
           </form>
         </div>
+      )}
+
+      {session.barbeiroId && dicasPessoais.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-lg font-semibold mb-3">Dicas pra você</h2>
+          <div className="bg-blue-600 text-white rounded-xl p-5 shadow-sm">
+            <ul className="space-y-2">
+              {dicasPessoais.map((texto, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm">
+                  <span className="shrink-0">💡</span>
+                  <span>{texto}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
       )}
 
       {session.barbeiroId && meuAtendimento ? (
