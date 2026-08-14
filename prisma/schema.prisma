@@ -343,6 +343,7 @@ model ConfiguracaoTotem {
 model ConfiguracaoFinanceira {
   id                            String   @id @default("singleton")
   taxaCartaoPercentualX100      Int?
+  impostoPercentualX100         Int?
   metaFaturamentoMensalCentavos Int?
   atualizadoEm                  DateTime @updatedAt
 }
