@@ -75,6 +75,12 @@ enum TipoMaterialTreinamento {
   ARQUIVO
 }
 
+enum PeriodicidadeFeedback {
+  SEMANAL
+  MENSAL
+  AVULSO
+}
+
 model Usuario {
   id         String    @id @default(cuid())
   nome       String
@@ -106,6 +112,7 @@ model Barbeiro {
   assinaturasVendidas     Assinatura[]
   campanhasVenda          CampanhaVenda[]
   jornadas                JornadaTrabalho[]
+  feedbacks               Feedback[]
   criadoEm                DateTime            @default(now())
 }
 
@@ -385,4 +392,25 @@ model MaterialTreinamento {
   ordem        Int                     @default(0)
   criadoEm     DateTime                @default(now())
   atualizadoEm DateTime                @updatedAt
+}
+
+model TemaFeedback {
+  id        String     @id @default(cuid())
+  nome      String
+  ativo     Boolean    @default(true)
+  criadoEm  DateTime   @default(now())
+  feedbacks Feedback[]
+}
+
+model Feedback {
+  id               String                @id @default(cuid())
+  barbeiro         Barbeiro              @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
+  barbeiroId       String
+  tema             TemaFeedback?         @relation(fields: [temaId], references: [id])
+  temaId           String?
+  temaNomeSnapshot String
+  periodicidade    PeriodicidadeFeedback
+  nota             Int
+  observacoes      String?
+  criadoEm         DateTime              @default(now())
 }

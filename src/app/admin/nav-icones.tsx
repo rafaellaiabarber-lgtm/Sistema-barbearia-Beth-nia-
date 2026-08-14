@@ -24,6 +24,7 @@ import {
   Handshake,
   Settings,
   Calculator,
+  MessageSquareText,
   type LucideIcon,
 } from "lucide-react";
 
@@ -53,4 +54,5 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   vendas: Handshake,
   configuracoes: Settings,
   precificacao: Calculator,
+  feedback: MessageSquareText,
 };

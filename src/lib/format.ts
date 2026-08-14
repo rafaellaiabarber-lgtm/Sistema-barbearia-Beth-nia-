@@ -27,6 +27,12 @@ export const LABEL_CATEGORIA_DESPESA: Record<string, string> = {
   OUTRA: "Outra",
 };
 
+export const LABEL_PERIODICIDADE_FEEDBACK: Record<string, string> = {
+  SEMANAL: "Semanal",
+  MENSAL: "Mensal",
+  AVULSO: "Avulsa",
+};
+
 // Percentuais são guardados como "percentual × 100" (ex.: 349 = 3,49%) para suportar casas decimais.
 export function percentualX100ParaValor(percentualX100: number) {
   return (percentualX100 / 100).toFixed(2).replace(".", ",");

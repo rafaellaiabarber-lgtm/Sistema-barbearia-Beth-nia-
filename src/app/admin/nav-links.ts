@@ -33,6 +33,7 @@ export const gruposNav: NavGrupo[] = [
       { href: "/admin/metas", label: "Metas", icone: "metas" },
       { href: "/admin/comissoes", label: "Comissões", icone: "comissoes" },
       { href: "/admin/treinamento", label: "Treinamentos", icone: "treinamento" },
+      { href: "/admin/feedback", label: "Feedback", icone: "feedback" },
     ],
   },
   {
