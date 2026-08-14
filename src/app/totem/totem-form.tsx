@@ -27,7 +27,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
     if (!estado.sucesso) return;
     const timer = setTimeout(() => {
       window.location.href = "/totem";
-    }, 5000);
+    }, 2000);
     return () => clearTimeout(timer);
   }, [estado.sucesso]);
 
