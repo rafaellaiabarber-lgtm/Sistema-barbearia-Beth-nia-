@@ -3,7 +3,6 @@ import { Wallet, Target, Quote } from "lucide-react";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { chamarProximo, chamarCliente, cancelarAtendimento } from "@/lib/actions/fila";
-import { logout } from "@/lib/actions/auth";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo } from "@/lib/periodo";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
@@ -15,7 +14,6 @@ import { calcularProgressoMeta } from "@/lib/metas-server";
 import { fraseDoDia } from "@/lib/frases";
 import { AutoRefresh } from "./auto-refresh";
 import { AtendendoAgora } from "./atendendo-agora";
-import { ThemeToggle } from "../theme-toggle";
 
 function tempoEspera(desde: Date) {
   const minutos = Math.max(0, Math.floor((Date.now() - desde.getTime()) / 60000));
@@ -193,34 +191,10 @@ export default async function FilaPage({
   const mostrarAvisoCampanha = !!session.barbeiroId && itensFaltandoCampanha.length > 0;
 
   return (
-    <div
-      className={`min-h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 p-6 ${
-        mostrarAvisoCampanha ? "pb-28" : ""
-      }`}
-    >
+    <div className={`p-6 ${mostrarAvisoCampanha ? "pb-28" : ""}`}>
       <AutoRefresh />
-      <header className="flex flex-wrap items-center justify-between gap-3 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold">Fila de atendimento</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Olá, {session.nome}</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <ThemeToggle className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800" />
-          <Link href="/indicacoes" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
-            Indicações
-          </Link>
-          <Link href="/ranking" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
-            Ranking
-          </Link>
-          {session.role === "ADMIN" && (
-            <Link href="/admin" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
-              Painel admin
-            </Link>
-          )}
-          <form action={logout}>
-            <button className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-sm">Sair</button>
-          </form>
-        </div>
+      <header className="mb-8">
+        <h1 className="text-2xl font-bold">Fila de atendimento</h1>
       </header>
 
       {session.barbeiroId && (

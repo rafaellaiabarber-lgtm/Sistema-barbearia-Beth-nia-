@@ -7,7 +7,6 @@ import { buscarTodasCampanhasAtivasComProgresso } from "@/lib/campanhas-server";
 import { RankingLista } from "./ranking-lista";
 import { RankingConfigForm } from "./ranking-config-form";
 import { CampanhasVenda } from "./campanhas-venda";
-import { ThemeToggle } from "../theme-toggle";
 
 async function buscarContagens(
   inicio: Date,
@@ -107,23 +106,12 @@ export default async function RankingPage({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 p-6">
-      <header className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Ranking dos barbeiros</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">
-            Pontos por serviço extra (configurável em Serviços), venda de produto, assinatura vendida e indicação convertida.
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <ThemeToggle className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800" />
-          <Link href="/indicacoes" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
-            Indicações
-          </Link>
-          <Link href={session.role === "ADMIN" ? "/admin" : "/fila"} className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
-            {session.role === "ADMIN" ? "Painel admin" : "Voltar pra fila"}
-          </Link>
-        </div>
+    <div className="p-6">
+      <header className="mb-6">
+        <h1 className="text-2xl font-bold">Ranking dos barbeiros</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-sm">
+          Pontos por serviço extra (configurável em Serviços), venda de produto, assinatura vendida e indicação convertida.
+        </p>
       </header>
 
       <CampanhasVenda campanhas={campanhasAtivas} />
