@@ -8,7 +8,8 @@ export default async function TotemConfigPage() {
     <div>
       <h1 className="text-2xl font-bold mb-1">Personalizar totem</h1>
       <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
-        Defina a logo e a imagem de fundo exibidas na tela de autoatendimento (totem).
+        Defina a logo e a imagem de fundo exibidas na tela de autoatendimento (totem). A logo também aparece no menu
+        e na tela de login do sistema.
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">

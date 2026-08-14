@@ -9,23 +9,27 @@ import { ICONES_NAV } from "./nav-icones";
 import { ThemeToggle } from "../theme-toggle";
 import { ValoresToggle } from "../valores-toggle";
 
-export function MobileNav({ grupos, nome }: { grupos: NavGrupo[]; nome: string }) {
+export function MobileNav({ grupos, nome, logoUrl }: { grupos: NavGrupo[]; nome: string; logoUrl: string | null }) {
   const [aberto, setAberto] = useState(false);
 
   return (
     <div className="md:hidden border-b border-blue-500/10 bg-black relative">
       <div className="flex items-center justify-between gap-3 p-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <button
             type="button"
             onClick={() => setAberto((v) => !v)}
             aria-label="Abrir menu"
             aria-expanded={aberto}
-            className="text-blue-300 hover:text-white p-1"
+            className="text-blue-300 hover:text-white p-1 shrink-0"
           >
             <Menu className="w-6 h-6" />
           </button>
-          <div>
+          {logoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt="" className="w-8 h-8 rounded-lg object-contain bg-white shrink-0" />
+          )}
+          <div className="min-w-0">
             <p className="font-bold text-lg text-white">Barbearia Bethânia</p>
             <p className="text-blue-400 text-sm">Olá, {nome}</p>
           </div>
