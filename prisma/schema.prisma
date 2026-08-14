@@ -92,6 +92,7 @@ model Barbeiro {
   telefone                String?
   fotoUrl                 String?
   ativo                   Boolean             @default(true)
+  pausadoEm               DateTime?
   comissaoPercentual      Int                 @default(50)
   metaFaturamentoCentavos Int?
   bonificacaoCentavos     Int?

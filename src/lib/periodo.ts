@@ -26,6 +26,11 @@ export function calcularIntervalo(
   return { inicio, fim: agora };
 }
 
+export function estaPausadoHoje(pausadoEm: Date | null, agora: Date = new Date()): boolean {
+  if (!pausadoEm) return false;
+  return pausadoEm.getTime() >= calcularIntervalo("hoje", agora).inicio.getTime();
+}
+
 export function intervaloAnterior(periodo: "hoje" | "semana" | "mes", inicio: Date, fim: Date) {
   function deslocar(d: Date) {
     const novo = new Date(d);

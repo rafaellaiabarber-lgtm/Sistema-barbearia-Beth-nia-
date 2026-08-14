@@ -1,16 +1,18 @@
 import { prisma } from "@/lib/prisma";
+import { estaPausadoHoje } from "@/lib/periodo";
 import { TotemForm } from "./totem-form";
 
 export const dynamic = "force-dynamic";
 
 export default async function TotemPage() {
-  const [barbeiros, configuracao] = await Promise.all([
+  const [todosBarbeiros, configuracao] = await Promise.all([
     prisma.barbeiro.findMany({
       where: { ativo: true },
       orderBy: { nome: "asc" },
     }),
     prisma.configuracaoTotem.findUnique({ where: { id: "singleton" } }),
   ]);
+  const barbeiros = todosBarbeiros.filter((b) => !estaPausadoHoje(b.pausadoEm));
 
   return (
     <div
