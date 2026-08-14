@@ -3,52 +3,36 @@ export type NavGrupo = { titulo: string | null; icone: string; links: NavLink[] 
 
 export const gruposNav: NavGrupo[] = [
   {
-    titulo: null,
+    titulo: "Operação",
     icone: "dashboard",
-    links: [{ href: "/admin", label: "Visão geral", icone: "dashboard" }],
-  },
-  {
-    titulo: "Gerente Virtual",
-    icone: "gerenteVirtual",
-    links: [{ href: "/admin/gerente-virtual", label: "Gerente Virtual", icone: "gerenteVirtual" }],
-  },
-  {
-    titulo: "Clientes",
-    icone: "clientes",
-    links: [{ href: "/admin/clientes", label: "Clientes", icone: "clientes" }],
-  },
-  {
-    titulo: "Barbeiros",
-    icone: "barbeiros",
     links: [
+      { href: "/admin", label: "Visão geral", icone: "dashboard" },
+      { href: "/fila", label: "Fila", icone: "atendimentos" },
+      { href: "/admin/clientes", label: "Clientes", icone: "clientes" },
       { href: "/admin/barbeiros", label: "Barbeiros", icone: "barbeiros" },
-      { href: "/admin/treinamento", label: "Treinamento", icone: "treinamento" },
-    ],
-  },
-  {
-    titulo: "Serviços",
-    icone: "servicos",
-    links: [
       { href: "/admin/servicos", label: "Serviços", icone: "servicos" },
       { href: "/admin/produtos", label: "Produtos", icone: "produtos" },
     ],
   },
   {
-    titulo: "Atendimentos",
-    icone: "atendimentos",
-    links: [
-      { href: "/fila", label: "Fila de atendimento", icone: "atendimentos" },
-      { href: "/indicacoes", label: "Indicações", icone: "indicacoes" },
-      { href: "/ranking", label: "Ranking", icone: "ranking" },
-      { href: "/admin/campanhas", label: "Campanhas de venda", icone: "campanhas" },
-    ],
-  },
-  {
-    titulo: "Assinaturas",
-    icone: "assinaturas",
+    titulo: "Vendas e relacionamento",
+    icone: "vendas",
     links: [
       { href: "/admin/assinaturas", label: "Assinaturas", icone: "assinaturas" },
       { href: "/admin/planos", label: "Planos", icone: "planos" },
+      { href: "/indicacoes", label: "Indicações", icone: "indicacoes" },
+      { href: "/admin/campanhas", label: "Campanhas", icone: "campanhas" },
+    ],
+  },
+  {
+    titulo: "Equipe",
+    icone: "barbeiros",
+    links: [
+      { href: "/admin/barbeiros", label: "Barbeiros", icone: "barbeiros" },
+      { href: "/ranking", label: "Ranking", icone: "ranking" },
+      { href: "/admin/metas", label: "Metas", icone: "metas" },
+      { href: "/admin/comissoes", label: "Comissões", icone: "comissoes" },
+      { href: "/admin/treinamento", label: "Treinamentos", icone: "treinamento" },
     ],
   },
   {
@@ -67,13 +51,18 @@ export const gruposNav: NavGrupo[] = [
     links: [
       { href: "/admin/financeiro", label: "Financeiro", icone: "financeiro" },
       { href: "/admin/fluxo-caixa", label: "Fluxo de caixa", icone: "fluxoCaixa" },
-      { href: "/admin/dre", label: "DRE simplificada", icone: "dre" },
+      { href: "/admin/dre", label: "DRE", icone: "dre" },
       { href: "/admin/eficiencia", label: "Eficiência", icone: "eficiencia" },
     ],
   },
   {
+    titulo: "Inteligência",
+    icone: "gerenteVirtual",
+    links: [{ href: "/admin/gerente-virtual", label: "Gerente Virtual", icone: "gerenteVirtual" }],
+  },
+  {
     titulo: "Configurações",
-    icone: "totem",
+    icone: "configuracoes",
     links: [{ href: "/admin/totem", label: "Totem", icone: "totem" }],
   },
 ];
