@@ -177,38 +177,82 @@ export async function concluirAtendimento(
     return { erro: "Escolha a forma de pagamento." };
   }
 
-  const [servicos, atendimento] = await Promise.all([
+  const produtoIds = formData.getAll("produtoIds").map(String);
+  const produtoQuantidades = formData.getAll("produtoQuantidades").map(String);
+  const itensProduto = produtoIds
+    .map((id, i) => ({ id, quantidade: Number.parseInt(produtoQuantidades[i] ?? "0", 10) }))
+    .filter((item) => item.quantidade > 0);
+
+  const [servicos, atendimento, produtos] = await Promise.all([
     prisma.servico.findMany({ where: { id: { in: servicoIds } } }),
     prisma.atendimento.findUnique({ where: { id: atendimentoId }, include: { barbeiro: true } }),
+    itensProduto.length > 0
+      ? prisma.produto.findMany({ where: { id: { in: itensProduto.map((i) => i.id) }, ativo: true } })
+      : Promise.resolve([]),
   ]);
   if (servicos.length === 0) return { erro: "Serviços inválidos." };
 
   const comissaoPadrao = atendimento?.barbeiro?.comissaoPercentual ?? 0;
   const precoTotalCentavos = servicos.reduce((soma, s) => soma + s.precoCentavos, 0);
+  const barbeiroId = atendimento?.barbeiroId ?? null;
+  const barbeiroNome = atendimento?.barbeiro?.nome ?? "barbeiro";
+  const produtosPorId = new Map(produtos.map((p) => [p.id, p]));
 
-  await prisma.atendimento.update({
-    where: { id: atendimentoId },
-    data: {
-      status: "CONCLUIDO",
-      concluidoEm: new Date(),
-      precoTotalCentavos,
-      formaPagamento,
-      servicos: {
-        create: servicos.map((s) => ({
-          servicoId: s.id,
-          nomeSnapshot: s.nome,
-          precoCentavos: s.precoCentavos,
-          custoCentavos: s.custoCentavos,
-          comissaoPercentual: s.comissaoPercentual ?? comissaoPadrao,
-        })),
+  await prisma.$transaction(async (tx) => {
+    await tx.atendimento.update({
+      where: { id: atendimentoId },
+      data: {
+        status: "CONCLUIDO",
+        concluidoEm: new Date(),
+        precoTotalCentavos,
+        formaPagamento,
+        servicos: {
+          create: servicos.map((s) => ({
+            servicoId: s.id,
+            nomeSnapshot: s.nome,
+            precoCentavos: s.precoCentavos,
+            custoCentavos: s.custoCentavos,
+            comissaoPercentual: s.comissaoPercentual ?? comissaoPadrao,
+          })),
+        },
       },
-    },
+    });
+
+    for (const item of itensProduto) {
+      const produto = produtosPorId.get(item.id);
+      if (!produto) continue;
+      const totalCentavos = produto.precoCentavos * item.quantidade;
+      await tx.vendaProduto.create({
+        data: {
+          produtoId: produto.id,
+          barbeiroId,
+          quantidade: item.quantidade,
+          precoUnitarioCentavos: produto.precoCentavos,
+          totalCentavos,
+          comissaoPercentual: produto.comissaoPercentual,
+          formaPagamento,
+        },
+      });
+      await tx.movimentoCaixa.create({
+        data: {
+          tipo: "ENTRADA",
+          descricao: `Venda de produto — ${produto.nome} x${item.quantidade} (${barbeiroNome})`,
+          valorCentavos: totalCentavos,
+          formaPagamento,
+        },
+      });
+    }
   });
 
   revalidatePath("/fila");
   revalidatePath("/admin/financeiro");
   revalidatePath("/ranking");
   revalidatePath("/admin/campanhas");
+  revalidatePath("/admin/caixa");
+  revalidatePath("/admin/comissoes");
+  revalidatePath("/admin/metas");
+  revalidatePath("/admin/fluxo-caixa");
+  revalidatePath("/admin/dre");
   return {};
 }
 
