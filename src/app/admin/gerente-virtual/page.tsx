@@ -2,7 +2,16 @@ import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo, intervaloAnterior } from "@/lib/periodo";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
-import { calcularMargem, calcularTicketMedio, gerarAlertas, calcularPrevisao, type ComparativoMes } from "@/lib/gerente-virtual";
+import {
+  calcularMargem,
+  calcularTicketMedio,
+  gerarAlertas,
+  calcularPrevisao,
+  identificarBarbeirosAbaixoMedia,
+  identificarJanelaBaixaOcupacao,
+  gerarRecomendacoesDia,
+  type ComparativoMes,
+} from "@/lib/gerente-virtual";
 import { MetaMensalForm } from "./meta-mensal-form";
 import { ClienteInativoRow } from "./cliente-inativo-row";
 
@@ -44,15 +53,21 @@ export default async function GerenteVirtualPage({
   const mesAtual = calcularIntervalo("mes", agora);
   const mesAnterior = intervaloAnterior("mes", mesAtual.inicio, mesAtual.fim);
 
-  const [comparativoAtual, comparativoAnterior, configuracao, clientesComAtendimento] = await Promise.all([
-    buscarComparativo(mesAtual.inicio, mesAtual.fim),
-    buscarComparativo(mesAnterior.inicio, mesAnterior.fim),
-    prisma.configuracaoFinanceira.findUnique({ where: { id: "singleton" } }),
-    prisma.cliente.findMany({
-      where: { atendimentos: { some: { status: "CONCLUIDO" } } },
-      include: { atendimentos: { where: { status: "CONCLUIDO" }, select: { concluidoEm: true } } },
-    }),
-  ]);
+  const [comparativoAtual, comparativoAnterior, configuracao, clientesComAtendimento, barbeirosAtivos, atendimentosMesTodos] =
+    await Promise.all([
+      buscarComparativo(mesAtual.inicio, mesAtual.fim),
+      buscarComparativo(mesAnterior.inicio, mesAnterior.fim),
+      prisma.configuracaoFinanceira.findUnique({ where: { id: "singleton" } }),
+      prisma.cliente.findMany({
+        where: { atendimentos: { some: { status: "CONCLUIDO" } } },
+        include: { atendimentos: { where: { status: "CONCLUIDO" }, select: { concluidoEm: true } } },
+      }),
+      prisma.barbeiro.findMany({ where: { ativo: true } }),
+      prisma.atendimento.findMany({
+        where: { criadoEm: { gte: mesAtual.inicio, lte: mesAtual.fim } },
+        select: { criadoEm: true, barbeiroId: true, status: true },
+      }),
+    ]);
 
   const alertas = gerarAlertas(comparativoAtual, comparativoAnterior);
   const margemAtual = calcularMargem(comparativoAtual);
@@ -81,12 +96,58 @@ export default async function GerenteVirtualPage({
     return Math.floor((agora.getTime() - data.getTime()) / (1000 * 60 * 60 * 24));
   }
 
+  const qtdPorBarbeiro = new Map<string, number>();
+  for (const a of atendimentosMesTodos) {
+    if (a.status !== "CONCLUIDO" || !a.barbeiroId) continue;
+    qtdPorBarbeiro.set(a.barbeiroId, (qtdPorBarbeiro.get(a.barbeiroId) ?? 0) + 1);
+  }
+  const barbeirosAbaixoMedia = identificarBarbeirosAbaixoMedia(
+    barbeirosAtivos.map((b) => ({ nome: b.nome, qtd: qtdPorBarbeiro.get(b.id) ?? 0 }))
+  );
+
+  const contagemPorHora = new Array(24).fill(0) as number[];
+  for (const a of atendimentosMesTodos) contagemPorHora[a.criadoEm.getHours()]++;
+  const horasComMovimento = contagemPorHora.map((c, h) => ({ c, h })).filter((x) => x.c > 0);
+  let horaMin = 8;
+  let horaMax = 20;
+  if (horasComMovimento.length > 0) {
+    horaMin = Math.max(0, Math.min(...horasComMovimento.map((x) => x.h)) - 1);
+    horaMax = Math.min(23, Math.max(...horasComMovimento.map((x) => x.h)) + 1);
+  }
+  const janelaBaixaOcupacao = identificarJanelaBaixaOcupacao(contagemPorHora, horaMin, horaMax);
+
+  const recomendacoesDia = gerarRecomendacoesDia({
+    qtdClientesSumidos: clientesSumidos.length,
+    barbeirosAbaixoMedia,
+    janelaBaixaOcupacao,
+  });
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1">Gerente Virtual</h1>
       <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
         Diagnóstico, previsão e oportunidades — calculados automaticamente com os dados da sua barbearia.
       </p>
+
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold mb-3">O que fazer amanhã</h2>
+        {recomendacoesDia.length === 0 ? (
+          <p className="text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+            Nenhuma recomendação por enquanto — está tudo dentro do esperado.
+          </p>
+        ) : (
+          <div className="bg-blue-600 text-white rounded-xl p-5 shadow-sm">
+            <ul className="space-y-2">
+              {recomendacoesDia.map((texto, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm">
+                  <span className="shrink-0">💡</span>
+                  <span>{texto}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
 
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">Diagnóstico do mês</h2>

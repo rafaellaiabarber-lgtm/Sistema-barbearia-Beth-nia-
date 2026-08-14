@@ -80,6 +80,92 @@ export function gerarAlertas(atual: ComparativoMes, anterior: ComparativoMes): A
   return alertas;
 }
 
+const LIMIAR_ABAIXO_MEDIA = 0.15; // 15% abaixo da média da equipe já vale alerta
+
+export function identificarBarbeirosAbaixoMedia(
+  qtdPorBarbeiro: { nome: string; qtd: number }[]
+): { nome: string; percentualAbaixo: number }[] {
+  if (qtdPorBarbeiro.length < 2) return [];
+  const total = qtdPorBarbeiro.reduce((s, b) => s + b.qtd, 0);
+  const mediaEquipe = total / qtdPorBarbeiro.length;
+  if (mediaEquipe <= 0) return [];
+
+  return qtdPorBarbeiro
+    .filter((b) => b.qtd < mediaEquipe * (1 - LIMIAR_ABAIXO_MEDIA))
+    .map((b) => ({ nome: b.nome, percentualAbaixo: ((mediaEquipe - b.qtd) / mediaEquipe) * 100 }));
+}
+
+export function identificarJanelaBaixaOcupacao(
+  contagemPorHora: number[],
+  horaMin: number,
+  horaMax: number
+): { horaInicio: number; horaFim: number } | null {
+  if (horaMax - horaMin < 1) return null;
+
+  const horas: number[] = [];
+  for (let h = horaMin; h <= horaMax; h++) horas.push(h);
+
+  const total = horas.reduce((s, h) => s + contagemPorHora[h], 0);
+  const mediaHora = total / horas.length;
+  if (mediaHora <= 0) return null;
+
+  const limiar = mediaHora * 0.5;
+  type Grupo = { inicio: number; fim: number };
+  const grupos: Grupo[] = [];
+  let atual: Grupo | null = null;
+  for (const h of horas) {
+    if (contagemPorHora[h] <= limiar) {
+      if (atual && atual.fim === h - 1) {
+        atual.fim = h;
+      } else {
+        atual = { inicio: h, fim: h };
+        grupos.push(atual);
+      }
+    } else {
+      atual = null;
+    }
+  }
+
+  const candidatos = grupos.filter((g) => g.fim > g.inicio);
+  if (candidatos.length === 0) return null;
+
+  const maior = candidatos.reduce((a, b) => (b.fim - b.inicio > a.fim - a.inicio ? b : a));
+  return { horaInicio: maior.inicio, horaFim: maior.fim + 1 };
+}
+
+function formatarHora(h: number): string {
+  return `${String(h).padStart(2, "0")}h`;
+}
+
+export function gerarRecomendacoesDia(input: {
+  qtdClientesSumidos: number;
+  barbeirosAbaixoMedia: { nome: string; percentualAbaixo: number }[];
+  janelaBaixaOcupacao: { horaInicio: number; horaFim: number } | null;
+}): string[] {
+  const recomendacoes: string[] = [];
+
+  if (input.qtdClientesSumidos > 0) {
+    const plural = input.qtdClientesSumidos > 1 ? "s" : "";
+    recomendacoes.push(
+      `Você tem ${input.qtdClientesSumidos} cliente${plural} inativo${plural}. Recomendo uma campanha de retorno.`
+    );
+  }
+
+  for (const b of input.barbeirosAbaixoMedia) {
+    recomendacoes.push(
+      `O barbeiro ${b.nome} está com ${b.percentualAbaixo.toFixed(0)}% menos atendimentos que a média da equipe.`
+    );
+  }
+
+  if (input.janelaBaixaOcupacao) {
+    recomendacoes.push(
+      `Seus horários das ${formatarHora(input.janelaBaixaOcupacao.horaInicio)} às ${formatarHora(input.janelaBaixaOcupacao.horaFim)} estão com baixa ocupação.`
+    );
+  }
+
+  return recomendacoes;
+}
+
 export type Previsao = {
   ritmoDiarioCentavos: number;
   previsaoFechamentoCentavos: number;
