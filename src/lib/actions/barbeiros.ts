@@ -83,10 +83,30 @@ export async function atualizarBarbeiro(
   const nome = String(formData.get("nome") ?? "").trim();
   const telefone = String(formData.get("telefone") ?? "").trim();
   const comissao = Number(formData.get("comissao") ?? 50);
+  const login = String(formData.get("login") ?? "").trim();
+  const senha = String(formData.get("senha") ?? "");
 
   if (!nome) return { erro: "Informe o nome do barbeiro." };
   if (Number.isNaN(comissao) || comissao < 0 || comissao > 100) {
     return { erro: "Comissão deve ser um número entre 0 e 100." };
+  }
+  if (senha && senha.length < 4) return { erro: "A senha deve ter ao menos 4 caracteres." };
+
+  const usuario = await prisma.usuario.findUnique({ where: { barbeiroId: id } });
+  if (usuario) {
+    if (!login) return { erro: "Informe um usuário de login." };
+    if (login !== usuario.login) {
+      const loginExistente = await prisma.usuario.findUnique({ where: { login } });
+      if (loginExistente) return { erro: "Esse usuário já existe." };
+    }
+    await prisma.usuario.update({
+      where: { id: usuario.id },
+      data: {
+        nome,
+        login,
+        ...(senha ? { senhaHash: await hashSenha(senha) } : {}),
+      },
+    });
   }
 
   await prisma.barbeiro.update({
