@@ -1,10 +1,8 @@
-import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { calcularIntervalo } from "@/lib/periodo";
 import { NovaIndicacaoForm } from "./nova-indicacao-form";
 import { IndicacaoRow } from "./indicacao-row";
-import { ThemeToggle } from "../theme-toggle";
 
 export default async function IndicacoesPage({
   searchParams,
@@ -38,23 +36,12 @@ export default async function IndicacoesPage({
   const totalSemana = indicacoes.filter((i) => i.criadoEm >= semana.inicio && i.criadoEm <= semana.fim).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 p-6">
-      <header className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Indicações</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">
-            Contatos indicados por clientes — use pra preencher os horários vazios.
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <ThemeToggle className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800" />
-          <Link href="/ranking" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
-            Ranking
-          </Link>
-          <Link href={session.role === "ADMIN" ? "/admin" : "/fila"} className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
-            {session.role === "ADMIN" ? "Painel admin" : "Voltar pra fila"}
-          </Link>
-        </div>
+    <div className="p-6">
+      <header className="mb-6">
+        <h1 className="text-2xl font-bold">Indicações</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-sm">
+          Contatos indicados por clientes — use pra preencher os horários vazios.
+        </p>
       </header>
 
       <div className="grid grid-cols-2 gap-4 mb-6 max-w-md">

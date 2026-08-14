@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import type { Servico } from "@prisma/client";
 import { concluirAtendimento, type ConcluirState } from "@/lib/actions/fila";
 import { formatarReais } from "@/lib/format";
-import { SeletorFormaPagamento } from "../forma-pagamento-selector";
+import { SeletorFormaPagamento } from "../../forma-pagamento-selector";
 
 const estadoInicial: ConcluirState = {};
 
