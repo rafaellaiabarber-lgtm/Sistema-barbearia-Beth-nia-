@@ -68,6 +68,12 @@ enum TipoMeta {
   VENDAS_PRODUTO
 }
 
+enum TipoMaterialTreinamento {
+  TEXTO
+  LINK
+  VIDEO
+}
+
 model Usuario {
   id         String    @id @default(cuid())
   nome       String
@@ -186,13 +192,13 @@ model Servico {
 }
 
 model Produto {
-  id                 String         @id @default(cuid())
+  id                 String              @id @default(cuid())
   nome               String
   precoCentavos      Int
-  custoCentavos      Int            @default(0)
+  custoCentavos      Int                 @default(0)
   comissaoPercentual Int?
-  ativo              Boolean        @default(true)
-  criadoEm           DateTime       @default(now())
+  ativo              Boolean             @default(true)
+  criadoEm           DateTime            @default(now())
   vendas             VendaProduto[]
   metas              Meta[]
   itensCampanha      ItemCampanhaVenda[]
@@ -365,4 +371,14 @@ model ContaFinanceira {
   pagoEm        DateTime?
   movimentoId   String?
   criadoEm      DateTime          @default(now())
+}
+
+model MaterialTreinamento {
+  id           String                  @id @default(cuid())
+  titulo       String
+  tipo         TipoMaterialTreinamento
+  conteudo     String
+  ordem        Int                     @default(0)
+  criadoEm     DateTime                @default(now())
+  atualizadoEm DateTime                @updatedAt
 }
