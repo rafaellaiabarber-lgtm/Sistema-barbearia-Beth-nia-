@@ -1,3 +1,5 @@
+import { formatarReais } from "@/lib/format";
+
 export type ComparativoMes = {
   faturamentoCentavos: number;
   despesasCentavos: number;
@@ -137,12 +139,38 @@ function formatarHora(h: number): string {
   return `${String(h).padStart(2, "0")}h`;
 }
 
+const LIMIAR_META_RISCO = 0.85; // previsão abaixo de 85% da meta já vale alerta
+
+export function metaEstaEmRisco(previsaoFechamentoCentavos: number, metaCentavos: number | null): boolean {
+  if (metaCentavos === null || metaCentavos <= 0) return false;
+  return previsaoFechamentoCentavos < metaCentavos * LIMIAR_META_RISCO;
+}
+
+const LIMIAR_OCUPACAO_ALTA = 85; // % de ocupação a partir do qual vale considerar contratar
+
+export function identificarBarbeirosSobrecarregados(
+  ocupacaoPorBarbeiro: { nome: string; percentual: number | null }[]
+): string[] {
+  return ocupacaoPorBarbeiro
+    .filter((o) => o.percentual !== null && o.percentual >= LIMIAR_OCUPACAO_ALTA)
+    .map((o) => o.nome);
+}
+
 export function gerarRecomendacoesDia(input: {
   qtdClientesSumidos: number;
   barbeirosAbaixoMedia: { nome: string; percentualAbaixo: number }[];
   janelaBaixaOcupacao: { horaInicio: number; horaFim: number } | null;
+  metaCentavos: number | null;
+  previsaoFechamentoCentavos: number;
+  barbeirosSobrecarregados: string[];
 }): string[] {
   const recomendacoes: string[] = [];
+
+  if (input.metaCentavos !== null && metaEstaEmRisco(input.previsaoFechamentoCentavos, input.metaCentavos)) {
+    recomendacoes.push(
+      `No ritmo atual, você deve fechar o mês em ${formatarReais(input.previsaoFechamentoCentavos)}, abaixo da sua meta de ${formatarReais(input.metaCentavos)}. Vale reforçar vendas ou divulgação.`
+    );
+  }
 
   if (input.qtdClientesSumidos > 0) {
     const plural = input.qtdClientesSumidos > 1 ? "s" : "";
@@ -155,6 +183,10 @@ export function gerarRecomendacoesDia(input: {
     recomendacoes.push(
       `O barbeiro ${b.nome} está com ${b.percentualAbaixo.toFixed(0)}% menos atendimentos que a média da equipe.`
     );
+  }
+
+  for (const nome of input.barbeirosSobrecarregados) {
+    recomendacoes.push(`${nome} está com a agenda muito cheia — vale considerar contratar reforço ou ajustar horários.`);
   }
 
   if (input.janelaBaixaOcupacao) {
