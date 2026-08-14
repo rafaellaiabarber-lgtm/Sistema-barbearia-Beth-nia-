@@ -9,7 +9,7 @@ import { ValoresToggle } from "../valores-toggle";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const [session, configuracao] = await Promise.all([requireSession(["ADMIN"]), obterConfiguracaoTotem()]);
-  const logoUrl = configuracao?.logoUrl ?? null;
+  const logoUrl = configuracao?.logoMenuUrl ?? configuracao?.logoUrl ?? null;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 flex flex-col md:flex-row">

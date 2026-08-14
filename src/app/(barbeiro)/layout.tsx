@@ -13,7 +13,7 @@ export default async function FilaLayout({ children }: { children: React.ReactNo
     requireSession(["ADMIN", "BARBEIRO"]),
     obterConfiguracaoTotem(),
   ]);
-  const logoUrl = configuracao?.logoUrl ?? null;
+  const logoUrl = configuracao?.logoMenuUrl ?? configuracao?.logoUrl ?? null;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 flex flex-col md:flex-row">

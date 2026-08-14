@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function LoginPage() {
   const configuracao = await obterConfiguracaoTotem();
-  const logoUrl = configuracao?.logoUrl ?? null;
+  const logoUrl = configuracao?.logoMenuUrl ?? configuracao?.logoUrl ?? null;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">

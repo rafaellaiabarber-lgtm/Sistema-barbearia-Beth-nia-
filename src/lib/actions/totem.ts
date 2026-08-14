@@ -52,6 +52,40 @@ export async function atualizarLogoTotem(
   return { sucesso: true };
 }
 
+export async function atualizarLogoMenu(
+  _prevState: ConfiguracaoTotemState,
+  formData: FormData
+): Promise<ConfiguracaoTotemState> {
+  await requireSession(["ADMIN"]);
+
+  try {
+    const logoMenuUrl = await enviarImagem("logo-menu", formData.get("logoMenu"));
+    if (!logoMenuUrl) return { erro: "Escolha uma imagem." };
+    await prisma.configuracaoTotem.upsert({
+      where: { id: CONFIGURACAO_ID },
+      create: { id: CONFIGURACAO_ID, logoMenuUrl },
+      update: { logoMenuUrl },
+    });
+  } catch (e) {
+    return { erro: e instanceof Error ? e.message : "Falha ao enviar a imagem." };
+  }
+
+  revalidatePath("/admin/totem");
+  revalidatePath("/", "layout");
+  return { sucesso: true };
+}
+
+export async function removerLogoMenu() {
+  await requireSession(["ADMIN"]);
+  await prisma.configuracaoTotem.upsert({
+    where: { id: CONFIGURACAO_ID },
+    create: { id: CONFIGURACAO_ID, logoMenuUrl: null },
+    update: { logoMenuUrl: null },
+  });
+  revalidatePath("/admin/totem");
+  revalidatePath("/", "layout");
+}
+
 export async function atualizarFundoTotem(
   _prevState: ConfiguracaoTotemState,
   formData: FormData
