@@ -21,6 +21,8 @@ import {
   Trophy,
   ListChecks,
   GraduationCap,
+  Handshake,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 
@@ -47,4 +49,6 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   dre: ClipboardList,
   eficiencia: Gauge,
   totem: Image,
+  vendas: Handshake,
+  configuracoes: Settings,
 };
