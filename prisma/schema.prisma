@@ -333,6 +333,7 @@ model PagamentoAssinatura {
 model ConfiguracaoTotem {
   id           String   @id @default("singleton")
   logoUrl      String?
+  logoMenuUrl  String?
   fundoUrl     String?
   // "imagem" ou "video". Null (fundoUrl definido em versões antigas) é tratado como imagem.
   fundoTipo    String?
