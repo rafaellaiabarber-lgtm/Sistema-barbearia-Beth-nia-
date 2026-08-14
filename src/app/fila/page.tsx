@@ -389,11 +389,18 @@ export default async function FilaPage({
                 <div className="grid gap-3 md:grid-cols-2">
                   {emAtendimento.map((a) => (
                     <div key={a.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-                      <p className="font-semibold">
-                        {a.cliente.nome}
-                        <BadgeAssinante info={planoInfoPorCliente.get(a.clienteId)} />{" "}
-                        <span className="text-slate-500 dark:text-slate-400 text-sm">com {a.barbeiro?.nome}</span>
-                      </p>
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="font-semibold">
+                          {a.cliente.nome}
+                          <BadgeAssinante info={planoInfoPorCliente.get(a.clienteId)} />{" "}
+                          <span className="text-slate-500 dark:text-slate-400 text-sm">com {a.barbeiro?.nome}</span>
+                        </p>
+                        <form action={cancelarAtendimento.bind(null, a.id)}>
+                          <button className="text-slate-400 dark:text-slate-500 hover:text-red-600 text-xs shrink-0">
+                            Cancelar
+                          </button>
+                        </form>
+                      </div>
                       <p className="text-blue-600 dark:text-blue-400 text-sm">{formatarReais(a.precoTotalCentavos)}</p>
                     </div>
                   ))}
