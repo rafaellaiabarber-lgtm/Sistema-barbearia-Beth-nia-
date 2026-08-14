@@ -23,6 +23,7 @@ import {
   GraduationCap,
   Handshake,
   Settings,
+  Calculator,
   type LucideIcon,
 } from "lucide-react";
 
@@ -51,4 +52,5 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   totem: Image,
   vendas: Handshake,
   configuracoes: Settings,
+  precificacao: Calculator,
 };

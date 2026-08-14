@@ -74,6 +74,28 @@ export async function atualizarTaxaCartao(
   return { sucesso: true };
 }
 
+export async function atualizarImpostoPadrao(
+  _prevState: ConfiguracaoFinanceiraState,
+  formData: FormData
+): Promise<ConfiguracaoFinanceiraState> {
+  await requireSession(["ADMIN"]);
+
+  const imposto = String(formData.get("imposto") ?? "").trim();
+  const impostoPercentualX100 = imposto ? valorParaPercentualX100(imposto) : null;
+  if (impostoPercentualX100 !== null && impostoPercentualX100 < 0) {
+    return { erro: "Informe um percentual válido." };
+  }
+
+  await prisma.configuracaoFinanceira.upsert({
+    where: { id: "singleton" },
+    create: { id: "singleton", impostoPercentualX100 },
+    update: { impostoPercentualX100 },
+  });
+
+  revalidatePath("/admin/precificacao");
+  return { sucesso: true };
+}
+
 export async function atualizarMetaFaturamentoMensal(
   _prevState: ConfiguracaoFinanceiraState,
   formData: FormData
