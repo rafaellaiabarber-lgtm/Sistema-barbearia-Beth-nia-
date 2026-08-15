@@ -24,7 +24,7 @@ export function JornadaForm({ barbeiroId, jornadas }: { barbeiroId: string; jorn
         {[1, 2, 3, 4, 5, 6, 0].map((dia) => {
           const jornada = porDia.get(dia);
           return (
-            <div key={dia} className="flex items-center gap-3 text-sm">
+            <div key={dia} className="flex flex-wrap items-center gap-3 text-sm">
               <label className="flex items-center gap-2 w-24 shrink-0">
                 <input
                   type="checkbox"
@@ -50,9 +50,28 @@ export function JornadaForm({ barbeiroId, jornadas }: { barbeiroId: string; jorn
                 disabled={!ativos[dia]}
                 className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1 text-sm disabled:opacity-40"
               />
+              <span className="text-slate-400 text-xs ml-2">almoço</span>
+              <input
+                type="time"
+                name={`almoco-inicio-${dia}`}
+                defaultValue={jornada?.almocoInicio ?? ""}
+                disabled={!ativos[dia]}
+                className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1 text-sm disabled:opacity-40"
+              />
+              <span className="text-slate-400">até</span>
+              <input
+                type="time"
+                name={`almoco-fim-${dia}`}
+                defaultValue={jornada?.almocoFim ?? ""}
+                disabled={!ativos[dia]}
+                className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1 text-sm disabled:opacity-40"
+              />
             </div>
           );
         })}
+        <p className="text-slate-400 dark:text-slate-500 text-xs">
+          Almoço é opcional — deixe os dois campos em branco se o barbeiro não tiver horário fixo de almoço nesse dia.
+        </p>
         <div className="flex items-center gap-3 pt-1">
           <button
             type="submit"
