@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { type Periodo, calcularIntervalo } from "@/lib/periodo";
+import { type Periodo, calcularIntervalo, validarPeriodo } from "@/lib/periodo";
 import { FiltroRelatorio } from "../filtro-relatorio";
 import { GraficoBarras } from "../grafico-barras";
 import { minutosDisponiveis, formatarJornada } from "@/lib/jornada";
@@ -30,10 +30,7 @@ export default async function EficienciaPage({
   }>;
 }) {
   const { periodo: periodoParam, dataInicio, dataFim, barbeiroId } = await searchParams;
-  const periodo: Periodo =
-    periodoParam === "semana" || periodoParam === "mes" || periodoParam === "personalizado"
-      ? periodoParam
-      : "mes";
+  const periodo: Periodo = validarPeriodo(periodoParam, "mes");
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
 
   const [atendimentos, barbeiros, atendimentosPeriodoTodos] = await Promise.all([

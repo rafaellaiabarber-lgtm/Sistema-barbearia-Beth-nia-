@@ -36,13 +36,14 @@ export function FiltroRelatorio({
           className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
         >
           <option value="hoje">Hoje</option>
+          <option value="dia">Um dia específico</option>
           <option value="semana">Esta semana</option>
           <option value="mes">Este mês</option>
           <option value="personalizado">Personalizado</option>
         </select>
       </div>
       <div>
-        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">De</label>
+        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">{periodo === "dia" ? "Dia" : "De"}</label>
         <input
           type="date"
           name="dataInicio"
@@ -50,15 +51,17 @@ export function FiltroRelatorio({
           className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
         />
       </div>
-      <div>
-        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Até</label>
-        <input
-          type="date"
-          name="dataFim"
-          defaultValue={dataFim}
-          className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
-        />
-      </div>
+      {periodo !== "dia" && (
+        <div>
+          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Até</label>
+          <input
+            type="date"
+            name="dataFim"
+            defaultValue={dataFim}
+            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+          />
+        </div>
+      )}
       {mostrarServico && (
         <div>
           <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Serviço</label>
@@ -97,7 +100,7 @@ export function FiltroRelatorio({
       >
         Buscar
       </button>
-      {(servicoId || barbeiroId || periodo === "personalizado") && (
+      {(servicoId || barbeiroId || periodo === "personalizado" || periodo === "dia") && (
         <a href={basePath} className="text-slate-400 dark:text-slate-500 hover:text-slate-700 text-sm">
           Limpar filtros
         </a>

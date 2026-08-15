@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { formatarReais, LABEL_FORMA_PAGAMENTO, LABEL_CATEGORIA_DESPESA } from "@/lib/format";
-import { type Periodo, calcularIntervalo } from "@/lib/periodo";
+import { type Periodo, calcularIntervalo, validarPeriodo } from "@/lib/periodo";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 import { BotaoExcluirAtendimento } from "../excluir-atendimento-button";
@@ -19,10 +19,7 @@ export default async function FinanceiroPage({
   }>;
 }) {
   const { periodo: periodoParam, dataInicio, dataFim, servicoId, barbeiroId } = await searchParams;
-  const periodo: Periodo =
-    periodoParam === "semana" || periodoParam === "mes" || periodoParam === "personalizado"
-      ? periodoParam
-      : "hoje";
+  const periodo: Periodo = validarPeriodo(periodoParam, "hoje");
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
 
   const [atendimentos, servicos, barbeiros, movimentos, configuracaoFinanceira, vendasProduto] = await Promise.all([

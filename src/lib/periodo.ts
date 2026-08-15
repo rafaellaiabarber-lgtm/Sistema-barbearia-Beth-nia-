@@ -1,12 +1,25 @@
-export type Periodo = "hoje" | "semana" | "mes" | "personalizado";
+export type Periodo = "hoje" | "dia" | "semana" | "mes" | "personalizado";
 
 export type IntervaloPersonalizado = { dataInicio?: string; dataFim?: string };
+
+const PERIODOS_VALIDOS: Periodo[] = ["hoje", "dia", "semana", "mes", "personalizado"];
+
+/** Valida um valor de período vindo da URL, caindo no padrão se for inválido ou ausente. */
+export function validarPeriodo(valor: string | undefined, padrao: Periodo): Periodo {
+  return (PERIODOS_VALIDOS as string[]).includes(valor ?? "") ? (valor as Periodo) : padrao;
+}
 
 export function calcularIntervalo(
   periodo: Periodo,
   agora: Date = new Date(),
   personalizado?: IntervaloPersonalizado
 ) {
+  if (periodo === "dia" && personalizado?.dataInicio) {
+    const inicio = new Date(`${personalizado.dataInicio}T00:00:00`);
+    const fim = new Date(`${personalizado.dataInicio}T23:59:59.999`);
+    return { inicio, fim };
+  }
+
   if (periodo === "personalizado" && personalizado?.dataInicio) {
     const inicio = new Date(`${personalizado.dataInicio}T00:00:00`);
     const fim = personalizado.dataFim ? new Date(`${personalizado.dataFim}T23:59:59.999`) : agora;
