@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
-import { type Periodo, calcularIntervalo, chavePeriodo } from "@/lib/periodo";
+import { type Periodo, calcularIntervalo, chavePeriodo, validarPeriodo } from "@/lib/periodo";
 import { marcarComissaoPaga, desmarcarComissaoPaga } from "@/lib/actions/comissoes";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
@@ -18,12 +18,9 @@ export default async function ComissoesPage({
   }>;
 }) {
   const { periodo: periodoParam, dataInicio, dataFim, servicoId, barbeiroId } = await searchParams;
-  const periodo: Periodo =
-    periodoParam === "semana" || periodoParam === "mes" || periodoParam === "personalizado"
-      ? periodoParam
-      : "hoje";
+  const periodo: Periodo = validarPeriodo(periodoParam, "hoje");
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
-  const podeMarcarPago = periodo !== "personalizado";
+  const podeMarcarPago = periodo !== "personalizado" && periodo !== "dia";
   const chave = podeMarcarPago ? chavePeriodo(periodo) : "";
 
   const [atendimentos, servicos, barbeiros, vendasProduto] = await Promise.all([
