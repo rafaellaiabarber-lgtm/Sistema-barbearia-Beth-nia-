@@ -206,7 +206,8 @@ export default async function EficienciaPage({
       <h2 className="text-lg font-semibold mt-8 mb-3">Taxa de ocupação</h2>
       <p className="text-slate-400 dark:text-slate-500 text-xs mb-4">
         Ocupação = tempo total atendendo dividido pelo tempo disponível, conforme o horário de trabalho cadastrado
-        em Barbeiros. Cadastre o horário de cada um pra essa conta ficar precisa.
+        em Barbeiros (já descontando o horário de almoço, se estiver cadastrado). Cadastre o horário de cada um pra
+        essa conta ficar precisa.
       </p>
 
       {ocupadosDemais.map((o) => (
