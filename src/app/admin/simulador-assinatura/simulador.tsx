@@ -95,6 +95,10 @@ export function Simulador({
     const faturamentoProjetadoAnualCentavos = Math.round(faturamentoProjetadoCentavos * fatorMensal * 12);
     const diferencaAnualCentavos = faturamentoProjetadoAnualCentavos - faturamentoAtualAnualCentavos;
 
+    // Referência de mercado: um teto comum de mensalidade ilimitada usado por outras redes de barbearia é 2x o
+    // valor do corte avulso — serve só de benchmark, o preço calibrado na régua acima continua sendo o principal.
+    const tetoDoisCortesCentavos = ticketAvulsoCentavos * 2;
+
     return {
       desconto,
       conversao,
@@ -111,6 +115,7 @@ export function Simulador({
       faturamentoAtualAnualCentavos,
       faturamentoProjetadoAnualCentavos,
       diferencaAnualCentavos,
+      tetoDoisCortesCentavos,
     };
   }, [
     ticketAvulso,
@@ -282,6 +287,20 @@ export function Simulador({
                 {formatarReais(resultado.precoAssinaturaCentavos)}
               </p>
               <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">preço sugerido da assinatura no mês</p>
+
+              <div className="mb-4 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 dark:text-slate-400">Referência de mercado (teto de 2 cortes avulsos)</span>
+                  <span className="font-medium">{formatarReais(resultado.tetoDoisCortesCentavos)}</span>
+                </div>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                  {resultado.precoAssinaturaCentavos <= resultado.tetoDoisCortesCentavos
+                    ? `Seu preço sugerido está ${formatarReais(resultado.tetoDoisCortesCentavos - resultado.precoAssinaturaCentavos)} abaixo desse teto.`
+                    : `Seu preço sugerido está ${formatarReais(resultado.precoAssinaturaCentavos - resultado.tetoDoisCortesCentavos)} acima desse teto — vale conferir se ainda faz sentido.`}{" "}
+                  Outras redes usam esse teto (2× o corte avulso) como limite de referência pra um plano ilimitado.
+                </p>
+              </div>
+
               <div className="space-y-1.5 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 dark:text-slate-400">Valor cheio (sem desconto)</span>
