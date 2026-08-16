@@ -111,7 +111,7 @@ export default async function ComissoesPage({
         servicoId={servicoId}
         barbeiroId={barbeiroId}
         servicos={servicos}
-        barbeiros={barbeiros}
+        barbeiros={barbeiros.filter((b) => b.ativo)}
       />
 
       {!podeMarcarPago && (
