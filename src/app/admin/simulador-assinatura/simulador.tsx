@@ -25,15 +25,21 @@ export function Simulador({
   dadosReais,
   diasPeriodo,
   ticketAvulsoDefault,
+  intervaloMedioDias,
+  frequenciaRealCortesPorMes,
 }: {
   servico: ServicoSelecionado | null;
   comissaoPadrao: number;
   dadosReais: DadosReais;
   diasPeriodo: number;
   ticketAvulsoDefault: string;
+  intervaloMedioDias: number | null;
+  frequenciaRealCortesPorMes: number | null;
 }) {
   const [ticketAvulso, setTicketAvulso] = useState(ticketAvulsoDefault);
-  const [frequencia, setFrequencia] = useState("4");
+  const [frequencia, setFrequencia] = useState(
+    frequenciaRealCortesPorMes ? frequenciaRealCortesPorMes.toFixed(1).replace(".", ",") : "4"
+  );
   const [descontoMin, setDescontoMin] = useState("5");
   const [descontoMax, setDescontoMax] = useState("35");
   const [conversaoMin, setConversaoMin] = useState("10");
@@ -124,7 +130,7 @@ export function Simulador({
 
   return (
     <div>
-      <div className="grid gap-4 sm:grid-cols-4 mb-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-4">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Atendimentos no período</p>
           <p className="text-xl font-bold">{dadosReais.nAtendimentos}</p>
@@ -140,6 +146,17 @@ export function Simulador({
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Faturamento real no período</p>
           <p className="text-xl font-bold">{formatarReais(dadosReais.faturamentoCentavos)}</p>
+        </div>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Ritmo real de retorno (histórico)</p>
+          <p className="text-xl font-bold">
+            {intervaloMedioDias ? `${Math.round(intervaloMedioDias)} dias` : "—"}
+          </p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+            {frequenciaRealCortesPorMes
+              ? `≈ ${frequenciaRealCortesPorMes.toFixed(1).replace(".", ",")} cortes/mês`
+              : "sem clientes com 2+ visitas ainda"}
+          </p>
         </div>
       </div>
 
@@ -178,7 +195,9 @@ export function Simulador({
             </div>
             <p className="text-xs text-slate-400 dark:text-slate-500">
               Ticket avulso já vem preenchido com o valor real do serviço/período escolhidos acima — mas você pode
-              editar.
+              editar. Cortes por mês já vem do ritmo real de retorno dos clientes (card "Ritmo real de retorno" acima)
+              — se o plano prometer mais cortes do que o cliente realmente costuma fazer, isso é margem extra pra
+              você, mas ele também pode nunca usar tudo o que pagou.
             </p>
 
             <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
