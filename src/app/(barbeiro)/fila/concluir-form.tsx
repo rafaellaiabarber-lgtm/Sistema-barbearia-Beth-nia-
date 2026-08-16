@@ -13,15 +13,18 @@ export function ConcluirForm({
   atendimentoId,
   servicos,
   produtos,
+  planoInfo,
 }: {
   atendimentoId: string;
   servicos: Servico[];
   produtos: Produto[];
+  planoInfo: { nome: string; cobertoHoje: boolean } | null;
 }) {
   const acaoComId = concluirAtendimento.bind(null, atendimentoId);
   const [estado, formAction, pendente] = useActionState(acaoComId, estadoInicial);
   const [selecionados, setSelecionados] = useState<string[]>([]);
   const [quantidadesProduto, setQuantidadesProduto] = useState<Record<string, number>>({});
+  const [cobertoPorAssinatura, setCobertoPorAssinatura] = useState(false);
 
   function alternarServico(id: string) {
     setSelecionados((atual) => (atual.includes(id) ? atual.filter((s) => s !== id) : [...atual, id]));
@@ -46,10 +49,26 @@ export function ConcluirForm({
     0
   );
 
-  const totalCentavos = totalServicosCentavos + totalProdutosCentavos;
+  const totalCentavos = (cobertoPorAssinatura ? 0 : totalServicosCentavos) + totalProdutosCentavos;
+  const precisaFormaPagamento = !cobertoPorAssinatura || totalProdutosCentavos > 0;
 
   return (
     <form action={formAction}>
+      {planoInfo?.cobertoHoje && (
+        <label className="flex items-start gap-2 bg-amber-50 dark:bg-amber-950 border border-amber-300 dark:border-amber-800 rounded-xl p-3 mb-3 cursor-pointer">
+          <input
+            type="checkbox"
+            name="cobertoPorAssinatura"
+            checked={cobertoPorAssinatura}
+            onChange={(e) => setCobertoPorAssinatura(e.target.checked)}
+            className="mt-0.5 accent-amber-600"
+          />
+          <span className="text-amber-900 dark:text-amber-100 text-sm">
+            <span className="font-semibold">Atendimento coberto pela assinatura</span> — não cobra pelo(s) serviço(s), entra no rateio da assinatura no fim do mês.
+          </span>
+        </label>
+      )}
+
       <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
       <div className="grid grid-cols-2 gap-2 mb-3">
         {servicos.map((s) => {
@@ -66,7 +85,9 @@ export function ConcluirForm({
               }`}
             >
               <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
-              <span className="block text-blue-600 dark:text-blue-400 text-xs"><Valor>{formatarReais(s.precoCentavos)}</Valor></span>
+              <span className="block text-blue-600 dark:text-blue-400 text-xs">
+                {cobertoPorAssinatura ? "coberto pela assinatura" : <Valor>{formatarReais(s.precoCentavos)}</Valor>}
+              </span>
             </button>
           );
         })}
@@ -129,10 +150,14 @@ export function ConcluirForm({
         <p className="text-blue-600 dark:text-blue-400 font-semibold mb-3">Total: <Valor>{formatarReais(totalCentavos)}</Valor></p>
       )}
 
-      <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Forma de pagamento:</p>
-      <div className="mb-3">
-        <SeletorFormaPagamento />
-      </div>
+      {precisaFormaPagamento && (
+        <>
+          <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Forma de pagamento:</p>
+          <div className="mb-3">
+            <SeletorFormaPagamento />
+          </div>
+        </>
+      )}
 
       {estado.erro && <p className="text-red-600 text-sm mb-3">{estado.erro}</p>}
 

@@ -90,6 +90,24 @@ export async function atualizarComissaoServico(
   return {};
 }
 
+export async function atualizarFichasServico(
+  id: string,
+  _prevState: ServicoState,
+  formData: FormData
+): Promise<ServicoState> {
+  await requireSession(["ADMIN"]);
+
+  const fichasRaw = String(formData.get("fichas") ?? "").trim();
+  const fichas = fichasRaw ? Number(fichasRaw) : 0;
+  if (Number.isNaN(fichas) || fichas < 0) {
+    return { erro: "Fichas deve ser um número maior ou igual a 0." };
+  }
+
+  await prisma.servico.update({ where: { id }, data: { fichas } });
+  revalidatePath("/admin/servicos");
+  return {};
+}
+
 export async function atualizarCustoServico(
   id: string,
   _prevState: ServicoState,

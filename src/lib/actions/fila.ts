@@ -172,16 +172,22 @@ export async function concluirAtendimento(
     return { erro: "Escolha ao menos um serviço realizado." };
   }
 
-  const formaPagamento = String(formData.get("formaPagamento") ?? "");
-  if (formaPagamento !== "DINHEIRO" && formaPagamento !== "PIX" && formaPagamento !== "CARTAO") {
-    return { erro: "Escolha a forma de pagamento." };
-  }
+  const cobertoPorAssinatura = formData.get("cobertoPorAssinatura") === "on";
 
   const produtoIds = formData.getAll("produtoIds").map(String);
   const produtoQuantidades = formData.getAll("produtoQuantidades").map(String);
   const itensProduto = produtoIds
     .map((id, i) => ({ id, quantidade: Number.parseInt(produtoQuantidades[i] ?? "0", 10) }))
     .filter((item) => item.quantidade > 0);
+
+  const precisaFormaPagamento = !cobertoPorAssinatura || itensProduto.length > 0;
+  const formaPagamentoRaw = String(formData.get("formaPagamento") ?? "");
+  if (precisaFormaPagamento && formaPagamentoRaw !== "DINHEIRO" && formaPagamentoRaw !== "PIX" && formaPagamentoRaw !== "CARTAO") {
+    return { erro: "Escolha a forma de pagamento." };
+  }
+  const formaPagamento = precisaFormaPagamento
+    ? (formaPagamentoRaw as "DINHEIRO" | "PIX" | "CARTAO")
+    : null;
 
   const [servicos, atendimento, produtos] = await Promise.all([
     prisma.servico.findMany({ where: { id: { in: servicoIds } } }),
@@ -193,7 +199,7 @@ export async function concluirAtendimento(
   if (servicos.length === 0) return { erro: "Serviços inválidos." };
 
   const comissaoPadrao = atendimento?.barbeiro?.comissaoPercentual ?? 0;
-  const precoTotalCentavos = servicos.reduce((soma, s) => soma + s.precoCentavos, 0);
+  const precoTotalCentavos = cobertoPorAssinatura ? 0 : servicos.reduce((soma, s) => soma + s.precoCentavos, 0);
   const barbeiroId = atendimento?.barbeiroId ?? null;
   const barbeiroNome = atendimento?.barbeiro?.nome ?? "barbeiro";
   const produtosPorId = new Map(produtos.map((p) => [p.id, p]));
@@ -206,13 +212,15 @@ export async function concluirAtendimento(
         concluidoEm: new Date(),
         precoTotalCentavos,
         formaPagamento,
+        cobertoPorAssinatura,
         servicos: {
           create: servicos.map((s) => ({
             servicoId: s.id,
             nomeSnapshot: s.nome,
-            precoCentavos: s.precoCentavos,
+            precoCentavos: cobertoPorAssinatura ? 0 : s.precoCentavos,
             custoCentavos: s.custoCentavos,
             comissaoPercentual: s.comissaoPercentual ?? comissaoPadrao,
+            fichas: s.fichas,
           })),
         },
       },
