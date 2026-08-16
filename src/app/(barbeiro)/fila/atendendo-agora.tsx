@@ -68,7 +68,7 @@ export function AtendendoAgora({
             </div>
           )}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
-            <ConcluirForm atendimentoId={atendimentoId} servicos={servicos} produtos={produtos} />
+            <ConcluirForm atendimentoId={atendimentoId} servicos={servicos} produtos={produtos} planoInfo={planoInfo} />
           </div>
           <button
             type="button"

@@ -113,6 +113,7 @@ model Barbeiro {
   campanhasVenda          CampanhaVenda[]
   jornadas                JornadaTrabalho[]
   feedbacks               Feedback[]
+  itensDistribuicaoPote   ItemDistribuicaoPote[]
   criadoEm                DateTime            @default(now())
 }
 
@@ -194,6 +195,7 @@ model Servico {
   custoCentavos       Int                  @default(0)
   duracaoMinutos      Int                  @default(30)
   comissaoPercentual  Int?
+  fichas              Int                  @default(0)
   ativo               Boolean              @default(true)
   pontuaRanking       Boolean              @default(true)
   criadoEm            DateTime             @default(now())
@@ -262,6 +264,7 @@ model Atendimento {
   servicos            AtendimentoServico[]
   precoTotalCentavos  Int                  @default(0)
   formaPagamento      FormaPagamento?
+  cobertoPorAssinatura Boolean             @default(false)
   criadoEm            DateTime             @default(now())
   chamadoEm           DateTime?
   concluidoEm         DateTime?
@@ -300,6 +303,7 @@ model AtendimentoServico {
   precoCentavos      Int
   custoCentavos      Int         @default(0)
   comissaoPercentual Int?
+  fichas             Int         @default(0)
 }
 
 model Plano {
@@ -337,6 +341,25 @@ model PagamentoAssinatura {
   pagoEm        DateTime   @default(now())
 
   @@unique([assinaturaId, competencia])
+}
+
+model DistribuicaoPote {
+  id                String                 @id @default(cuid())
+  competencia       String                 @unique
+  totalPoteCentavos Int
+  totalFichas       Int
+  criadoEm          DateTime               @default(now())
+  itens             ItemDistribuicaoPote[]
+}
+
+model ItemDistribuicaoPote {
+  id             String           @id @default(cuid())
+  distribuicao   DistribuicaoPote @relation(fields: [distribuicaoId], references: [id], onDelete: Cascade)
+  distribuicaoId String
+  barbeiro       Barbeiro         @relation(fields: [barbeiroId], references: [id])
+  barbeiroId     String
+  fichas         Int
+  valorCentavos  Int
 }
 
 model ConfiguracaoTotem {

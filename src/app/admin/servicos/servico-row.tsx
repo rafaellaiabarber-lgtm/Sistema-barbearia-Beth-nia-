@@ -12,6 +12,7 @@ import {
 import { formatarReais } from "@/lib/format";
 import { ComissaoServicoForm } from "./comissao-servico-form";
 import { CustoServicoForm } from "./custo-servico-form";
+import { FichasServicoForm } from "./fichas-servico-form";
 import { Valor } from "../../valor";
 
 const estadoInicial: ServicoState = {};
@@ -102,7 +103,8 @@ export function ServicoRow({ servico }: { servico: Servico }) {
               · {servico.duracaoMinutos} min ·{" "}
               {servico.comissaoPercentual !== null
                 ? `comissão própria: ${servico.comissaoPercentual}%`
-                : "comissão: padrão do barbeiro"}
+                : "comissão: padrão do barbeiro"}{" "}
+              · {servico.fichas} ficha(s)
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
@@ -113,6 +115,12 @@ export function ServicoRow({ servico }: { servico: Servico }) {
             <div className="flex flex-col items-start gap-1">
               <span className="text-xs text-slate-400 dark:text-slate-500">Comissão</span>
               <ComissaoServicoForm servicoId={servico.id} comissaoPercentual={servico.comissaoPercentual} />
+            </div>
+            <div className="flex flex-col items-start gap-1">
+              <span className="text-xs text-slate-400 dark:text-slate-500" title="Usado no Rateio de Assinatura pra dividir o pote proporcionalmente">
+                Fichas
+              </span>
+              <FichasServicoForm servicoId={servico.id} fichas={servico.fichas} />
             </div>
             <div className="flex items-center gap-4">
               <button
