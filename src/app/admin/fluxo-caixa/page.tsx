@@ -38,7 +38,7 @@ export default async function FluxoCaixaPage({
     }),
     prisma.movimentoCaixa.findMany({ where: { criadoEm: { gte: inicio, lte: fim } } }),
     prisma.servico.findMany({ orderBy: { nome: "asc" } }),
-    prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
   ]);
 
   const porDia = new Map<string, { entradas: number; saidas: number }>();

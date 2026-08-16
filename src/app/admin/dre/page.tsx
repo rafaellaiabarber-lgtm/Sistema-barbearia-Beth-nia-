@@ -30,7 +30,7 @@ export default async function DrePage({
     }),
     prisma.movimentoCaixa.findMany({ where: { criadoEm: { gte: inicio, lte: fim } } }),
     prisma.servico.findMany({ orderBy: { nome: "asc" } }),
-    prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
     prisma.configuracaoFinanceira.findUnique({ where: { id: "singleton" } }),
     prisma.vendaProduto.findMany({
       where: { criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
