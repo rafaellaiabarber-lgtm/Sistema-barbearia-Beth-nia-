@@ -19,7 +19,7 @@ export async function calcularPote(competencia: string): Promise<{
   const [pagamentos, atendimentos, barbeiros] = await Promise.all([
     prisma.pagamentoAssinatura.findMany({ where: { competencia } }),
     prisma.atendimento.findMany({
-      where: { cobertoPorAssinatura: true, status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim } },
+      where: { status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim } },
       include: { servicos: true },
     }),
     prisma.barbeiro.findMany(),
