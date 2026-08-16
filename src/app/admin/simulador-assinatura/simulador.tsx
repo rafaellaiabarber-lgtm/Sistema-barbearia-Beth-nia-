@@ -216,7 +216,7 @@ export function Simulador({
           sistema e em quantos meses isso foi — os cards acima e a simulação passam a usar esses números (junto com
           o ticket avulso e o uso esperado ao lado).
         </p>
-        <div className="grid grid-cols-2 gap-3 max-w-md">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:max-w-md">
           <div>
             <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Faturamento avulso total (R$)</label>
             <input
@@ -244,7 +244,7 @@ export function Simulador({
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <h2 className="font-semibold mb-4">Dados do plano</h2>
           <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Ticket médio avulso (R$)</label>
                 <input
@@ -274,7 +274,7 @@ export function Simulador({
 
             <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Como está sua agenda hoje?</p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {(Object.keys(LABEL_AGENDA) as Agenda[]).map((a) => (
                   <button
                     key={a}
@@ -298,7 +298,7 @@ export function Simulador({
 
             <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Conversão estimada (clientes avulsos que migram)</p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Conversão no mínimo (%)</label>
                   <input
