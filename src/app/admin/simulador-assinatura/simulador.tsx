@@ -9,7 +9,17 @@ function paraNumero(valor: string): number {
   return Number.isNaN(numero) ? 0 : numero;
 }
 
-export function Simulador({ ticketAvulsoDefault }: { ticketAvulsoDefault: string }) {
+type ServicoOpcao = { id: string; nome: string; custoCentavos: number; comissaoPercentual: number | null };
+
+export function Simulador({
+  ticketAvulsoDefault,
+  servicos,
+  comissaoPadrao,
+}: {
+  ticketAvulsoDefault: string;
+  servicos: ServicoOpcao[];
+  comissaoPadrao: number;
+}) {
   const [ticketAvulso, setTicketAvulso] = useState(ticketAvulsoDefault);
   const [frequencia, setFrequencia] = useState("4");
   const [descontoMin, setDescontoMin] = useState("5");
@@ -17,6 +27,9 @@ export function Simulador({ ticketAvulsoDefault }: { ticketAvulsoDefault: string
   const [conversaoMin, setConversaoMin] = useState("10");
   const [conversaoMax, setConversaoMax] = useState("60");
   const [slider, setSlider] = useState(50);
+  const [servicoId, setServicoId] = useState("");
+
+  const servicoEscolhido = servicos.find((s) => s.id === servicoId) ?? null;
 
   const resultado = useMemo(() => {
     const ticketAvulsoCentavos = reaisParaCentavos(ticketAvulso);
@@ -39,6 +52,15 @@ export function Simulador({ ticketAvulsoDefault }: { ticketAvulsoDefault: string
       (conversao / 100) * ticketPorCorteAssinaturaCentavos + (1 - conversao / 100) * ticketAvulsoCentavos
     );
 
+    let lucroPorCorteCentavos: number | null = null;
+    let lucroMensalPlanoCentavos: number | null = null;
+    if (servicoEscolhido) {
+      const comissaoPercentual = servicoEscolhido.comissaoPercentual ?? comissaoPadrao;
+      const comissaoCentavos = Math.round((ticketPorCorteAssinaturaCentavos * comissaoPercentual) / 100);
+      lucroPorCorteCentavos = ticketPorCorteAssinaturaCentavos - servicoEscolhido.custoCentavos - comissaoCentavos;
+      lucroMensalPlanoCentavos = lucroPorCorteCentavos * freq;
+    }
+
     return {
       desconto,
       conversao,
@@ -46,8 +68,10 @@ export function Simulador({ ticketAvulsoDefault }: { ticketAvulsoDefault: string
       precoAssinaturaCentavos,
       ticketPorCorteAssinaturaCentavos,
       novoTicketMedioGeralCentavos,
+      lucroPorCorteCentavos,
+      lucroMensalPlanoCentavos,
     };
-  }, [ticketAvulso, frequencia, descontoMin, descontoMax, conversaoMin, conversaoMax, slider]);
+  }, [ticketAvulso, frequencia, descontoMin, descontoMax, conversaoMin, conversaoMax, slider, servicoEscolhido, comissaoPadrao]);
 
   const limitesInvalidos = paraNumero(descontoMax) < paraNumero(descontoMin);
 
@@ -82,6 +106,24 @@ export function Simulador({ ticketAvulsoDefault }: { ticketAvulsoDefault: string
             Ticket avulso é calculado automaticamente com base nos atendimentos não cobertos por assinatura dos
             últimos 90 dias — mas você pode editar.
           </p>
+
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
+              Serviço equivalente ao corte da assinatura (pra calcular o lucro)
+            </label>
+            <select
+              value={servicoId}
+              onChange={(e) => setServicoId(e.target.value)}
+              className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+            >
+              <option value="">Não calcular lucro</option>
+              {servicos.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.nome}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Régua de desconto</p>
@@ -187,6 +229,28 @@ export function Simulador({ ticketAvulsoDefault }: { ticketAvulsoDefault: string
                 <span className="font-medium text-green-600">{formatarReais(resultado.novoTicketMedioGeralCentavos)}</span>
               </div>
             </div>
+
+            {resultado.lucroPorCorteCentavos !== null && resultado.lucroMensalPlanoCentavos !== null ? (
+              <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 space-y-1.5 text-sm">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                  Lucro (custo e comissão do serviço selecionado)
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 dark:text-slate-400">Lucro por corte na assinatura</span>
+                  <span>{formatarReais(resultado.lucroPorCorteCentavos)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-blue-600 dark:text-blue-400">Lucro mensal por assinante</span>
+                  <span className="font-medium text-blue-600 dark:text-blue-400">
+                    {formatarReais(resultado.lucroMensalPlanoCentavos)}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-3">
+                Escolha um serviço equivalente ao lado pra ver o lucro descontando custo e comissão do barbeiro.
+              </p>
+            )}
           </>
         )}
       </div>
