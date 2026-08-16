@@ -1,21 +1,19 @@
 import { prisma } from "@/lib/prisma";
+import { validarPeriodo, calcularIntervalo } from "@/lib/periodo";
 import { Simulador } from "./simulador";
 
 export const dynamic = "force-dynamic";
 
-export default async function SimuladorAssinaturaPage() {
-  const noventaDiasAtras = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+export default async function SimuladorAssinaturaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ periodo?: string; dataInicio?: string; dataFim?: string; servicoId?: string }>;
+}) {
+  const sp = await searchParams;
+  const periodo = validarPeriodo(sp.periodo, "semana");
+  const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio: sp.dataInicio, dataFim: sp.dataFim });
 
-  const [avulsos, servicos, barbeiros] = await Promise.all([
-    prisma.atendimento.aggregate({
-      where: {
-        status: "CONCLUIDO",
-        cobertoPorAssinatura: false,
-        precoTotalCentavos: { gt: 0 },
-        concluidoEm: { gte: noventaDiasAtras },
-      },
-      _avg: { precoTotalCentavos: true },
-    }),
+  const [servicos, barbeiros] = await Promise.all([
     prisma.servico.findMany({
       where: { ativo: true },
       orderBy: { nome: "asc" },
@@ -24,25 +22,114 @@ export default async function SimuladorAssinaturaPage() {
     prisma.barbeiro.findMany({ where: { ativo: true }, select: { comissaoPercentual: true } }),
   ]);
 
-  const ticketAvulsoDefault = avulsos._avg.precoTotalCentavos
-    ? (Math.round(avulsos._avg.precoTotalCentavos) / 100).toFixed(2).replace(".", ",")
-    : "";
+  const servicoId = sp.servicoId && servicos.some((s) => s.id === sp.servicoId) ? sp.servicoId : (servicos[0]?.id ?? "");
+  const servico = servicos.find((s) => s.id === servicoId) ?? null;
 
   const comissaoPadrao =
     barbeiros.length > 0
       ? Math.round(barbeiros.reduce((s, b) => s + b.comissaoPercentual, 0) / barbeiros.length)
       : 0;
 
+  let dadosReais = { nAtendimentos: 0, clientesUnicos: 0, faturamentoCentavos: 0, ticketMedioCentavos: 0, frequenciaMediaPorCliente: 0 };
+  if (servico) {
+    const itens = await prisma.atendimentoServico.findMany({
+      where: {
+        servicoId: servico.id,
+        atendimento: { status: "CONCLUIDO", cobertoPorAssinatura: false, concluidoEm: { gte: inicio, lte: fim } },
+      },
+      select: { precoCentavos: true, atendimento: { select: { clienteId: true } } },
+    });
+
+    const nAtendimentos = itens.length;
+    const clientesUnicos = new Set(itens.map((i) => i.atendimento.clienteId)).size;
+    const faturamentoCentavos = itens.reduce((s, i) => s + i.precoCentavos, 0);
+
+    dadosReais = {
+      nAtendimentos,
+      clientesUnicos,
+      faturamentoCentavos,
+      ticketMedioCentavos: nAtendimentos > 0 ? Math.round(faturamentoCentavos / nAtendimentos) : 0,
+      frequenciaMediaPorCliente: clientesUnicos > 0 ? nAtendimentos / clientesUnicos : 0,
+    };
+  }
+
+  const diasPeriodo = Math.max((fim.getTime() - inicio.getTime()) / (24 * 60 * 60 * 1000), 0.5);
+
+  const ticketAvulsoDefault =
+    dadosReais.ticketMedioCentavos > 0 ? (dadosReais.ticketMedioCentavos / 100).toFixed(2).replace(".", ",") : "";
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1">Simulador de Assinatura</h1>
       <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
-        Calibre o desconto de um novo plano de assinatura e veja o preço final, o ticket por corte e o impacto no seu
-        ticket médio geral, considerando quantos clientes avulsos devem migrar pra assinatura em cada nível de
-        desconto.
+        Escolha o serviço e o período que quer usar como base, calibre o desconto de um novo plano, e veja o
+        faturamento real desse período comparado com o que teria sido se parte desses clientes já fosse assinante.
       </p>
 
-      <Simulador ticketAvulsoDefault={ticketAvulsoDefault} servicos={servicos} comissaoPadrao={comissaoPadrao} />
+      <form
+        method="get"
+        className="flex flex-wrap items-end gap-3 mb-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
+      >
+        <div>
+          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Serviço avulso</label>
+          <select
+            name="servicoId"
+            defaultValue={servicoId}
+            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+          >
+            {servicos.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.nome}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Período</label>
+          <select
+            name="periodo"
+            defaultValue={periodo}
+            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+          >
+            <option value="hoje">Hoje</option>
+            <option value="dia">Um dia específico</option>
+            <option value="semana">Esta semana</option>
+            <option value="mes">Este mês</option>
+            <option value="personalizado">Personalizado</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">{periodo === "dia" ? "Dia" : "De"}</label>
+          <input
+            type="date"
+            name="dataInicio"
+            defaultValue={sp.dataInicio}
+            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+          />
+        </div>
+        {periodo !== "dia" && (
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Até</label>
+            <input
+              type="date"
+              name="dataFim"
+              defaultValue={sp.dataFim}
+              className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+            />
+          </div>
+        )}
+        <button type="submit" className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
+          Buscar
+        </button>
+      </form>
+
+      <Simulador
+        servico={servico}
+        comissaoPadrao={comissaoPadrao}
+        dadosReais={dadosReais}
+        diasPeriodo={diasPeriodo}
+        ticketAvulsoDefault={ticketAvulsoDefault}
+      />
     </div>
   );
 }
