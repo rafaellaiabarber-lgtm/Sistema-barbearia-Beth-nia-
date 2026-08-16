@@ -20,17 +20,19 @@ export async function calcularPote(competencia: string): Promise<{
     prisma.pagamentoAssinatura.findMany({ where: { competencia } }),
     prisma.atendimento.findMany({
       where: { status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim } },
-      include: { servicos: true },
+      include: { servicos: { include: { servico: true } } },
     }),
     prisma.barbeiro.findMany(),
   ]);
 
   const totalPoteCentavos = pagamentos.reduce((s, p) => s + p.valorCentavos, 0);
 
+  // Usa as fichas configuradas hoje em cada serviço (não o valor gravado no momento do atendimento), pra
+  // atendimentos já lançados antes de configurar as fichas passarem a contar assim que forem configuradas.
   const fichasPorBarbeiro = new Map<string, number>();
   for (const a of atendimentos) {
     if (!a.barbeiroId) continue;
-    const fichas = a.servicos.reduce((s, serv) => s + serv.fichas, 0);
+    const fichas = a.servicos.reduce((s, serv) => s + (serv.servico?.fichas ?? serv.fichas), 0);
     fichasPorBarbeiro.set(a.barbeiroId, (fichasPorBarbeiro.get(a.barbeiroId) ?? 0) + fichas);
   }
   const totalFichas = [...fichasPorBarbeiro.values()].reduce((s, f) => s + f, 0);
