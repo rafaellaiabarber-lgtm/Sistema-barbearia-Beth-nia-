@@ -31,6 +31,8 @@ export default async function SimuladorAssinaturaPage({
       : 0;
 
   let dadosReais = { nAtendimentos: 0, clientesUnicos: 0, faturamentoCentavos: 0, ticketMedioCentavos: 0, frequenciaMediaPorCliente: 0 };
+  let intervaloMedioDias: number | null = null;
+  let frequenciaRealCortesPorMes: number | null = null;
   if (servico) {
     const itens = await prisma.atendimentoServico.findMany({
       where: {
@@ -51,6 +53,39 @@ export default async function SimuladorAssinaturaPage({
       ticketMedioCentavos: nAtendimentos > 0 ? Math.round(faturamentoCentavos / nAtendimentos) : 0,
       frequenciaMediaPorCliente: clientesUnicos > 0 ? nAtendimentos / clientesUnicos : 0,
     };
+
+    // A maioria dos clientes avulsos não volta a cada 30 dias certinhos — pra saber o ritmo real de retorno
+    // (e não um número redondo chutado), olha pro histórico completo do serviço, não só pro período escolhido acima.
+    const historico = await prisma.atendimentoServico.findMany({
+      where: { servicoId: servico.id, atendimento: { status: "CONCLUIDO", cobertoPorAssinatura: false } },
+      select: { atendimento: { select: { clienteId: true, concluidoEm: true } } },
+    });
+
+    const visitasPorCliente = new Map<string, Date[]>();
+    for (const h of historico) {
+      if (!h.atendimento.concluidoEm) continue;
+      const arr = visitasPorCliente.get(h.atendimento.clienteId) ?? [];
+      arr.push(h.atendimento.concluidoEm);
+      visitasPorCliente.set(h.atendimento.clienteId, arr);
+    }
+
+    let somaIntervalosDias = 0;
+    let nIntervalos = 0;
+    for (const datas of visitasPorCliente.values()) {
+      datas.sort((a, b) => a.getTime() - b.getTime());
+      for (let i = 1; i < datas.length; i++) {
+        const dias = (datas[i].getTime() - datas[i - 1].getTime()) / (24 * 60 * 60 * 1000);
+        if (dias > 0) {
+          somaIntervalosDias += dias;
+          nIntervalos++;
+        }
+      }
+    }
+
+    if (nIntervalos > 0) {
+      intervaloMedioDias = somaIntervalosDias / nIntervalos;
+      frequenciaRealCortesPorMes = 30 / intervaloMedioDias;
+    }
   }
 
   const diasPeriodo = Math.max((fim.getTime() - inicio.getTime()) / (24 * 60 * 60 * 1000), 0.5);
@@ -129,6 +164,8 @@ export default async function SimuladorAssinaturaPage({
         dadosReais={dadosReais}
         diasPeriodo={diasPeriodo}
         ticketAvulsoDefault={ticketAvulsoDefault}
+        intervaloMedioDias={intervaloMedioDias}
+        frequenciaRealCortesPorMes={frequenciaRealCortesPorMes}
       />
     </div>
   );
