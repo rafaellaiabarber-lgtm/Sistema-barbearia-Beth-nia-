@@ -82,6 +82,13 @@ export function Simulador({
     const faturamentoProjetadoCentavos = receitaAssinantesCentavos + receitaAvulsosRestantesCentavos;
     const diferencaCentavos = faturamentoProjetadoCentavos - dadosReais.faturamentoCentavos;
 
+    // Extrapola o período pra uma base mensal e depois anual, pra dar uma ideia do LTV do grupo de clientes ao
+    // longo de 12 meses (mantendo a mesma proporção de conversão e a mesma frequência avulsa observadas no período).
+    const fatorMensal = 30 / diasPeriodo;
+    const faturamentoAtualAnualCentavos = Math.round(dadosReais.faturamentoCentavos * fatorMensal * 12);
+    const faturamentoProjetadoAnualCentavos = Math.round(faturamentoProjetadoCentavos * fatorMensal * 12);
+    const diferencaAnualCentavos = faturamentoProjetadoAnualCentavos - faturamentoAtualAnualCentavos;
+
     return {
       desconto,
       conversao,
@@ -95,6 +102,9 @@ export function Simulador({
       clientesAvulsosRestantes,
       faturamentoProjetadoCentavos,
       diferencaCentavos,
+      faturamentoAtualAnualCentavos,
+      faturamentoProjetadoAnualCentavos,
+      diferencaAnualCentavos,
     };
   }, [
     ticketAvulso,
@@ -316,6 +326,28 @@ export function Simulador({
                   </span>
                   <span className={`font-medium ${resultado.diferencaCentavos >= 0 ? "text-green-600" : "text-red-600"}`}>
                     {formatarReais(Math.abs(resultado.diferencaCentavos))}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 space-y-1.5 text-sm">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                  Projeção anual (extrapolando o ritmo do período escolhido pra 12 meses)
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 dark:text-slate-400">Faturamento anual no ritmo de hoje (avulso)</span>
+                  <span>{formatarReais(resultado.faturamentoAtualAnualCentavos)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 dark:text-slate-400">Faturamento anual com a assinatura</span>
+                  <span>{formatarReais(resultado.faturamentoProjetadoAnualCentavos)}</span>
+                </div>
+                <div className="flex items-center justify-between pt-1.5 border-t border-slate-200 dark:border-slate-800">
+                  <span className={`font-medium ${resultado.diferencaAnualCentavos >= 0 ? "text-green-600" : "text-red-600"}`}>
+                    {resultado.diferencaAnualCentavos >= 0 ? "Aumento" : "Redução"} no ano
+                  </span>
+                  <span className={`font-medium ${resultado.diferencaAnualCentavos >= 0 ? "text-green-600" : "text-red-600"}`}>
+                    {formatarReais(Math.abs(resultado.diferencaAnualCentavos))}
                   </span>
                 </div>
               </div>
