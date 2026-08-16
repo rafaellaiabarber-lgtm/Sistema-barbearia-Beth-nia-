@@ -97,8 +97,9 @@ export default async function SimuladorAssinaturaPage({
     <div>
       <h1 className="text-2xl font-bold mb-1">Simulador de Assinatura</h1>
       <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
-        Escolha o serviço e o período que quer usar como base, calibre o desconto de um novo plano, e veja o
-        faturamento real desse período comparado com o que teria sido se parte desses clientes já fosse assinante.
+        Escolha o serviço e o período que quer usar como base, ajuste como está sua agenda hoje, e veja o preço
+        sugerido do plano ilimitado (teto de 2× o corte avulso) e o faturamento real desse período comparado com o
+        que teria sido se parte desses clientes já fosse assinante.
       </p>
 
       <form
