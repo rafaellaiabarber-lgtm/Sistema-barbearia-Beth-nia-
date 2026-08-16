@@ -44,8 +44,8 @@ export default async function RateioAssinaturaPage({
       <h1 className="text-2xl font-bold mb-2">Rateio de Assinatura</h1>
       <p className="text-slate-400 dark:text-slate-500 text-sm mb-6">
         Todo mês, o valor recebido das assinaturas entra num pote único e é dividido entre os barbeiros conforme
-        as fichas dos atendimentos que marcaram &quot;coberto pela assinatura&quot; ao fechar a comanda. Configure
-        quantas fichas vale cada serviço em Serviços.
+        as fichas dos serviços que cada um realizou no mês. Configure quantas fichas vale cada serviço em
+        Serviços — todo atendimento lançado com esse serviço já conta automaticamente, sem precisar marcar nada.
       </p>
 
       <div className="flex items-center justify-between mb-6">
@@ -125,7 +125,7 @@ export default async function RateioAssinaturaPage({
             </div>
           ) : (
             <p className="text-slate-400 dark:text-slate-500 text-sm mb-4">
-              Nenhum atendimento coberto pela assinatura registrado ainda nessa competência.
+              Nenhum atendimento com serviço de ficha registrado ainda nessa competência.
             </p>
           )}
 
