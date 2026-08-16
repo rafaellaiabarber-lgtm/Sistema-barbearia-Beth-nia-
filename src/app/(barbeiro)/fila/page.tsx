@@ -40,6 +40,15 @@ function BadgeAssinante({ info }: { info: { nome: string; cobertoHoje: boolean }
   );
 }
 
+function BadgePremio({ premios }: { premios: { id: string; ofertaNome: string }[] | undefined }) {
+  if (!premios || premios.length === 0) return null;
+  return (
+    <span className="ml-2 inline-block rounded-full bg-lime-100 dark:bg-lime-950 text-lime-700 dark:text-lime-400 text-xs font-medium px-2 py-0.5 align-middle">
+      🎁 Prêmio pendente
+    </span>
+  );
+}
+
 function BadgePreferencia({
   preferidoId,
   preferidoNome,
@@ -132,6 +141,20 @@ export default async function FilaPage({
     if (!planoInfoPorCliente.has(a.clienteId)) {
       planoInfoPorCliente.set(a.clienteId, { nome: a.plano.nome, cobertoHoje: diaCobertoHoje(a.plano.diasSemana) });
     }
+  }
+
+  const premiosPendentes = clienteIdsNaFila.length
+    ? await prisma.giroRoleta.findMany({
+        where: { clienteId: { in: clienteIdsNaFila }, resgatadoEm: null },
+        include: { oferta: true },
+        orderBy: { criadoEm: "asc" },
+      })
+    : [];
+  const premiosPorCliente = new Map<string, { id: string; ofertaNome: string; descontoPercentual: number | null }[]>();
+  for (const g of premiosPendentes) {
+    const atual = premiosPorCliente.get(g.clienteId) ?? [];
+    atual.push({ id: g.id, ofertaNome: g.oferta.nome, descontoPercentual: g.oferta.descontoPercentual });
+    premiosPorCliente.set(g.clienteId, atual);
   }
 
   let comissaoPeriodo: {
@@ -331,6 +354,7 @@ export default async function FilaPage({
           campanhas={campanhasAtivas}
           comAvisoFixo={mostrarAvisoCampanha}
           planoInfo={planoInfoPorCliente.get(meuAtendimento.clienteId) ?? null}
+          premiosPendentes={premiosPorCliente.get(meuAtendimento.clienteId) ?? []}
         />
       ) : (
         <>
@@ -486,7 +510,8 @@ export default async function FilaPage({
                       <div className="flex items-start justify-between gap-2">
                         <p className="font-semibold">
                           {a.cliente.nome}
-                          <BadgeAssinante info={planoInfoPorCliente.get(a.clienteId)} />{" "}
+                          <BadgeAssinante info={planoInfoPorCliente.get(a.clienteId)} />
+                          <BadgePremio premios={premiosPorCliente.get(a.clienteId)} />{" "}
                           <span className="text-slate-500 dark:text-slate-400 text-sm">com {a.barbeiro?.nome}</span>
                         </p>
                         <form action={cancelarAtendimento.bind(null, a.id)}>
@@ -535,6 +560,7 @@ export default async function FilaPage({
                         <p className="font-semibold">
                           {a.cliente.nome}
                           <BadgeAssinante info={planoInfoPorCliente.get(a.clienteId)} />
+                          <BadgePremio premios={premiosPorCliente.get(a.clienteId)} />
                           <BadgePreferencia
                             preferidoId={a.barbeiroPreferidoId}
                             preferidoNome={a.barbeiroPreferido?.nome ?? null}

@@ -114,6 +114,7 @@ model Barbeiro {
   jornadas                JornadaTrabalho[]
   feedbacks               Feedback[]
   itensDistribuicaoPote   ItemDistribuicaoPote[]
+  girosRoleta             GiroRoleta[]
   criadoEm                DateTime            @default(now())
 }
 
@@ -186,6 +187,7 @@ model Cliente {
   criadoEm     DateTime      @default(now())
   atendimentos Atendimento[]
   assinaturas  Assinatura[]
+  girosRoleta  GiroRoleta[]
 }
 
 model Servico {
@@ -438,4 +440,26 @@ model Feedback {
   nota             Int
   observacoes      String?
   criadoEm         DateTime              @default(now())
+}
+
+model OfertaRoleta {
+  id                 String       @id @default(cuid())
+  nome               String
+  descontoPercentual Int?
+  ativo              Boolean      @default(true)
+  ordem              Int          @default(0)
+  criadoEm           DateTime     @default(now())
+  giros              GiroRoleta[]
+}
+
+model GiroRoleta {
+  id          String       @id @default(cuid())
+  barbeiro    Barbeiro     @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
+  barbeiroId  String
+  cliente     Cliente      @relation(fields: [clienteId], references: [id])
+  clienteId   String
+  oferta      OfertaRoleta @relation(fields: [ofertaId], references: [id])
+  ofertaId    String
+  resgatadoEm DateTime?
+  criadoEm    DateTime     @default(now())
 }
