@@ -17,7 +17,7 @@ import { Valor } from "../../valor";
 
 const estadoInicial: ServicoState = {};
 
-export function ServicoRow({ servico }: { servico: Servico }) {
+export function ServicoRow({ servico, comissoesPadrao }: { servico: Servico; comissoesPadrao: number[] }) {
   const [editando, setEditando] = useState(false);
   const acaoComId = atualizarServico.bind(null, servico.id);
   const [estado, formAction, pendente] = useActionState(acaoComId, estadoInicial);
@@ -37,6 +37,11 @@ export function ServicoRow({ servico }: { servico: Servico }) {
   }, [editando]);
 
   const margemCentavos = servico.precoCentavos - servico.custoCentavos;
+
+  const percentuaisAplicaveis = servico.comissaoPercentual !== null ? [servico.comissaoPercentual] : comissoesPadrao;
+  const comissaoValoresCentavos = percentuaisAplicaveis.map((p) => Math.round((servico.precoCentavos * p) / 100));
+  const comissaoMinCentavos = comissaoValoresCentavos.length > 0 ? Math.min(...comissaoValoresCentavos) : null;
+  const comissaoMaxCentavos = comissaoValoresCentavos.length > 0 ? Math.max(...comissaoValoresCentavos) : null;
 
   return (
     <div
@@ -104,6 +109,19 @@ export function ServicoRow({ servico }: { servico: Servico }) {
               {servico.comissaoPercentual !== null
                 ? `comissão própria: ${servico.comissaoPercentual}%`
                 : "comissão: padrão do barbeiro"}{" "}
+              {comissaoMinCentavos !== null && (
+                <span className="text-green-700 dark:text-green-400 font-medium">
+                  (
+                  {comissaoMinCentavos === comissaoMaxCentavos ? (
+                    <Valor>{formatarReais(comissaoMinCentavos)}</Valor>
+                  ) : (
+                    <>
+                      <Valor>{formatarReais(comissaoMinCentavos)}</Valor>–<Valor>{formatarReais(comissaoMaxCentavos!)}</Valor>
+                    </>
+                  )}
+                  )
+                </span>
+              )}{" "}
               · {servico.fichas} ficha(s)
             </p>
           </div>

@@ -3,7 +3,11 @@ import { NovoServicoForm } from "./novo-servico-form";
 import { ServicoRow } from "./servico-row";
 
 export default async function ServicosPage() {
-  const servicos = await prisma.servico.findMany({ orderBy: [{ ativo: "desc" }, { nome: "asc" }] });
+  const [servicos, barbeiros] = await Promise.all([
+    prisma.servico.findMany({ orderBy: [{ ativo: "desc" }, { nome: "asc" }] }),
+    prisma.barbeiro.findMany({ where: { ativo: true }, select: { comissaoPercentual: true } }),
+  ]);
+  const comissoesPadrao = barbeiros.map((b) => b.comissaoPercentual);
 
   return (
     <div>
@@ -13,7 +17,7 @@ export default async function ServicosPage() {
 
       <div className="space-y-2">
         {servicos.map((s) => (
-          <ServicoRow key={s.id} servico={s} />
+          <ServicoRow key={s.id} servico={s} comissoesPadrao={comissoesPadrao} />
         ))}
       </div>
     </div>
