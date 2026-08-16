@@ -26,6 +26,7 @@ import {
   Calculator,
   MessageSquareText,
   PieChart,
+  Disc3,
   type LucideIcon,
 } from "lucide-react";
 
@@ -57,4 +58,5 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   precificacao: Calculator,
   feedback: MessageSquareText,
   rateio: PieChart,
+  roleta: Disc3,
 };
