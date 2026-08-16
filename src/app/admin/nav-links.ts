@@ -20,6 +20,7 @@ export const gruposNav: NavGrupo[] = [
     links: [
       { href: "/admin/assinaturas", label: "Assinaturas", icone: "assinaturas" },
       { href: "/admin/planos", label: "Planos", icone: "planos" },
+      { href: "/admin/simulador-assinatura", label: "Simulador de Assinatura", icone: "simuladorAssinatura" },
       { href: "/indicacoes", label: "Indicações", icone: "indicacoes" },
       { href: "/admin/campanhas", label: "Campanhas", icone: "campanhas" },
       { href: "/admin/roleta", label: "Roleta de Prêmios", icone: "roleta" },
