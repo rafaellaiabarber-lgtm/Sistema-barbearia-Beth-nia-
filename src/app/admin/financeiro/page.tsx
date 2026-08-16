@@ -42,7 +42,9 @@ export default async function FinanceiroPage({
     }),
   ]);
 
-  const totalCentavos = atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
+  const totalServicosCentavos = atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
+  const totalProdutosCentavos = vendasProduto.reduce((s, v) => s + v.totalCentavos, 0);
+  const totalCentavos = totalServicosCentavos + totalProdutosCentavos;
 
   const porFormaPagamento = new Map<string, number>();
   for (const a of atendimentos) {
@@ -94,6 +96,7 @@ export default async function FinanceiroPage({
     const barbeiro = barbeirosPorId.get(barbeiroId);
     if (!barbeiro) continue;
     const atual = porBarbeiro.get(barbeiroId) ?? { nome: barbeiro.nome, totalCentavos: 0, comissaoCentavos: 0, qtd: 0 };
+    atual.totalCentavos += vendas.reduce((s, v) => s + v.totalCentavos, 0);
     atual.comissaoCentavos += comissaoProdutos(vendas);
     porBarbeiro.set(barbeiroId, atual);
   }
@@ -117,6 +120,9 @@ export default async function FinanceiroPage({
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Faturamento total</p>
           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(totalCentavos)}</Valor></p>
+          <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">
+            serviços <Valor>{formatarReais(totalServicosCentavos)}</Valor> · produtos <Valor>{formatarReais(totalProdutosCentavos)}</Valor>
+          </p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <p className="text-slate-500 dark:text-slate-400 text-sm">Atendimentos concluídos</p>
