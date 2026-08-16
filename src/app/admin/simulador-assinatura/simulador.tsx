@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatarReais, reaisParaCentavos } from "@/lib/format";
 
 function paraNumero(valor: string): number {
@@ -62,6 +62,22 @@ export function Simulador({
   const [mesesHistorico, setMesesHistorico] = useState("");
 
   const usandoHistorico = reaisParaCentavos(faturamentoHistorico) > 0 && paraNumero(mesesHistorico) > 0;
+
+  // Ticket avulso e uso esperado vêm preenchidos com o (pouco) dado real do sistema atual. Assim que o admin
+  // começa a usar dados históricos de outro sistema, isso fica enganoso — limpa os dois campos (se ele não tiver
+  // mexido neles ainda) pra deixar claro que agora precisam refletir o histórico digitado, não o sistema atual.
+  const jaLimpouParaHistoricoRef = useRef(false);
+  useEffect(() => {
+    if (usandoHistorico && !jaLimpouParaHistoricoRef.current) {
+      jaLimpouParaHistoricoRef.current = true;
+      if (ticketAvulso === ticketAvulsoDefault) setTicketAvulso("");
+      const usoEsperadoDefault = frequenciaRealCortesPorMes ? frequenciaRealCortesPorMes.toFixed(1).replace(".", ",") : "4";
+      if (usoEsperado === usoEsperadoDefault) setUsoEsperado("");
+    }
+    if (!usandoHistorico) {
+      jaLimpouParaHistoricoRef.current = false;
+    }
+  }, [usandoHistorico, ticketAvulso, ticketAvulsoDefault, usoEsperado, frequenciaRealCortesPorMes]);
 
   // Sistema novo, sem histórico suficiente ainda pra calcular nada sozinho: se o admin digitar o faturamento
   // avulso que já tinha em outro sistema (e em quantos meses), usa isso como base em vez dos dados reais do
@@ -250,7 +266,7 @@ export function Simulador({
                 <input
                   value={ticketAvulso}
                   onChange={(e) => setTicketAvulso(e.target.value)}
-                  placeholder="45,00"
+                  placeholder={usandoHistorico ? "informe o ticket desse histórico" : "45,00"}
                   inputMode="decimal"
                   className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
                 />
@@ -260,17 +276,25 @@ export function Simulador({
                 <input
                   value={usoEsperado}
                   onChange={(e) => setUsoEsperado(e.target.value)}
-                  placeholder="4"
+                  placeholder={usandoHistorico ? "ex: 4" : "4"}
                   inputMode="decimal"
                   className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
                 />
               </div>
             </div>
-            <p className="text-xs text-slate-400 dark:text-slate-500">
-              Ticket avulso já vem preenchido com o valor real do serviço/período escolhidos acima. Uso esperado já
-              vem do ritmo real de retorno dos clientes (card "Ritmo real de retorno" acima) — é só usado pra calcular
-              lucro e ticket efetivo, já que o plano é ilimitado (não tem "cortes contratados").
-            </p>
+            {usandoHistorico ? (
+              <p className="text-xs text-blue-600 dark:text-blue-400">
+                Como você está usando dados históricos, preencha aqui o ticket médio e o uso esperado daquele período
+                (do outro sistema) — eles não vêm mais do sistema atual, e são a base pra estimar quantos clientes
+                geraram o faturamento histórico informado abaixo.
+              </p>
+            ) : (
+              <p className="text-xs text-slate-400 dark:text-slate-500">
+                Ticket avulso já vem preenchido com o valor real do serviço/período escolhidos acima. Uso esperado já
+                vem do ritmo real de retorno dos clientes (card "Ritmo real de retorno" acima) — é só usado pra calcular
+                lucro e ticket efetivo, já que o plano é ilimitado (não tem "cortes contratados").
+              </p>
+            )}
 
             <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Como está sua agenda hoje?</p>
