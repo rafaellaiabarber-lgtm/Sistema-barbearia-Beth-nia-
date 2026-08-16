@@ -19,6 +19,20 @@ type DadosReais = {
   frequenciaMediaPorCliente: number;
 };
 
+type Agenda = "sobra" | "movimentada" | "lotada";
+
+const POSICAO_POR_AGENDA: Record<Agenda, number> = {
+  sobra: 0.7,
+  movimentada: 0.85,
+  lotada: 1,
+};
+
+const LABEL_AGENDA: Record<Agenda, string> = {
+  sobra: "Sobra horário",
+  movimentada: "Movimentada",
+  lotada: "Quase lotada",
+};
+
 export function Simulador({
   servico,
   comissaoPadrao,
@@ -37,43 +51,45 @@ export function Simulador({
   frequenciaRealCortesPorMes: number | null;
 }) {
   const [ticketAvulso, setTicketAvulso] = useState(ticketAvulsoDefault);
-  const [frequencia, setFrequencia] = useState(
+  const [usoEsperado, setUsoEsperado] = useState(
     frequenciaRealCortesPorMes ? frequenciaRealCortesPorMes.toFixed(1).replace(".", ",") : "4"
   );
-  const [descontoMin, setDescontoMin] = useState("5");
-  const [descontoMax, setDescontoMax] = useState("35");
+  const [agenda, setAgenda] = useState<Agenda>("movimentada");
   const [conversaoMin, setConversaoMin] = useState("10");
   const [conversaoMax, setConversaoMax] = useState("60");
   const [slider, setSlider] = useState(50);
 
   const resultado = useMemo(() => {
     const ticketAvulsoCentavos = reaisParaCentavos(ticketAvulso);
-    const freq = paraNumero(frequencia);
-    if (ticketAvulsoCentavos <= 0 || freq <= 0) return null;
+    const uso = paraNumero(usoEsperado);
+    if (ticketAvulsoCentavos <= 0) return null;
 
-    const dMin = paraNumero(descontoMin);
-    const dMax = paraNumero(descontoMax);
     const cMin = paraNumero(conversaoMin);
     const cMax = paraNumero(conversaoMax);
     const t = slider / 100;
-
-    const desconto = dMin + (dMax - dMin) * t;
     const conversao = cMin + (cMax - cMin) * t;
 
-    const valorCheioCentavos = ticketAvulsoCentavos * freq;
-    const precoAssinaturaCentavos = Math.round(valorCheioCentavos * (1 - desconto / 100));
-    const ticketPorCorteAssinaturaCentavos = Math.round(ticketAvulsoCentavos * (1 - desconto / 100));
-    const novoTicketMedioGeralCentavos = Math.round(
-      (conversao / 100) * ticketPorCorteAssinaturaCentavos + (1 - conversao / 100) * ticketAvulsoCentavos
-    );
+    // Teto de um plano ilimitado comum no mercado: 2x o valor do corte avulso. O preço de lançamento fica numa
+    // posição dentro dessa faixa de acordo com a agenda de hoje — agenda vazia puxa pra baixo (convida a assinar),
+    // agenda cheia sobe até o teto (não precisa de desconto pra vender o que já não tem vaga sobrando).
+    const tetoCentavos = ticketAvulsoCentavos * 2;
+    const posicaoPercentual = POSICAO_POR_AGENDA[agenda];
+    const precoAssinaturaCentavos = Math.round(tetoCentavos * posicaoPercentual);
 
-    let lucroPorCorteCentavos: number | null = null;
-    let lucroMensalPlanoCentavos: number | null = null;
-    if (servico) {
+    const ticketEfetivoPorUsoCentavos = uso > 0 ? Math.round(precoAssinaturaCentavos / uso) : null;
+
+    const novoTicketMedioGeralCentavos =
+      ticketEfetivoPorUsoCentavos !== null
+        ? Math.round((conversao / 100) * ticketEfetivoPorUsoCentavos + (1 - conversao / 100) * ticketAvulsoCentavos)
+        : null;
+
+    let lucroPorUsoCentavos: number | null = null;
+    let lucroMensalPorAssinanteCentavos: number | null = null;
+    if (servico && ticketEfetivoPorUsoCentavos !== null) {
       const comissaoPercentual = servico.comissaoPercentual ?? comissaoPadrao;
-      const comissaoCentavos = Math.round((ticketPorCorteAssinaturaCentavos * comissaoPercentual) / 100);
-      lucroPorCorteCentavos = ticketPorCorteAssinaturaCentavos - servico.custoCentavos - comissaoCentavos;
-      lucroMensalPlanoCentavos = lucroPorCorteCentavos * freq;
+      const comissaoCentavos = Math.round((ticketEfetivoPorUsoCentavos * comissaoPercentual) / 100);
+      lucroPorUsoCentavos = ticketEfetivoPorUsoCentavos - servico.custoCentavos - comissaoCentavos;
+      lucroMensalPorAssinanteCentavos = lucroPorUsoCentavos * uso;
     }
 
     // Compara o faturamento real do período com uma projeção: parte dos clientes vira assinante (pagando a
@@ -95,19 +111,15 @@ export function Simulador({
     const faturamentoProjetadoAnualCentavos = Math.round(faturamentoProjetadoCentavos * fatorMensal * 12);
     const diferencaAnualCentavos = faturamentoProjetadoAnualCentavos - faturamentoAtualAnualCentavos;
 
-    // Referência de mercado: um teto comum de mensalidade ilimitada usado por outras redes de barbearia é 2x o
-    // valor do corte avulso — serve só de benchmark, o preço calibrado na régua acima continua sendo o principal.
-    const tetoDoisCortesCentavos = ticketAvulsoCentavos * 2;
-
     return {
-      desconto,
       conversao,
-      valorCheioCentavos,
+      tetoCentavos,
+      posicaoPercentual,
       precoAssinaturaCentavos,
-      ticketPorCorteAssinaturaCentavos,
+      ticketEfetivoPorUsoCentavos,
       novoTicketMedioGeralCentavos,
-      lucroPorCorteCentavos,
-      lucroMensalPlanoCentavos,
+      lucroPorUsoCentavos,
+      lucroMensalPorAssinanteCentavos,
       clientesConvertidos,
       clientesAvulsosRestantes,
       faturamentoProjetadoCentavos,
@@ -115,23 +127,8 @@ export function Simulador({
       faturamentoAtualAnualCentavos,
       faturamentoProjetadoAnualCentavos,
       diferencaAnualCentavos,
-      tetoDoisCortesCentavos,
     };
-  }, [
-    ticketAvulso,
-    frequencia,
-    descontoMin,
-    descontoMax,
-    conversaoMin,
-    conversaoMax,
-    slider,
-    servico,
-    comissaoPadrao,
-    dadosReais,
-    diasPeriodo,
-  ]);
-
-  const limitesInvalidos = paraNumero(descontoMax) < paraNumero(descontoMin);
+  }, [ticketAvulso, usoEsperado, agenda, conversaoMin, conversaoMax, slider, servico, comissaoPadrao, dadosReais, diasPeriodo]);
 
   return (
     <div>
@@ -188,10 +185,10 @@ export function Simulador({
                 />
               </div>
               <div>
-                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Cortes por mês no plano</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Uso médio esperado (cortes/mês)</label>
                 <input
-                  value={frequencia}
-                  onChange={(e) => setFrequencia(e.target.value)}
+                  value={usoEsperado}
+                  onChange={(e) => setUsoEsperado(e.target.value)}
                   placeholder="4"
                   inputMode="decimal"
                   className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
@@ -199,41 +196,40 @@ export function Simulador({
               </div>
             </div>
             <p className="text-xs text-slate-400 dark:text-slate-500">
-              Ticket avulso já vem preenchido com o valor real do serviço/período escolhidos acima — mas você pode
-              editar. Cortes por mês já vem do ritmo real de retorno dos clientes (card "Ritmo real de retorno" acima)
-              — se o plano prometer mais cortes do que o cliente realmente costuma fazer, isso é margem extra pra
-              você, mas ele também pode nunca usar tudo o que pagou.
+              Ticket avulso já vem preenchido com o valor real do serviço/período escolhidos acima. Uso esperado já
+              vem do ritmo real de retorno dos clientes (card "Ritmo real de retorno" acima) — é só usado pra calcular
+              lucro e ticket efetivo, já que o plano é ilimitado (não tem "cortes contratados").
             </p>
 
             <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Régua de desconto</p>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Desconto no "Baixo" (%)</label>
-                  <input
-                    value={descontoMin}
-                    onChange={(e) => setDescontoMin(e.target.value)}
-                    inputMode="decimal"
-                    className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Desconto no "Muito UAU" (%)</label>
-                  <input
-                    value={descontoMax}
-                    onChange={(e) => setDescontoMax(e.target.value)}
-                    inputMode="decimal"
-                    className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
-                  />
-                </div>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Como está sua agenda hoje?</p>
+              <div className="grid grid-cols-3 gap-2">
+                {(Object.keys(LABEL_AGENDA) as Agenda[]).map((a) => (
+                  <button
+                    key={a}
+                    type="button"
+                    onClick={() => setAgenda(a)}
+                    className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                      agenda === a
+                        ? "bg-blue-600 border-blue-600 text-white"
+                        : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300"
+                    }`}
+                  >
+                    {LABEL_AGENDA[a]}
+                  </button>
+                ))}
               </div>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                Sobra horário → preço mais convidativo, perto do piso da faixa. Quase lotada → preço perto do teto,
+                já que a prioridade deixa de ser encher a agenda.
+              </p>
             </div>
 
-            <div>
+            <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Conversão estimada (clientes avulsos que migram)</p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Conversão no "Baixo" (%)</label>
+                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Conversão no mínimo (%)</label>
                   <input
                     value={conversaoMin}
                     onChange={(e) => setConversaoMin(e.target.value)}
@@ -242,7 +238,7 @@ export function Simulador({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Conversão no "Muito UAU" (%)</label>
+                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Conversão no máximo (%)</label>
                   <input
                     value={conversaoMax}
                     onChange={(e) => setConversaoMax(e.target.value)}
@@ -254,89 +250,75 @@ export function Simulador({
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                 Você calibra isso com base no que achar razoável — depois pode ajustar com dados reais.
               </p>
-            </div>
-
-            <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-slate-500 dark:text-slate-400">Baixo</span>
-                <span className="text-xs text-slate-500 dark:text-slate-400">Muito UAU</span>
+              <div className="mt-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Mínimo</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Máximo</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={slider}
+                  onChange={(e) => setSlider(Number(e.target.value))}
+                  className="w-full accent-blue-600"
+                />
               </div>
-              <input
-                type="range"
-                min={0}
-                max={100}
-                value={slider}
-                onChange={(e) => setSlider(Number(e.target.value))}
-                className="w-full accent-blue-600"
-              />
             </div>
           </div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
           <h2 className="font-semibold mb-4">Resultado da simulação</h2>
-          {limitesInvalidos ? (
-            <p className="text-red-600 text-sm">
-              O desconto do "Muito UAU" precisa ser maior ou igual ao do "Baixo".
-            </p>
-          ) : !resultado ? (
-            <p className="text-slate-400 dark:text-slate-500 text-sm">Preencha o ticket avulso e a frequência pra calcular.</p>
+          {!resultado ? (
+            <p className="text-slate-400 dark:text-slate-500 text-sm">Preencha o ticket avulso pra calcular.</p>
           ) : (
             <>
               <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">
                 {formatarReais(resultado.precoAssinaturaCentavos)}
               </p>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">preço sugerido da assinatura no mês</p>
-
-              <div className="mb-4 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Referência de mercado (teto de 2 cortes avulsos)</span>
-                  <span className="font-medium">{formatarReais(resultado.tetoDoisCortesCentavos)}</span>
-                </div>
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-                  {resultado.precoAssinaturaCentavos <= resultado.tetoDoisCortesCentavos
-                    ? `Seu preço sugerido está ${formatarReais(resultado.tetoDoisCortesCentavos - resultado.precoAssinaturaCentavos)} abaixo desse teto.`
-                    : `Seu preço sugerido está ${formatarReais(resultado.precoAssinaturaCentavos - resultado.tetoDoisCortesCentavos)} acima desse teto — vale conferir se ainda faz sentido.`}{" "}
-                  Outras redes usam esse teto (2× o corte avulso) como limite de referência pra um plano ilimitado.
-                </p>
-              </div>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">preço sugerido da assinatura ilimitada no mês</p>
 
               <div className="space-y-1.5 text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Valor cheio (sem desconto)</span>
-                  <span>{formatarReais(resultado.valorCheioCentavos)}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Teto do plano (2× o avulso)</span>
+                  <span>{formatarReais(resultado.tetoCentavos)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Desconto aplicado</span>
-                  <span>{resultado.desconto.toFixed(1).replace(".", ",")}%</span>
+                  <span className="text-slate-500 dark:text-slate-400">Posição na faixa ({LABEL_AGENDA[agenda]})</span>
+                  <span>{Math.round(resultado.posicaoPercentual * 100)}% do teto</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Ticket por corte na assinatura</span>
-                  <span>{formatarReais(resultado.ticketPorCorteAssinaturaCentavos)}</span>
-                </div>
+                {resultado.ticketEfetivoPorUsoCentavos !== null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 dark:text-slate-400">Ticket efetivo por uso</span>
+                    <span>{formatarReais(resultado.ticketEfetivoPorUsoCentavos)}</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 dark:text-slate-400">Conversão estimada</span>
                   <span>{resultado.conversao.toFixed(1).replace(".", ",")}%</span>
                 </div>
-                <div className="flex items-center justify-between pt-1.5 border-t border-slate-200 dark:border-slate-800">
-                  <span className="font-medium text-green-600">Novo ticket médio geral</span>
-                  <span className="font-medium text-green-600">{formatarReais(resultado.novoTicketMedioGeralCentavos)}</span>
-                </div>
+                {resultado.novoTicketMedioGeralCentavos !== null && (
+                  <div className="flex items-center justify-between pt-1.5 border-t border-slate-200 dark:border-slate-800">
+                    <span className="font-medium text-green-600">Novo ticket médio geral</span>
+                    <span className="font-medium text-green-600">{formatarReais(resultado.novoTicketMedioGeralCentavos)}</span>
+                  </div>
+                )}
               </div>
 
-              {resultado.lucroPorCorteCentavos !== null && resultado.lucroMensalPlanoCentavos !== null && (
+              {resultado.lucroPorUsoCentavos !== null && resultado.lucroMensalPorAssinanteCentavos !== null && (
                 <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 space-y-1.5 text-sm">
                   <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
                     Lucro (custo e comissão de "{servico?.nome}")
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-500 dark:text-slate-400">Lucro por corte na assinatura</span>
-                    <span>{formatarReais(resultado.lucroPorCorteCentavos)}</span>
+                    <span className="text-slate-500 dark:text-slate-400">Lucro por uso</span>
+                    <span>{formatarReais(resultado.lucroPorUsoCentavos)}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-blue-600 dark:text-blue-400">Lucro mensal por assinante</span>
                     <span className="font-medium text-blue-600 dark:text-blue-400">
-                      {formatarReais(resultado.lucroMensalPlanoCentavos)}
+                      {formatarReais(resultado.lucroMensalPorAssinanteCentavos)}
                     </span>
                   </div>
                 </div>
