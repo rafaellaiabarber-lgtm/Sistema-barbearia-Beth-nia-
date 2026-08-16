@@ -19,7 +19,7 @@ export async function distribuirPote(
   const { totalPoteCentavos, totalFichas, itens } = await calcularPote(competencia);
 
   if (totalPoteCentavos <= 0) return { erro: "Não há pagamentos de assinatura registrados nessa competência." };
-  if (totalFichas <= 0) return { erro: "Nenhum atendimento coberto pela assinatura com fichas nessa competência." };
+  if (totalFichas <= 0) return { erro: "Nenhum atendimento com serviço de ficha registrado nessa competência." };
 
   await prisma.distribuicaoPote.create({
     data: {
