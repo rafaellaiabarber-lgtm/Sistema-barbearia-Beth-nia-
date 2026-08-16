@@ -58,6 +58,36 @@ export function Simulador({
   const [conversaoMin, setConversaoMin] = useState("10");
   const [conversaoMax, setConversaoMax] = useState("60");
   const [slider, setSlider] = useState(50);
+  const [faturamentoHistorico, setFaturamentoHistorico] = useState("");
+  const [mesesHistorico, setMesesHistorico] = useState("");
+
+  const usandoHistorico = reaisParaCentavos(faturamentoHistorico) > 0 && paraNumero(mesesHistorico) > 0;
+
+  // Sistema novo, sem histórico suficiente ainda pra calcular nada sozinho: se o admin digitar o faturamento
+  // avulso que já tinha em outro sistema (e em quantos meses), usa isso como base em vez dos dados reais do
+  // período, estimando clientes/atendimentos a partir do ticket avulso e do uso esperado já informados ao lado.
+  const dadosEfetivos = useMemo(() => {
+    if (!usandoHistorico) return dadosReais;
+
+    const ticketAvulsoCentavos = reaisParaCentavos(ticketAvulso);
+    const uso = paraNumero(usoEsperado);
+    const faturamentoHistoricoCentavos = reaisParaCentavos(faturamentoHistorico);
+    const meses = paraNumero(mesesHistorico);
+
+    const faturamentoMensalCentavos = faturamentoHistoricoCentavos / meses;
+    const faturamentoPeriodoCentavos = Math.round(faturamentoMensalCentavos * (diasPeriodo / 30));
+    const clientesUnicos =
+      ticketAvulsoCentavos > 0 && uso > 0 ? Math.round(faturamentoMensalCentavos / (ticketAvulsoCentavos * uso)) : 0;
+    const nAtendimentos = Math.round(clientesUnicos * uso);
+
+    return {
+      nAtendimentos,
+      clientesUnicos,
+      faturamentoCentavos: faturamentoPeriodoCentavos,
+      ticketMedioCentavos: ticketAvulsoCentavos,
+      frequenciaMediaPorCliente: uso,
+    };
+  }, [usandoHistorico, dadosReais, ticketAvulso, usoEsperado, faturamentoHistorico, mesesHistorico, diasPeriodo]);
 
   const resultado = useMemo(() => {
     const ticketAvulsoCentavos = reaisParaCentavos(ticketAvulso);
@@ -92,22 +122,23 @@ export function Simulador({
       lucroMensalPorAssinanteCentavos = lucroPorUsoCentavos * uso;
     }
 
-    // Compara o faturamento real do período com uma projeção: parte dos clientes vira assinante (pagando a
-    // assinatura, prorateada pelos dias do período) e o resto continua avulso, na mesma frequência que já tem hoje.
-    const clientesConvertidos = Math.round(dadosReais.clientesUnicos * (conversao / 100));
-    const clientesAvulsosRestantes = dadosReais.clientesUnicos - clientesConvertidos;
+    // Compara o faturamento do período (real, ou o informado manualmente acima) com uma projeção: parte dos
+    // clientes vira assinante (pagando a assinatura, prorateada pelos dias do período) e o resto continua
+    // avulso, na mesma frequência que já tem hoje.
+    const clientesConvertidos = Math.round(dadosEfetivos.clientesUnicos * (conversao / 100));
+    const clientesAvulsosRestantes = dadosEfetivos.clientesUnicos - clientesConvertidos;
     const precoAssinaturaProrateadoCentavos = Math.round(precoAssinaturaCentavos * (diasPeriodo / 30));
     const receitaAssinantesCentavos = clientesConvertidos * precoAssinaturaProrateadoCentavos;
     const receitaAvulsosRestantesCentavos = Math.round(
-      clientesAvulsosRestantes * dadosReais.frequenciaMediaPorCliente * ticketAvulsoCentavos
+      clientesAvulsosRestantes * dadosEfetivos.frequenciaMediaPorCliente * ticketAvulsoCentavos
     );
     const faturamentoProjetadoCentavos = receitaAssinantesCentavos + receitaAvulsosRestantesCentavos;
-    const diferencaCentavos = faturamentoProjetadoCentavos - dadosReais.faturamentoCentavos;
+    const diferencaCentavos = faturamentoProjetadoCentavos - dadosEfetivos.faturamentoCentavos;
 
     // Extrapola o período pra uma base mensal e depois anual, pra dar uma ideia do LTV do grupo de clientes ao
     // longo de 12 meses (mantendo a mesma proporção de conversão e a mesma frequência avulsa observadas no período).
     const fatorMensal = 30 / diasPeriodo;
-    const faturamentoAtualAnualCentavos = Math.round(dadosReais.faturamentoCentavos * fatorMensal * 12);
+    const faturamentoAtualAnualCentavos = Math.round(dadosEfetivos.faturamentoCentavos * fatorMensal * 12);
     const faturamentoProjetadoAnualCentavos = Math.round(faturamentoProjetadoCentavos * fatorMensal * 12);
     const diferencaAnualCentavos = faturamentoProjetadoAnualCentavos - faturamentoAtualAnualCentavos;
 
@@ -128,26 +159,35 @@ export function Simulador({
       faturamentoProjetadoAnualCentavos,
       diferencaAnualCentavos,
     };
-  }, [ticketAvulso, usoEsperado, agenda, conversaoMin, conversaoMax, slider, servico, comissaoPadrao, dadosReais, diasPeriodo]);
+  }, [ticketAvulso, usoEsperado, agenda, conversaoMin, conversaoMax, slider, servico, comissaoPadrao, dadosEfetivos, diasPeriodo]);
 
   return (
     <div>
+      {usandoHistorico && (
+        <p className="text-xs text-blue-600 dark:text-blue-400 mb-2">
+          Usando os dados históricos informados abaixo em vez dos dados reais do sistema.
+        </p>
+      )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-4">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Atendimentos no período</p>
-          <p className="text-xl font-bold">{dadosReais.nAtendimentos}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+            Atendimentos {usandoHistorico ? "(estimado)" : "no período"}
+          </p>
+          <p className="text-xl font-bold">{dadosEfetivos.nAtendimentos}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Clientes únicos</p>
-          <p className="text-xl font-bold">{dadosReais.clientesUnicos}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Clientes únicos {usandoHistorico ? "(estimado)" : ""}</p>
+          <p className="text-xl font-bold">{dadosEfetivos.clientesUnicos}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Ticket médio real</p>
-          <p className="text-xl font-bold">{formatarReais(dadosReais.ticketMedioCentavos)}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Ticket médio {usandoHistorico ? "(informado)" : "real"}</p>
+          <p className="text-xl font-bold">{formatarReais(dadosEfetivos.ticketMedioCentavos)}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Faturamento real no período</p>
-          <p className="text-xl font-bold">{formatarReais(dadosReais.faturamentoCentavos)}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+            Faturamento {usandoHistorico ? "(estimado)" : "real"} no período
+          </p>
+          <p className="text-xl font-bold">{formatarReais(dadosEfetivos.faturamentoCentavos)}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Ritmo real de retorno (histórico)</p>
@@ -162,12 +202,43 @@ export function Simulador({
         </div>
       </div>
 
-      {dadosReais.nAtendimentos === 0 && (
+      {dadosReais.nAtendimentos === 0 && !usandoHistorico && (
         <p className="text-amber-600 text-sm mb-4">
           Nenhum atendimento desse serviço nesse período. Escolha outro serviço/período acima, ou preencha o ticket
           avulso manualmente pra simular mesmo assim.
         </p>
       )}
+
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm mb-4">
+        <h2 className="font-semibold mb-1">Dados históricos (de antes do sistema atual)</h2>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
+          Sistema novo ainda não tem histórico suficiente? Preencha o faturamento avulso que você já tinha em outro
+          sistema e em quantos meses isso foi — os cards acima e a simulação passam a usar esses números (junto com
+          o ticket avulso e o uso esperado ao lado).
+        </p>
+        <div className="grid grid-cols-2 gap-3 max-w-md">
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Faturamento avulso total (R$)</label>
+            <input
+              value={faturamentoHistorico}
+              onChange={(e) => setFaturamentoHistorico(e.target.value)}
+              placeholder="9.000,00"
+              inputMode="decimal"
+              className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Em quantos meses (aprox.)</label>
+            <input
+              value={mesesHistorico}
+              onChange={(e) => setMesesHistorico(e.target.value)}
+              placeholder="2"
+              inputMode="decimal"
+              className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
+      </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
@@ -330,11 +401,13 @@ export function Simulador({
                 </p>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 dark:text-slate-400">Clientes que virariam assinantes</span>
-                  <span>{resultado.clientesConvertidos} de {dadosReais.clientesUnicos}</span>
+                  <span>{resultado.clientesConvertidos} de {dadosEfetivos.clientesUnicos}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Faturamento real do período</span>
-                  <span>{formatarReais(dadosReais.faturamentoCentavos)}</span>
+                  <span className="text-slate-500 dark:text-slate-400">
+                    Faturamento {usandoHistorico ? "(estimado)" : "real"} do período
+                  </span>
+                  <span>{formatarReais(dadosEfetivos.faturamentoCentavos)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 dark:text-slate-400">Faturamento projetado com a assinatura</span>
