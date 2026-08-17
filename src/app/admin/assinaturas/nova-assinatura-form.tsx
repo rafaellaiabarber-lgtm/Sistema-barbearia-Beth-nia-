@@ -204,6 +204,14 @@ export function NovaAssinaturaForm({
               ))}
             </select>
           </div>
+          <div>
+            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Já foi pago? Em que dia (opcional)</label>
+            <input
+              name="dataPagamento"
+              type="date"
+              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+            />
+          </div>
         </div>
 
         {clienteEncontrado && (
