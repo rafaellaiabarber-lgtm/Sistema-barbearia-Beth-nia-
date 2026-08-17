@@ -10,12 +10,22 @@ import { Valor } from "../../valor";
 
 const estadoInicial: AssinaturaState = {};
 
-export function NovaAssinaturaForm({ planos, barbeiros }: { planos: Plano[]; barbeiros: Barbeiro[] }) {
+export function NovaAssinaturaForm({
+  planos,
+  barbeiros,
+  telefoneInicial,
+  nomeInicial,
+}: {
+  planos: Plano[];
+  barbeiros: Barbeiro[];
+  telefoneInicial?: string;
+  nomeInicial?: string;
+}) {
   const [estado, formAction, pendente] = useActionState(criarAssinatura, estadoInicial);
-  const [nome, setNome] = useState("");
-  const [telefone, setTelefone] = useState("");
+  const [nome, setNome] = useState(nomeInicial ?? "");
+  const [telefone, setTelefone] = useState(telefoneInicial ?? "");
   const [buscandoNome, setBuscandoNome] = useState(false);
-  const [clienteEncontrado, setClienteEncontrado] = useState(false);
+  const [clienteEncontrado, setClienteEncontrado] = useState(!!telefoneInicial);
   const [sugestoes, setSugestoes] = useState<SugestaoCliente[]>([]);
   const [sugestoesAbertas, setSugestoesAbertas] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -95,7 +105,10 @@ export function NovaAssinaturaForm({ planos, barbeiros }: { planos: Plano[]; bar
   }
 
   return (
-    <details className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm">
+    <details
+      open={!!telefoneInicial}
+      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm"
+    >
       <summary className="cursor-pointer font-semibold text-slate-800 dark:text-slate-100 select-none">
         Nova assinatura
       </summary>

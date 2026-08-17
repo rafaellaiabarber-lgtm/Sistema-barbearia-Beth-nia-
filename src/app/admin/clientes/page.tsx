@@ -11,6 +11,7 @@ export default async function ClientesPage() {
         orderBy: { concluidoEm: "desc" },
         include: { servicos: true, barbeiro: true },
       },
+      assinaturas: { where: { status: "ATIVA" }, include: { plano: true } },
     },
   });
 
@@ -33,6 +34,22 @@ export default async function ClientesPage() {
                 </span>
               </summary>
               <div className="mt-3 space-y-2">
+                {c.assinaturas.length > 0 ? (
+                  <p className="text-sm text-green-600 dark:text-green-400">
+                    ✓ Assinante do plano {c.assinaturas[0].plano.nome}
+                  </p>
+                ) : c.telefone ? (
+                  <a
+                    href={`/admin/assinaturas?telefone=${encodeURIComponent(c.telefone)}&nome=${encodeURIComponent(c.nome)}`}
+                    className="inline-block text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    + Adicionar assinatura
+                  </a>
+                ) : (
+                  <p className="text-sm text-slate-400 dark:text-slate-500">
+                    Cadastre um telefone pra esse cliente pra poder criar uma assinatura.
+                  </p>
+                )}
                 {c.atendimentos.length === 0 && (
                   <p className="text-slate-400 dark:text-slate-500 text-sm">Sem atendimentos concluídos ainda.</p>
                 )}
