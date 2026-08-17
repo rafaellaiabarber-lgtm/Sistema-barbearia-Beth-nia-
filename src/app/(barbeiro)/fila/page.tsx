@@ -9,6 +9,7 @@ import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { buscarCampanhasAtivasComProgresso } from "@/lib/campanhas-server";
 import { itemCompleto, quantidadeFaltando, valorPotencialCentavos } from "@/lib/campanhas";
 import { diaCobertoHoje } from "@/lib/assinaturas";
+import { textoPremioRoleta } from "@/lib/roleta";
 import { LABEL_TIPO_META, formatarValorMeta, calcularNiveisAtingidos, nivelAtual, proximoNivel } from "@/lib/metas";
 import { calcularProgressoMeta } from "@/lib/metas-server";
 import { fraseDoDia } from "@/lib/frases";
@@ -150,10 +151,10 @@ export default async function FilaPage({
         orderBy: { criadoEm: "asc" },
       })
     : [];
-  const premiosPorCliente = new Map<string, { id: string; ofertaNome: string; descontoPercentual: number | null }[]>();
+  const premiosPorCliente = new Map<string, { id: string; ofertaNome: string }[]>();
   for (const g of premiosPendentes) {
     const atual = premiosPorCliente.get(g.clienteId) ?? [];
-    atual.push({ id: g.id, ofertaNome: g.oferta.nome, descontoPercentual: g.oferta.descontoPercentual });
+    atual.push({ id: g.id, ofertaNome: textoPremioRoleta(g.oferta) });
     premiosPorCliente.set(g.clienteId, atual);
   }
 

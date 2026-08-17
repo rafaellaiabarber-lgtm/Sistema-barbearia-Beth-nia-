@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { normalizarTelefone } from "@/lib/format";
+import { textoPremioRoleta } from "@/lib/roleta";
 
 const MAX_OFERTAS_ATIVAS = 6;
 const HORAS_ENTRE_GIROS = 24;
@@ -117,5 +118,5 @@ export async function girarRoleta(
 
   revalidatePath("/admin/roleta");
   revalidatePath("/fila");
-  return { sucesso: true, ofertaNome: sorteada.nome, ofertaId: sorteada.id };
+  return { sucesso: true, ofertaNome: textoPremioRoleta(sorteada), ofertaId: sorteada.id };
 }
