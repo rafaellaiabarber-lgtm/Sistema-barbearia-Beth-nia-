@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { marcarGiroResgatado } from "@/lib/actions/roleta";
+import { textoPremioRoleta } from "@/lib/roleta";
 import { NovaOfertaForm } from "./nova-oferta-form";
 import { OfertaRow } from "./oferta-row";
 import { BarbeiroQr } from "./barbeiro-qr";
@@ -60,7 +61,7 @@ export default async function RoletaAdminPage() {
           >
             <div>
               <p className="font-semibold text-slate-900 dark:text-white">
-                {g.cliente.nome} — {g.oferta.nome}
+                {g.cliente.nome} — {textoPremioRoleta(g.oferta)}
               </p>
               <p className="text-slate-400 dark:text-slate-500 text-sm">
                 {g.cliente.telefone} · girou com {g.barbeiro.nome} · {g.criadoEm.toLocaleDateString("pt-BR")}
@@ -85,7 +86,7 @@ export default async function RoletaAdminPage() {
           >
             <div>
               <p className="font-semibold text-slate-900 dark:text-white">
-                {g.cliente.nome} — {g.oferta.nome}
+                {g.cliente.nome} — {textoPremioRoleta(g.oferta)}
               </p>
               <p className="text-slate-400 dark:text-slate-500 text-sm">
                 girou com {g.barbeiro.nome} · resgatado em {g.resgatadoEm?.toLocaleDateString("pt-BR")}

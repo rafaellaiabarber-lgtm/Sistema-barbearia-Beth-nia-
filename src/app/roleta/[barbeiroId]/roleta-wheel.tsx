@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import type { OfertaRoleta } from "@prisma/client";
 import { girarRoleta, type GirarRoletaState } from "@/lib/actions/roleta";
+import { textoPremioRoleta } from "@/lib/roleta";
 
 const estadoInicial: GirarRoletaState = {};
 
@@ -110,7 +111,7 @@ export function RoletaWheel({
                     transformOrigin: "0 0",
                   }}
                 >
-                  {o.nome}
+                  {textoPremioRoleta(o)}
                 </span>
               );
             })}

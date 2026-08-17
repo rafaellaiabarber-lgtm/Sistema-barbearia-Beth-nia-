@@ -32,7 +32,7 @@ export function AtendendoAgora({
   campanhas: { id: string; titulo: string | null; itens: ItemProgresso[] }[];
   comAvisoFixo?: boolean;
   planoInfo: { nome: string; cobertoHoje: boolean } | null;
-  premiosPendentes: { id: string; ofertaNome: string; descontoPercentual: number | null }[];
+  premiosPendentes: { id: string; ofertaNome: string }[];
 }) {
   const [agora, setAgora] = useState(() => Date.now());
   const [finalizando, setFinalizando] = useState(false);
@@ -75,10 +75,7 @@ export function AtendendoAgora({
               key={p.id}
               className="bg-lime-50 dark:bg-lime-950 border border-lime-300 dark:border-lime-800 rounded-xl p-3 mb-4 text-center"
             >
-              <p className="text-lime-900 dark:text-lime-100 text-sm font-semibold">
-                🎁 Ganhou na Roleta: {p.ofertaNome}
-                {p.descontoPercentual !== null ? ` (${p.descontoPercentual}% off)` : ""}
-              </p>
+              <p className="text-lime-900 dark:text-lime-100 text-sm font-semibold">🎁 Ganhou na Roleta: {p.ofertaNome}</p>
               <p className="text-lime-800 dark:text-lime-200 text-xs mt-1 mb-2">
                 Aplique o desconto manualmente e marque como resgatado.
               </p>
