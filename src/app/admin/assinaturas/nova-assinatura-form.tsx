@@ -26,6 +26,7 @@ export function NovaAssinaturaForm({
   const [telefone, setTelefone] = useState(telefoneInicial ?? "");
   const [buscandoNome, setBuscandoNome] = useState(false);
   const [clienteEncontrado, setClienteEncontrado] = useState(!!telefoneInicial);
+  const [telefoneNaoEncontrado, setTelefoneNaoEncontrado] = useState(false);
   const [sugestoes, setSugestoes] = useState<SugestaoCliente[]>([]);
   const [sugestoesAbertas, setSugestoesAbertas] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -37,6 +38,7 @@ export function NovaAssinaturaForm({
       setNome("");
       setTelefone("");
       setClienteEncontrado(false);
+      setTelefoneNaoEncontrado(false);
       setSugestoes([]);
       setSugestoesAbertas(false);
     }
@@ -49,6 +51,7 @@ export function NovaAssinaturaForm({
     }
 
     const digitos = telefone.replace(/\D/g, "");
+    setTelefoneNaoEncontrado(false);
     if (digitos.length < 10) {
       setClienteEncontrado(false);
       return;
@@ -65,6 +68,7 @@ export function NovaAssinaturaForm({
         setNome(nomeExistente);
       } else {
         setClienteEncontrado(false);
+        setTelefoneNaoEncontrado(true);
       }
     }, 400);
 
@@ -216,6 +220,12 @@ export function NovaAssinaturaForm({
 
         {clienteEncontrado && (
           <p className="text-blue-600 dark:text-blue-400 text-xs mb-3">Cliente já cadastrado — nome preenchido automaticamente.</p>
+        )}
+        {telefoneNaoEncontrado && !clienteEncontrado && (
+          <p className="text-green-600 dark:text-green-400 text-xs mb-3">
+            Esse telefone ainda não está cadastrado — ao criar a assinatura, um cliente novo será cadastrado com esse
+            número e o nome que você informar.
+          </p>
         )}
 
         {estado.erro && <p className="text-red-600 text-sm mb-3">{estado.erro}</p>}
