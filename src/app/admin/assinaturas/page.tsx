@@ -10,7 +10,12 @@ import {
 import { NovaAssinaturaForm } from "./nova-assinatura-form";
 import { Valor } from "../../valor";
 
-export default async function AssinaturasPage() {
+export default async function AssinaturasPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ telefone?: string; nome?: string }>;
+}) {
+  const sp = await searchParams;
   const competencia = competenciaAtual();
 
   const [assinaturas, planosAtivos, barbeirosAtivos] = await Promise.all([
@@ -47,7 +52,12 @@ export default async function AssinaturasPage() {
         </div>
       </div>
 
-      <NovaAssinaturaForm planos={planosAtivos} barbeiros={barbeirosAtivos} />
+      <NovaAssinaturaForm
+        planos={planosAtivos}
+        barbeiros={barbeirosAtivos}
+        telefoneInicial={sp.telefone}
+        nomeInicial={sp.nome}
+      />
 
       <div className="space-y-2">
         {assinaturas.map((a) => {
