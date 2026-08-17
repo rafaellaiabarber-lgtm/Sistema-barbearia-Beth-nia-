@@ -29,8 +29,8 @@ export async function criarAssinatura(
   if (!nome) return { erro: "Informe o nome do cliente." };
   if (!telefone) return { erro: "Informe o telefone do cliente." };
   if (!planoId) return { erro: "Escolha um plano." };
-  if (!Number.isFinite(diaVencimento) || diaVencimento < 1 || diaVencimento > 28) {
-    return { erro: "Dia de vencimento deve ser entre 1 e 28." };
+  if (!Number.isFinite(diaVencimento) || diaVencimento < 1 || diaVencimento > 31) {
+    return { erro: "Dia de vencimento deve ser entre 1 e 31." };
   }
 
   const plano = await prisma.plano.findFirst({ where: { id: planoId, ativo: true } });

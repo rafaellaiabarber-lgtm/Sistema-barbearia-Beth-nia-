@@ -183,7 +183,7 @@ export function NovaAssinaturaForm({
               name="diaVencimento"
               type="number"
               min={1}
-              max={28}
+              max={31}
               defaultValue={5}
               required
               className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-20"
