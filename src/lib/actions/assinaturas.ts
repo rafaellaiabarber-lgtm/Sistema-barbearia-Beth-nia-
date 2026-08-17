@@ -25,6 +25,7 @@ export async function criarAssinatura(
   const planoId = String(formData.get("planoId") ?? "").trim();
   const barbeiroId = String(formData.get("barbeiroId") ?? "").trim() || null;
   const diaVencimento = Number(formData.get("diaVencimento") ?? 5);
+  const dataPagamentoStr = String(formData.get("dataPagamento") ?? "").trim();
 
   if (!nome) return { erro: "Informe o nome do cliente." };
   if (!telefone) return { erro: "Informe o telefone do cliente." };
@@ -47,9 +48,19 @@ export async function criarAssinatura(
   });
   if (jaTemAtiva) return { erro: "Esse cliente já tem uma assinatura ativa." };
 
-  await prisma.assinatura.create({
+  const novaAssinatura = await prisma.assinatura.create({
     data: { clienteId: cliente.id, planoId, barbeiroId, diaVencimento: Math.round(diaVencimento), status: "ATIVA" },
   });
+
+  if (dataPagamentoStr) {
+    const pagoEm = new Date(`${dataPagamentoStr}T12:00:00`);
+    if (!Number.isNaN(pagoEm.getTime())) {
+      const comp = `${pagoEm.getFullYear()}-${String(pagoEm.getMonth() + 1).padStart(2, "0")}`;
+      await prisma.pagamentoAssinatura.create({
+        data: { assinaturaId: novaAssinatura.id, competencia: comp, valorCentavos: plano.precoCentavos, pagoEm },
+      });
+    }
+  }
 
   revalidarPaginas();
   return { sucesso: true };
