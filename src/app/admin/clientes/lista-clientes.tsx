@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { formatarReais } from "@/lib/format";
+import { criarCliente, type ClienteState } from "@/lib/actions/clientes";
 import { Valor } from "../../valor";
 
 type Atendimento = {
@@ -23,6 +24,49 @@ type ClienteComDados = {
 
 function normalizarDigitos(valor: string) {
   return valor.replace(/\D/g, "");
+}
+
+function pareceTelefone(valor: string) {
+  return normalizarDigitos(valor).length >= 8;
+}
+
+const estadoInicialCliente: ClienteState = {};
+
+function CadastrarClienteForm({ busca }: { busca: string }) {
+  const [estado, formAction, pendente] = useActionState(criarCliente, estadoInicialCliente);
+  const ehTelefone = pareceTelefone(busca);
+
+  return (
+    <form action={formAction} className="mt-3 flex flex-wrap items-end gap-3">
+      <div>
+        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Nome</label>
+        <input
+          name="nome"
+          required
+          defaultValue={ehTelefone ? "" : busca}
+          placeholder="Nome do cliente"
+          className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-48"
+        />
+      </div>
+      <div>
+        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Telefone (opcional)</label>
+        <input
+          name="telefone"
+          defaultValue={ehTelefone ? busca : ""}
+          placeholder="11999999999"
+          className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-40"
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={pendente}
+        className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+      >
+        {pendente ? "Cadastrando..." : "Cadastrar cliente"}
+      </button>
+      {estado.erro && <p className="text-red-600 text-sm w-full">{estado.erro}</p>}
+    </form>
+  );
 }
 
 export function ListaClientes({ clientes }: { clientes: ClienteComDados[] }) {
@@ -98,10 +142,16 @@ export function ListaClientes({ clientes }: { clientes: ClienteComDados[] }) {
             </details>
           );
         })}
-        {clientesFiltrados.length === 0 && (
-          <p className="text-slate-400 dark:text-slate-500">
-            {clientes.length === 0 ? "Nenhum cliente cadastrado ainda." : "Nenhum cliente encontrado pra essa busca."}
-          </p>
+        {clientesFiltrados.length === 0 && clientes.length === 0 && (
+          <p className="text-slate-400 dark:text-slate-500">Nenhum cliente cadastrado ainda.</p>
+        )}
+        {clientesFiltrados.length === 0 && clientes.length > 0 && busca.trim() !== "" && (
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+            <p className="text-slate-500 dark:text-slate-400 text-sm">
+              Esse cliente não foi encontrado. Quer cadastrar ele?
+            </p>
+            <CadastrarClienteForm key={busca} busca={busca.trim()} />
+          </div>
         )}
       </div>
     </div>
