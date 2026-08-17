@@ -1,0 +1,109 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { Search } from "lucide-react";
+import { formatarReais } from "@/lib/format";
+import { Valor } from "../../valor";
+
+type Atendimento = {
+  id: string;
+  concluidoEm: Date | null;
+  precoTotalCentavos: number;
+  barbeiro: { nome: string } | null;
+  servicos: { nomeSnapshot: string }[];
+};
+
+type ClienteComDados = {
+  id: string;
+  nome: string;
+  telefone: string | null;
+  atendimentos: Atendimento[];
+  assinaturas: { plano: { nome: string } }[];
+};
+
+function normalizarDigitos(valor: string) {
+  return valor.replace(/\D/g, "");
+}
+
+export function ListaClientes({ clientes }: { clientes: ClienteComDados[] }) {
+  const [busca, setBusca] = useState("");
+
+  const clientesFiltrados = useMemo(() => {
+    const termo = busca.trim().toLowerCase();
+    if (!termo) return clientes;
+    const termoDigitos = normalizarDigitos(termo);
+    return clientes.filter((c) => {
+      const nomeBate = c.nome.toLowerCase().includes(termo);
+      const telefoneBate = termoDigitos.length > 0 && (c.telefone ?? "").includes(termoDigitos);
+      return nomeBate || telefoneBate;
+    });
+  }, [clientes, busca]);
+
+  return (
+    <div>
+      <div className="relative mb-4 max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
+        <input
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Buscar por nome ou telefone..."
+          className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 pl-9 pr-3 py-2 text-sm"
+        />
+      </div>
+
+      <div className="space-y-4">
+        {clientesFiltrados.map((c) => {
+          const totalGasto = c.atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
+          return (
+            <details key={c.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+              <summary className="cursor-pointer flex items-center justify-between">
+                <span>
+                  <span className="font-semibold">{c.nome}</span>{" "}
+                  <span className="text-slate-500 dark:text-slate-400 text-sm">{c.telefone ?? "sem telefone"}</span>
+                </span>
+                <span className="text-slate-500 dark:text-slate-400 text-sm">
+                  {c.atendimentos.length} atendimento(s) · <Valor>{formatarReais(totalGasto)}</Valor>
+                </span>
+              </summary>
+              <div className="mt-3 space-y-2">
+                {c.assinaturas.length > 0 ? (
+                  <p className="text-sm text-green-600 dark:text-green-400">
+                    ✓ Assinante do plano {c.assinaturas[0].plano.nome}
+                  </p>
+                ) : c.telefone ? (
+                  <a
+                    href={`/admin/assinaturas?telefone=${encodeURIComponent(c.telefone)}&nome=${encodeURIComponent(c.nome)}`}
+                    className="inline-block text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    + Adicionar assinatura
+                  </a>
+                ) : (
+                  <p className="text-sm text-slate-400 dark:text-slate-500">
+                    Cadastre um telefone pra esse cliente pra poder criar uma assinatura.
+                  </p>
+                )}
+                {c.atendimentos.length === 0 && (
+                  <p className="text-slate-400 dark:text-slate-500 text-sm">Sem atendimentos concluídos ainda.</p>
+                )}
+                {c.atendimentos.map((a) => (
+                  <div key={a.id} className="text-sm border-t border-slate-200 dark:border-slate-800 pt-2">
+                    <p className="text-slate-700 dark:text-slate-200">
+                      {a.concluidoEm?.toLocaleDateString("pt-BR")} — {a.barbeiro?.nome ?? "—"} —{" "}
+                      <Valor>{formatarReais(a.precoTotalCentavos)}</Valor>
+                    </p>
+                    <p className="text-slate-400 dark:text-slate-500">{a.servicos.map((s) => s.nomeSnapshot).join(", ")}</p>
+                  </div>
+                ))}
+              </div>
+            </details>
+          );
+        })}
+        {clientesFiltrados.length === 0 && (
+          <p className="text-slate-400 dark:text-slate-500">
+            {clientes.length === 0 ? "Nenhum cliente cadastrado ainda." : "Nenhum cliente encontrado pra essa busca."}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { formatarReais } from "@/lib/format";
-import { Valor } from "../../valor";
+import { ListaClientes } from "./lista-clientes";
 
 export default async function ClientesPage() {
   const clientes = await prisma.cliente.findMany({
@@ -18,56 +17,7 @@ export default async function ClientesPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Clientes</h1>
-
-      <div className="space-y-4">
-        {clientes.map((c) => {
-          const totalGasto = c.atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
-          return (
-            <details key={c.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-              <summary className="cursor-pointer flex items-center justify-between">
-                <span>
-                  <span className="font-semibold">{c.nome}</span>{" "}
-                  <span className="text-slate-500 dark:text-slate-400 text-sm">{c.telefone ?? "sem telefone"}</span>
-                </span>
-                <span className="text-slate-500 dark:text-slate-400 text-sm">
-                  {c.atendimentos.length} atendimento(s) · <Valor>{formatarReais(totalGasto)}</Valor>
-                </span>
-              </summary>
-              <div className="mt-3 space-y-2">
-                {c.assinaturas.length > 0 ? (
-                  <p className="text-sm text-green-600 dark:text-green-400">
-                    ✓ Assinante do plano {c.assinaturas[0].plano.nome}
-                  </p>
-                ) : c.telefone ? (
-                  <a
-                    href={`/admin/assinaturas?telefone=${encodeURIComponent(c.telefone)}&nome=${encodeURIComponent(c.nome)}`}
-                    className="inline-block text-sm text-blue-600 dark:text-blue-400 hover:underline"
-                  >
-                    + Adicionar assinatura
-                  </a>
-                ) : (
-                  <p className="text-sm text-slate-400 dark:text-slate-500">
-                    Cadastre um telefone pra esse cliente pra poder criar uma assinatura.
-                  </p>
-                )}
-                {c.atendimentos.length === 0 && (
-                  <p className="text-slate-400 dark:text-slate-500 text-sm">Sem atendimentos concluídos ainda.</p>
-                )}
-                {c.atendimentos.map((a) => (
-                  <div key={a.id} className="text-sm border-t border-slate-200 dark:border-slate-800 pt-2">
-                    <p className="text-slate-700 dark:text-slate-200">
-                      {a.concluidoEm?.toLocaleDateString("pt-BR")} — {a.barbeiro?.nome ?? "—"} —{" "}
-                      <Valor>{formatarReais(a.precoTotalCentavos)}</Valor>
-                    </p>
-                    <p className="text-slate-400 dark:text-slate-500">{a.servicos.map((s) => s.nomeSnapshot).join(", ")}</p>
-                  </div>
-                ))}
-              </div>
-            </details>
-          );
-        })}
-        {clientes.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum cliente cadastrado ainda.</p>}
-      </div>
+      <ListaClientes clientes={clientes} />
     </div>
   );
 }
