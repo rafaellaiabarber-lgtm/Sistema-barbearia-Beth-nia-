@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
-import { competenciaAtual, competenciaAnterior } from "@/lib/assinaturas";
+import { competenciaAtual } from "@/lib/assinaturas";
 import { normalizarTelefone } from "@/lib/format";
 
 export type AssinaturaState = { erro?: string; sucesso?: boolean };
@@ -73,10 +73,12 @@ export async function reativarAssinatura(id: string) {
   revalidarPaginas();
 }
 
+const COMPETENCIA_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
+
 export async function marcarPagamentoAssinatura(assinaturaId: string, valorCentavos: number, competencia?: string) {
   await requireSession(["ADMIN"]);
   const comp = competencia ?? competenciaAtual();
-  if (comp !== competenciaAtual() && comp !== competenciaAnterior()) return;
+  if (!COMPETENCIA_REGEX.test(comp)) return;
   await prisma.pagamentoAssinatura.upsert({
     where: { assinaturaId_competencia: { assinaturaId, competencia: comp } },
     update: {},
@@ -88,7 +90,29 @@ export async function marcarPagamentoAssinatura(assinaturaId: string, valorCenta
 export async function desmarcarPagamentoAssinatura(assinaturaId: string, competencia?: string) {
   await requireSession(["ADMIN"]);
   const comp = competencia ?? competenciaAtual();
-  if (comp !== competenciaAtual() && comp !== competenciaAnterior()) return;
+  if (!COMPETENCIA_REGEX.test(comp)) return;
   await prisma.pagamentoAssinatura.deleteMany({ where: { assinaturaId, competencia: comp } });
+  revalidarPaginas();
+}
+
+// Deixa registrar um pagamento numa data específica (passada ou futura) — pra assinantes que já vinham pagando
+// antes de entrar no sistema, o dia real do pagamento importa, não só "hoje".
+export async function marcarPagamentoComData(formData: FormData) {
+  await requireSession(["ADMIN"]);
+
+  const assinaturaId = String(formData.get("assinaturaId") ?? "");
+  const valorCentavos = Number(formData.get("valorCentavos") ?? 0);
+  const dataStr = String(formData.get("data") ?? "");
+  if (!assinaturaId || !Number.isFinite(valorCentavos) || valorCentavos <= 0) return;
+
+  const pagoEm = new Date(`${dataStr}T12:00:00`);
+  if (Number.isNaN(pagoEm.getTime())) return;
+  const competencia = `${pagoEm.getFullYear()}-${String(pagoEm.getMonth() + 1).padStart(2, "0")}`;
+
+  await prisma.pagamentoAssinatura.upsert({
+    where: { assinaturaId_competencia: { assinaturaId, competencia } },
+    update: { pagoEm },
+    create: { assinaturaId, competencia, valorCentavos, pagoEm },
+  });
   revalidarPaginas();
 }
