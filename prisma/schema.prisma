@@ -93,18 +93,18 @@ model Usuario {
 }
 
 model Barbeiro {
-  id                      String              @id @default(cuid())
+  id                      String                 @id @default(cuid())
   nome                    String
   telefone                String?
   fotoUrl                 String?
-  ativo                   Boolean             @default(true)
+  ativo                   Boolean                @default(true)
   pausadoEm               DateTime?
-  comissaoPercentual      Int                 @default(50)
+  comissaoPercentual      Int                    @default(50)
   metaFaturamentoCentavos Int?
   bonificacaoCentavos     Int?
   usuario                 Usuario?
-  atendimentos            Atendimento[]       @relation("BarbeiroAtendeu")
-  atendimentosPreferidos  Atendimento[]       @relation("BarbeiroPreferido")
+  atendimentos            Atendimento[]          @relation("BarbeiroAtendeu")
+  atendimentosPreferidos  Atendimento[]          @relation("BarbeiroPreferido")
   pagamentosComissao      PagamentoComissao[]
   metas                   Meta[]
   vendasProduto           VendaProduto[]
@@ -115,7 +115,8 @@ model Barbeiro {
   feedbacks               Feedback[]
   itensDistribuicaoPote   ItemDistribuicaoPote[]
   girosRoleta             GiroRoleta[]
-  criadoEm                DateTime            @default(now())
+  despesas                DespesaBarbeiro[]
+  criadoEm                DateTime               @default(now())
 }
 
 model JornadaTrabalho {
@@ -142,6 +143,18 @@ model Indicacao {
   convertida   Boolean   @default(false)
   convertidaEm DateTime?
   criadoEm     DateTime  @default(now())
+}
+
+// Controle pessoal de despesas do barbeiro (não afeta comissão nem nenhum
+// relatório do admin — cada barbeiro só vê as suas).
+model DespesaBarbeiro {
+  id            String   @id @default(cuid())
+  barbeiro      Barbeiro @relation(fields: [barbeiroId], references: [id])
+  barbeiroId    String
+  descricao     String
+  valorCentavos Int
+  data          DateTime
+  criadoEm      DateTime @default(now())
 }
 
 // Sem @@unique de (barbeiroId, tipo): agora um barbeiro pode ter várias metas do
@@ -255,22 +268,22 @@ model VendaProduto {
 }
 
 model Atendimento {
-  id                  String               @id @default(cuid())
-  cliente             Cliente              @relation(fields: [clienteId], references: [id])
-  clienteId           String
-  barbeiro            Barbeiro?            @relation("BarbeiroAtendeu", fields: [barbeiroId], references: [id])
-  barbeiroId          String?
-  barbeiroPreferido   Barbeiro?            @relation("BarbeiroPreferido", fields: [barbeiroPreferidoId], references: [id])
-  barbeiroPreferidoId String?
-  status              StatusAtendimento    @default(AGUARDANDO)
-  servicos            AtendimentoServico[]
-  precoTotalCentavos  Int                  @default(0)
-  formaPagamento      FormaPagamento?
-  cobertoPorAssinatura Boolean             @default(false)
-  criadoEm            DateTime             @default(now())
-  chamadoEm           DateTime?
-  concluidoEm         DateTime?
-  observacao          String?
+  id                   String               @id @default(cuid())
+  cliente              Cliente              @relation(fields: [clienteId], references: [id])
+  clienteId            String
+  barbeiro             Barbeiro?            @relation("BarbeiroAtendeu", fields: [barbeiroId], references: [id])
+  barbeiroId           String?
+  barbeiroPreferido    Barbeiro?            @relation("BarbeiroPreferido", fields: [barbeiroPreferidoId], references: [id])
+  barbeiroPreferidoId  String?
+  status               StatusAtendimento    @default(AGUARDANDO)
+  servicos             AtendimentoServico[]
+  precoTotalCentavos   Int                  @default(0)
+  formaPagamento       FormaPagamento?
+  cobertoPorAssinatura Boolean              @default(false)
+  criadoEm             DateTime             @default(now())
+  chamadoEm            DateTime?
+  concluidoEm          DateTime?
+  observacao           String?
 }
 
 model MovimentoCaixa {
