@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
-import { competenciaAtual } from "@/lib/assinaturas";
+import { competenciaAtual, competenciaAnterior } from "@/lib/assinaturas";
 import { normalizarTelefone } from "@/lib/format";
 
 export type AssinaturaState = { erro?: string; sucesso?: boolean };
@@ -73,20 +73,22 @@ export async function reativarAssinatura(id: string) {
   revalidarPaginas();
 }
 
-export async function marcarPagamentoAssinatura(assinaturaId: string, valorCentavos: number) {
+export async function marcarPagamentoAssinatura(assinaturaId: string, valorCentavos: number, competencia?: string) {
   await requireSession(["ADMIN"]);
-  const competencia = competenciaAtual();
+  const comp = competencia ?? competenciaAtual();
+  if (comp !== competenciaAtual() && comp !== competenciaAnterior()) return;
   await prisma.pagamentoAssinatura.upsert({
-    where: { assinaturaId_competencia: { assinaturaId, competencia } },
+    where: { assinaturaId_competencia: { assinaturaId, competencia: comp } },
     update: {},
-    create: { assinaturaId, competencia, valorCentavos },
+    create: { assinaturaId, competencia: comp, valorCentavos },
   });
   revalidarPaginas();
 }
 
-export async function desmarcarPagamentoAssinatura(assinaturaId: string) {
+export async function desmarcarPagamentoAssinatura(assinaturaId: string, competencia?: string) {
   await requireSession(["ADMIN"]);
-  const competencia = competenciaAtual();
-  await prisma.pagamentoAssinatura.deleteMany({ where: { assinaturaId, competencia } });
+  const comp = competencia ?? competenciaAtual();
+  if (comp !== competenciaAtual() && comp !== competenciaAnterior()) return;
+  await prisma.pagamentoAssinatura.deleteMany({ where: { assinaturaId, competencia: comp } });
   revalidarPaginas();
 }

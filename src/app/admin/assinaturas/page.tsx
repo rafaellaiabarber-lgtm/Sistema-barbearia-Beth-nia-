@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
-import { competenciaAtual, formatarCompetencia, estaInadimplente } from "@/lib/assinaturas";
+import { competenciaAtual, competenciaAnterior, formatarCompetencia, estaInadimplente } from "@/lib/assinaturas";
 import {
   cancelarAssinatura,
   reativarAssinatura,
@@ -17,6 +17,7 @@ export default async function AssinaturasPage({
 }) {
   const sp = await searchParams;
   const competencia = competenciaAtual();
+  const competenciaPassada = competenciaAnterior();
 
   const [assinaturas, planosAtivos, barbeirosAtivos] = await Promise.all([
     prisma.assinatura.findMany({
@@ -24,7 +25,7 @@ export default async function AssinaturasPage({
         cliente: true,
         plano: true,
         barbeiro: true,
-        pagamentos: { where: { competencia } },
+        pagamentos: { where: { competencia: { in: [competencia, competenciaPassada] } } },
       },
       orderBy: [{ status: "asc" }, { criadoEm: "desc" }],
     }),
@@ -33,7 +34,9 @@ export default async function AssinaturasPage({
   ]);
 
   const ativas = assinaturas.filter((a) => a.status === "ATIVA");
-  const inadimplentes = ativas.filter((a) => estaInadimplente(a.diaVencimento, a.pagamentos.length > 0));
+  const inadimplentes = ativas.filter((a) =>
+    estaInadimplente(a.diaVencimento, a.pagamentos.some((p) => p.competencia === competencia))
+  );
 
   return (
     <div>
@@ -61,7 +64,8 @@ export default async function AssinaturasPage({
 
       <div className="space-y-2">
         {assinaturas.map((a) => {
-          const pago = a.pagamentos.length > 0;
+          const pago = a.pagamentos.some((p) => p.competencia === competencia);
+          const pagoMesPassado = a.pagamentos.some((p) => p.competencia === competenciaPassada);
           const inadimplente = a.status === "ATIVA" && estaInadimplente(a.diaVencimento, pago);
           return (
             <div
@@ -94,15 +98,28 @@ export default async function AssinaturasPage({
                 {a.status === "ATIVA" && (
                   <>
                     {pago ? (
-                      <form action={desmarcarPagamentoAssinatura.bind(null, a.id)}>
+                      <form action={desmarcarPagamentoAssinatura.bind(null, a.id, competencia)}>
                         <button className="rounded-lg bg-green-50 dark:bg-green-950 text-green-700 border border-green-200 px-3 py-1.5 text-sm font-medium">
                           ✓ Pago — desmarcar
                         </button>
                       </form>
                     ) : (
-                      <form action={marcarPagamentoAssinatura.bind(null, a.id, a.plano.precoCentavos)}>
+                      <form action={marcarPagamentoAssinatura.bind(null, a.id, a.plano.precoCentavos, competencia)}>
                         <button className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-sm font-medium">
                           Marcar como pago
+                        </button>
+                      </form>
+                    )}
+                    {pagoMesPassado ? (
+                      <form action={desmarcarPagamentoAssinatura.bind(null, a.id, competenciaPassada)}>
+                        <button className="rounded-lg bg-green-50 dark:bg-green-950 text-green-700 border border-green-200 px-3 py-1.5 text-xs font-medium">
+                          ✓ Pago em {formatarCompetencia(competenciaPassada)} — desmarcar
+                        </button>
+                      </form>
+                    ) : (
+                      <form action={marcarPagamentoAssinatura.bind(null, a.id, a.plano.precoCentavos, competenciaPassada)}>
+                        <button className="text-xs text-slate-400 dark:text-slate-500 hover:text-blue-600 hover:underline">
+                          Marcar {formatarCompetencia(competenciaPassada)} como pago
                         </button>
                       </form>
                     )}
