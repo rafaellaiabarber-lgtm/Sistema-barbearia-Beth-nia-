@@ -57,6 +57,14 @@ export function minutosDisponiveis(jornadas: JornadaDia[], inicio: Date, fim: Da
   return totalMin;
 }
 
+/** Menor hora de abertura e maior hora de fechamento entre as jornadas informadas (de um ou mais barbeiros). */
+export function limitesJornada(jornadas: JornadaDia[]): { horaMin: number; horaMax: number } | null {
+  if (jornadas.length === 0) return null;
+  const horaMin = Math.min(...jornadas.map((j) => Math.floor(minutosDoHorario(j.horaInicio) / 60)));
+  const horaMax = Math.max(...jornadas.map((j) => Math.max(0, Math.ceil(minutosDoHorario(j.horaFim) / 60) - 1)));
+  return { horaMin, horaMax };
+}
+
 /** Formata a jornada agrupando dias consecutivos com o mesmo horário (e almoço). Ex: "Seg–Sex 09:00–18:00 (almoço 12:00–13:00), Sáb 09:00–14:00". */
 export function formatarJornada(jornadas: JornadaDia[]): string {
   if (jornadas.length === 0) return "sem horário cadastrado";

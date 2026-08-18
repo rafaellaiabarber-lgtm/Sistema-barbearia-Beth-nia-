@@ -13,7 +13,7 @@ import {
   gerarRecomendacoesDia,
   type ComparativoMes,
 } from "@/lib/gerente-virtual";
-import { minutosDisponiveis } from "@/lib/jornada";
+import { minutosDisponiveis, limitesJornada } from "@/lib/jornada";
 import { MetaMensalForm } from "./meta-mensal-form";
 import { ClienteInativoRow } from "./cliente-inativo-row";
 import { Valor } from "../../valor";
@@ -110,14 +110,10 @@ export default async function GerenteVirtualPage({
 
   const contagemPorHora = new Array(24).fill(0) as number[];
   for (const a of atendimentosMesTodos) contagemPorHora[a.criadoEm.getHours()]++;
-  const horasComMovimento = contagemPorHora.map((c, h) => ({ c, h })).filter((x) => x.c > 0);
-  let horaMin = 8;
-  let horaMax = 20;
-  if (horasComMovimento.length > 0) {
-    horaMin = Math.max(0, Math.min(...horasComMovimento.map((x) => x.h)) - 1);
-    horaMax = Math.min(23, Math.max(...horasComMovimento.map((x) => x.h)) + 1);
-  }
-  const janelaBaixaOcupacao = identificarJanelaBaixaOcupacao(contagemPorHora, horaMin, horaMax);
+  // Usa o horário de funcionamento real (jornada cadastrada dos barbeiros) em vez de inferir
+  // pelos atendimentos — com poucos dados isso podia sugerir horários em que a barbearia nem abre.
+  const limites = limitesJornada(barbeirosAtivos.flatMap((b) => b.jornadas)) ?? { horaMin: 8, horaMax: 20 };
+  const janelaBaixaOcupacao = identificarJanelaBaixaOcupacao(contagemPorHora, limites.horaMin, limites.horaMax);
 
   const minutosAtendendoPorBarbeiro = new Map<string, number>();
   for (const a of atendimentosMesTodos) {
