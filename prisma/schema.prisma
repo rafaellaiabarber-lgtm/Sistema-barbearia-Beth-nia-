@@ -327,6 +327,9 @@ model Plano {
   precoCentavos           Int
   servicosIncluidosPorMes Int
   diasSemana              Int[]        @default([])
+  // Link externo de pagamento (ex.: de outro banco/app) pra virar o QR Code do plano.
+  // Se vazio, o QR Code usa a página interna de autocadastro do plano.
+  linkExterno             String?
   ativo                   Boolean      @default(true)
   criadoEm                DateTime     @default(now())
   assinaturas             Assinatura[]

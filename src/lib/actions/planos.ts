@@ -21,6 +21,7 @@ export async function criarPlano(_prevState: PlanoState, formData: FormData): Pr
   const preco = String(formData.get("preco") ?? "");
   const cota = Number(formData.get("cota") ?? 0);
   const diasSemana = formData.getAll("diasSemana").map(Number);
+  const linkExterno = String(formData.get("linkExterno") ?? "").trim() || null;
 
   if (!nome) return { erro: "Informe o nome do plano." };
   const precoCentavos = reaisParaCentavos(preco);
@@ -28,7 +29,7 @@ export async function criarPlano(_prevState: PlanoState, formData: FormData): Pr
   if (!Number.isFinite(cota) || cota <= 0) return { erro: "Informe uma cota de serviços válida." };
 
   await prisma.plano.create({
-    data: { nome, precoCentavos, servicosIncluidosPorMes: Math.round(cota), diasSemana },
+    data: { nome, precoCentavos, servicosIncluidosPorMes: Math.round(cota), diasSemana, linkExterno },
   });
 
   revalidarPaginas();
@@ -46,6 +47,7 @@ export async function atualizarPlano(
   const preco = String(formData.get("preco") ?? "");
   const cota = Number(formData.get("cota") ?? 0);
   const diasSemana = formData.getAll("diasSemana").map(Number);
+  const linkExterno = String(formData.get("linkExterno") ?? "").trim() || null;
 
   if (!nome) return { erro: "Informe o nome do plano." };
   const precoCentavos = reaisParaCentavos(preco);
@@ -54,7 +56,7 @@ export async function atualizarPlano(
 
   await prisma.plano.update({
     where: { id },
-    data: { nome, precoCentavos, servicosIncluidosPorMes: Math.round(cota), diasSemana },
+    data: { nome, precoCentavos, servicosIncluidosPorMes: Math.round(cota), diasSemana, linkExterno },
   });
 
   revalidarPaginas();

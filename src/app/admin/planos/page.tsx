@@ -231,7 +231,7 @@ export default async function PlanosPage() {
 
               {m.plano.ativo && (
                 <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-800">
-                  <PlanoLink planoId={m.plano.id} baseUrl={baseUrl} />
+                  <PlanoLink plano={m.plano} baseUrl={baseUrl} />
                 </div>
               )}
             </div>
