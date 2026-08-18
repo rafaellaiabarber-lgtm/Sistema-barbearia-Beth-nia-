@@ -2,8 +2,17 @@ import QRCode from "qrcode";
 import type { Plano } from "@prisma/client";
 import { linkPlano } from "@/lib/assinaturas";
 import { CopiarLinkButton } from "../../copiar-link-button";
+import { LinkExternoForm } from "./link-externo-form";
 
-export async function PlanoLink({ plano, baseUrl }: { plano: Plano; baseUrl: string }) {
+export async function PlanoLink({
+  plano,
+  baseUrl,
+  editavel = false,
+}: {
+  plano: Plano;
+  baseUrl: string;
+  editavel?: boolean;
+}) {
   const url = linkPlano(plano, baseUrl);
   const dataUrl = await QRCode.toDataURL(url, { margin: 1, width: 160 });
 
@@ -23,6 +32,11 @@ export async function PlanoLink({ plano, baseUrl }: { plano: Plano; baseUrl: str
           <CopiarLinkButton url={url} />
         </div>
       </div>
+      {editavel && (
+        <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
+          <LinkExternoForm planoId={plano.id} linkAtual={plano.linkExterno} />
+        </div>
+      )}
     </details>
   );
 }

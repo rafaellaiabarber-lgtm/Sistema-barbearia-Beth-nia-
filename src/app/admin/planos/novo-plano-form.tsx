@@ -51,16 +51,6 @@ export function NovoPlanoForm() {
           className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-32"
         />
       </div>
-      <div className="w-full sm:w-auto">
-        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
-          Link externo de pagamento (opcional)
-        </label>
-        <input
-          name="linkExterno"
-          placeholder="Link copiado de outro app/banco"
-          className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-full sm:w-64"
-        />
-      </div>
       <div className="w-full">
         <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
           Dias que o plano cobre (deixe tudo desmarcado pra valer todo dia)
