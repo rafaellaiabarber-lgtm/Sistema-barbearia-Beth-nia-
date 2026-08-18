@@ -14,6 +14,7 @@ import { LABEL_TIPO_META, formatarValorMeta, calcularNiveisAtingidos, nivelAtual
 import { calcularProgressoMeta } from "@/lib/metas-server";
 import { fraseDoDia } from "@/lib/frases";
 import { identificarJanelaBaixaOcupacao, gerarDicasPessoais } from "@/lib/gerente-virtual";
+import { limitesJornada } from "@/lib/jornada";
 import { AutoRefresh } from "./auto-refresh";
 import { AtendendoAgora } from "./atendendo-agora";
 import { Valor } from "../../valor";
@@ -184,7 +185,7 @@ export default async function FilaPage({
     const intervaloSelecionado =
       personalizado ?? (periodoFila === "ontem" ? intervaloOntem(agora) : calcularIntervalo(periodoFila, agora));
     const [barbeiro, atendimentosPeriodo, vendasProdutoPeriodo, metasBarbeiro] = await Promise.all([
-      prisma.barbeiro.findUnique({ where: { id: session.barbeiroId } }),
+      prisma.barbeiro.findUnique({ where: { id: session.barbeiroId }, include: { jornadas: true } }),
       prisma.atendimento.findMany({
         where: {
           barbeiroId: session.barbeiroId,
@@ -243,13 +244,12 @@ export default async function FilaPage({
 
     const contagemPorHoraPessoal = new Array(24).fill(0) as number[];
     for (const a of atendimentosMesBarbeiro) contagemPorHoraPessoal[a.criadoEm.getHours()]++;
-    const horasComMovimentoPessoal = contagemPorHoraPessoal.map((c, h) => ({ c, h })).filter((x) => x.c > 0);
-    let horaMinPessoal = 8;
-    let horaMaxPessoal = 20;
-    if (horasComMovimentoPessoal.length > 0) {
-      horaMinPessoal = Math.max(0, Math.min(...horasComMovimentoPessoal.map((x) => x.h)) - 1);
-      horaMaxPessoal = Math.min(23, Math.max(...horasComMovimentoPessoal.map((x) => x.h)) + 1);
-    }
+    // Usa a jornada de trabalho cadastrada como limite real — não infere pelos atendimentos,
+    // senão a dica podia sugerir divulgar um horário em que o barbeiro nem está trabalhando.
+    const { horaMin: horaMinPessoal, horaMax: horaMaxPessoal } = limitesJornada(barbeiro?.jornadas ?? []) ?? {
+      horaMin: 8,
+      horaMax: 20,
+    };
     const AMOSTRA_MINIMA_JANELA = 8; // com poucos atendimentos no mês, a janela sai larga demais pra ser útil
     const janelaBaixaOcupacaoPessoal =
       atendimentosMesBarbeiro.length >= AMOSTRA_MINIMA_JANELA
