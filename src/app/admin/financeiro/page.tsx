@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { formatarReais, LABEL_FORMA_PAGAMENTO, LABEL_CATEGORIA_DESPESA } from "@/lib/format";
+import { formatarReais, LABEL_FORMA_PAGAMENTO, LABEL_CATEGORIA_DESPESA, paraCampoDataHora } from "@/lib/format";
 import { type Periodo, calcularIntervalo, validarPeriodo } from "@/lib/periodo";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 import { BotaoExcluirAtendimento } from "../excluir-atendimento-button";
+import { EditarHorarioAtendimento } from "../editar-horario-atendimento";
 import { TaxaCartaoForm } from "./taxa-cartao-form";
 import { Valor } from "../../valor";
 
@@ -201,19 +202,26 @@ export default async function FinanceiroPage({
       <h2 className="text-lg font-semibold mb-3">Atendimentos</h2>
       <div className="space-y-2">
         {atendimentos.map((a) => (
-          <div key={a.id} className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm shadow-sm">
-            <div>
-              <p className="text-slate-800 dark:text-slate-100">
-                {a.cliente.nome} — {a.servicos.map((s) => s.nomeSnapshot).join(", ")}
-              </p>
-              <p className="text-slate-400 dark:text-slate-500">
-                {a.barbeiro?.nome ?? "—"} · {a.concluidoEm?.toLocaleString("pt-BR")}
-              </p>
+          <div key={a.id} className="flex flex-col gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm shadow-sm">
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <p className="text-slate-800 dark:text-slate-100">
+                  {a.cliente.nome} — {a.servicos.map((s) => s.nomeSnapshot).join(", ")}
+                </p>
+                <p className="text-slate-400 dark:text-slate-500">
+                  {a.barbeiro?.nome ?? "—"} · {a.concluidoEm?.toLocaleString("pt-BR")}
+                </p>
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <p className="text-blue-600 dark:text-blue-400 font-semibold"><Valor>{formatarReais(a.precoTotalCentavos)}</Valor></p>
+                <BotaoExcluirAtendimento atendimentoId={a.id} />
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <p className="text-blue-600 dark:text-blue-400 font-semibold"><Valor>{formatarReais(a.precoTotalCentavos)}</Valor></p>
-              <BotaoExcluirAtendimento atendimentoId={a.id} />
-            </div>
+            <EditarHorarioAtendimento
+              atendimentoId={a.id}
+              chamadoEmValor={a.chamadoEm ? paraCampoDataHora(a.chamadoEm) : null}
+              concluidoEmValor={a.concluidoEm ? paraCampoDataHora(a.concluidoEm) : ""}
+            />
           </div>
         ))}
         {atendimentos.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum atendimento no período.</p>}

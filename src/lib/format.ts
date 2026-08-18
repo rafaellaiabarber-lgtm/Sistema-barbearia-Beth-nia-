@@ -12,6 +12,11 @@ export function reaisParaCentavos(valor: string) {
   return Math.round(numero * 100);
 }
 
+export function paraCampoDataHora(data: Date) {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${data.getFullYear()}-${pad(data.getMonth() + 1)}-${pad(data.getDate())}T${pad(data.getHours())}:${pad(data.getMinutes())}`;
+}
+
 export const LABEL_FORMA_PAGAMENTO: Record<string, string> = {
   DINHEIRO: "Dinheiro",
   PIX: "Pix",
