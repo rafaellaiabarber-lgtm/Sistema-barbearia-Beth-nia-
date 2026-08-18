@@ -1,8 +1,8 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
-import { Search } from "lucide-react";
-import { formatarReais } from "@/lib/format";
+import { Search, MessageCircle } from "lucide-react";
+import { formatarReais, linkWhatsApp } from "@/lib/format";
 import { criarCliente, type ClienteState } from "@/lib/actions/clientes";
 import { Valor } from "../../valor";
 
@@ -110,6 +110,17 @@ export function ListaClientes({ clientes }: { clientes: ClienteComDados[] }) {
                 </span>
               </summary>
               <div className="mt-3 space-y-2">
+                {c.telefone && (
+                  <a
+                    href={linkWhatsApp(c.telefone)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-3 py-1.5"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    WhatsApp
+                  </a>
+                )}
                 {c.assinaturas.length > 0 ? (
                   <p className="text-sm text-green-600 dark:text-green-400">
                     ✓ Assinante do plano {c.assinaturas[0].plano.nome}
