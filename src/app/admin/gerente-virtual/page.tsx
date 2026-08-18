@@ -216,7 +216,8 @@ export default async function GerenteVirtualPage({
         <h2 className="text-lg font-semibold mb-3">Previsão de faturamento</h2>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm mb-3">
           <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">
-            No ritmo atual (<Valor>{formatarReais(previsao.ritmoDiarioCentavos)}</Valor>/dia), você deve fechar o mês em:
+            Você tem feito em média <Valor>{formatarReais(previsao.ritmoDiarioCentavos)}</Valor>/dia esse mês. Nesse ritmo, deve
+            fechar o mês em:
           </p>
           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-3"><Valor>{formatarReais(previsao.previsaoFechamentoCentavos)}</Valor></p>
 
@@ -225,9 +226,10 @@ export default async function GerenteVirtualPage({
               Meta do mês: <Valor>{formatarReais(metaCentavos)}</Valor>.{" "}
               {previsao.faltamPorDiaCentavos !== null && previsao.faltamPorDiaCentavos > 0 ? (
                 <>
-                  Faltam <Valor>{formatarReais(metaCentavos - comparativoAtual.faturamentoCentavos)}</Valor> — precisa fazer{" "}
+                  Faltam <Valor>{formatarReais(metaCentavos - comparativoAtual.faturamentoCentavos)}</Valor>. Pra bater a meta,
+                  precisa aumentar o ritmo pra{" "}
                   <span className="font-semibold"><Valor>{formatarReais(previsao.faltamPorDiaCentavos)}</Valor>/dia</span> nos
-                  próximos {previsao.diasRestantes} dia(s) pra bater.
+                  próximos {previsao.diasRestantes} dia(s).
                 </>
               ) : (
                 <span className="text-green-600 font-medium">Meta já batida ou no caminho certo! 🎉</span>

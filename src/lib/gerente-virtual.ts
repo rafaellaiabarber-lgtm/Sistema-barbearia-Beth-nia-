@@ -168,7 +168,7 @@ export function gerarRecomendacoesDia(input: {
 
   if (input.metaCentavos !== null && metaEstaEmRisco(input.previsaoFechamentoCentavos, input.metaCentavos)) {
     recomendacoes.push(
-      `No ritmo atual, você deve fechar o mês em ${formatarReais(input.previsaoFechamentoCentavos)}, abaixo da sua meta de ${formatarReais(input.metaCentavos)}. Vale reforçar vendas ou divulgação.`
+      `No ritmo atual de vendas, o mês deve fechar em ${formatarReais(input.previsaoFechamentoCentavos)}, abaixo da sua meta de ${formatarReais(input.metaCentavos)}. Vale reforçar vendas ou divulgação.`
     );
   }
 
