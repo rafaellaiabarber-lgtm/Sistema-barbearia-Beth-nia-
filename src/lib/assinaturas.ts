@@ -47,9 +47,3 @@ export function formatarDiasSemana(diasSemana: number[]): string {
   if (diasSemana.length === 0 || diasSemana.length === 7) return "todos os dias";
   return [...diasSemana].sort((a, b) => a - b).map((d) => NOMES_DIAS_SEMANA[d]).join(", ");
 }
-
-/** Link do plano pra QR Code: usa o link externo cadastrado (ex.: de outro banco/app), se houver,
- * senão cai na página interna de autocadastro do plano. */
-export function linkPlano(plano: { id: string; linkExterno: string | null }, baseUrl: string): string {
-  return plano.linkExterno?.trim() || `${baseUrl}/assinar/${plano.id}`;
-}
