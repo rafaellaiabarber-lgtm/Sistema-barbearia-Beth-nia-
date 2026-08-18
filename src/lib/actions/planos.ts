@@ -47,7 +47,6 @@ export async function atualizarPlano(
   const preco = String(formData.get("preco") ?? "");
   const cota = Number(formData.get("cota") ?? 0);
   const diasSemana = formData.getAll("diasSemana").map(Number);
-  const linkExterno = String(formData.get("linkExterno") ?? "").trim() || null;
 
   if (!nome) return { erro: "Informe o nome do plano." };
   const precoCentavos = reaisParaCentavos(preco);
@@ -56,8 +55,23 @@ export async function atualizarPlano(
 
   await prisma.plano.update({
     where: { id },
-    data: { nome, precoCentavos, servicosIncluidosPorMes: Math.round(cota), diasSemana, linkExterno },
+    data: { nome, precoCentavos, servicosIncluidosPorMes: Math.round(cota), diasSemana },
   });
+
+  revalidarPaginas();
+  return { sucesso: true };
+}
+
+export async function salvarLinkExternoPlano(
+  id: string,
+  _prevState: PlanoState,
+  formData: FormData
+): Promise<PlanoState> {
+  await requireSession(["ADMIN"]);
+
+  const linkExterno = String(formData.get("linkExterno") ?? "").trim() || null;
+
+  await prisma.plano.update({ where: { id }, data: { linkExterno } });
 
   revalidarPaginas();
   return { sucesso: true };
