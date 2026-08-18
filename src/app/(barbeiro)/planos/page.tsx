@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
@@ -9,13 +8,7 @@ import { Valor } from "../../valor";
 export default async function PlanosBarbeiroPage() {
   await requireSession(["ADMIN", "BARBEIRO"]);
 
-  const [planos, headersList] = await Promise.all([
-    prisma.plano.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    headers(),
-  ]);
-  const host = headersList.get("host") ?? "localhost:3000";
-  const protocolo = host.includes("localhost") ? "http" : "https";
-  const baseUrl = `${protocolo}://${host}`;
+  const planos = await prisma.plano.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } });
 
   return (
     <div className="p-6">
@@ -34,7 +27,7 @@ export default async function PlanosBarbeiroPage() {
               <Valor>{formatarReais(p.precoCentavos)}</Valor>/mês · {p.servicosIncluidosPorMes} serviço(s) incluído(s) por
               mês · cobre {formatarDiasSemana(p.diasSemana)}
             </p>
-            <PlanoLink plano={p} baseUrl={baseUrl} />
+            <PlanoLink plano={p} />
           </div>
         ))}
         {planos.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum plano ativo no momento.</p>}
