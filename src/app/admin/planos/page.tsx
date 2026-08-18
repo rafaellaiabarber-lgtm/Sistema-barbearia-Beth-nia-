@@ -1,9 +1,11 @@
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo } from "@/lib/periodo";
 import { competenciaAtual, estaInadimplente } from "@/lib/assinaturas";
 import { NovoPlanoForm } from "./novo-plano-form";
 import { PlanoRow } from "./plano-row";
+import { PlanoLink } from "./plano-link";
 import { Valor } from "../../valor";
 
 function formatarPercentual(valor: number | null) {
@@ -15,6 +17,11 @@ export default async function PlanosPage() {
   const agora = new Date();
   const mes = calcularIntervalo("mes", agora);
   const competencia = competenciaAtual(agora);
+
+  const headersList = await headers();
+  const host = headersList.get("host") ?? "localhost:3000";
+  const protocolo = host.includes("localhost") ? "http" : "https";
+  const baseUrl = `${protocolo}://${host}`;
 
   const planos = await prisma.plano.findMany({
     orderBy: [{ ativo: "desc" }, { nome: "asc" }],
@@ -221,6 +228,12 @@ export default async function PlanosPage() {
                   )}
                 </div>
               </details>
+
+              {m.plano.ativo && (
+                <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+                  <PlanoLink planoId={m.plano.id} baseUrl={baseUrl} />
+                </div>
+              )}
             </div>
           </div>
         ))}
