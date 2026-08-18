@@ -82,6 +82,34 @@ export async function excluirAtendimento(atendimentoId: string) {
   revalidarRelatorios();
 }
 
+export type EditarHorarioState = { erro?: string; sucesso?: boolean };
+
+export async function editarHorarioAtendimento(
+  _prevState: EditarHorarioState,
+  formData: FormData
+): Promise<EditarHorarioState> {
+  await requireSession(["ADMIN"]);
+
+  const atendimentoId = String(formData.get("atendimentoId") ?? "");
+  const chamadoEmStr = String(formData.get("chamadoEm") ?? "");
+  const concluidoEmStr = String(formData.get("concluidoEm") ?? "");
+
+  const chamadoEm = new Date(chamadoEmStr);
+  const concluidoEm = new Date(concluidoEmStr);
+  if (!chamadoEmStr || Number.isNaN(chamadoEm.getTime())) return { erro: "Horário de início inválido." };
+  if (!concluidoEmStr || Number.isNaN(concluidoEm.getTime())) return { erro: "Horário de término inválido." };
+  if (chamadoEm.getTime() > concluidoEm.getTime()) return { erro: "O início não pode ser depois do término." };
+
+  const atualizado = await prisma.atendimento.updateMany({
+    where: { id: atendimentoId, status: "CONCLUIDO" },
+    data: { chamadoEm, concluidoEm },
+  });
+  if (atualizado.count === 0) return { erro: "Atendimento não encontrado." };
+
+  revalidarRelatorios();
+  return { sucesso: true };
+}
+
 export type SugestaoCliente = { nome: string; telefone: string };
 
 export async function buscarClientesPorNome(query: string): Promise<SugestaoCliente[]> {
