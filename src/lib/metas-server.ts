@@ -2,7 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { calcularIntervalo } from "@/lib/periodo";
 import { valorAtualPorTipo, type ProgressoBarbeiro } from "@/lib/metas";
-import { comissaoServicos } from "@/lib/comissao";
+import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 
 export type MetaComNiveis = {
   id: string;
@@ -83,6 +83,14 @@ export async function calcularProgressoMeta(meta: MetaComNiveis, comissaoPadraoB
       if (a.cliente.criadoEm >= periodo.inicio && a.cliente.criadoEm <= periodo.fim) {
         progresso.clientesNovos += 1;
       }
+    }
+
+    if (meta.tipo === "FATURAMENTO") {
+      // A comissão do barbeiro também inclui as vendas de produto, não só os serviços.
+      const vendasProduto = await prisma.vendaProduto.findMany({
+        where: { barbeiroId: meta.barbeiroId, criadoEm: { gte: periodo.inicio, lte: periodo.fim } },
+      });
+      progresso.comissaoCentavos += comissaoProdutos(vendasProduto);
     }
   }
 
