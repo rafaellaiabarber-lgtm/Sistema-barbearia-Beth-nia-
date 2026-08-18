@@ -1,5 +1,6 @@
+import { MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { formatarReais } from "@/lib/format";
+import { formatarReais, linkWhatsApp } from "@/lib/format";
 import { competenciaAtual, formatarCompetencia, estaInadimplente } from "@/lib/assinaturas";
 import {
   cancelarAssinatura,
@@ -102,6 +103,17 @@ export default async function AssinaturasPage({
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-4">
+                  {a.cliente.telefone && (
+                    <a
+                      href={linkWhatsApp(a.cliente.telefone)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-3 py-1.5"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      WhatsApp
+                    </a>
+                  )}
                   {a.status === "ATIVA" && (
                     <>
                       {pago ? (
