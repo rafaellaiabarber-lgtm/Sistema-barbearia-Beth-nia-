@@ -66,6 +66,39 @@ export async function criarAssinatura(
   return { sucesso: true };
 }
 
+export async function criarAssinaturaPublica(
+  planoId: string,
+  _prevState: AssinaturaState,
+  formData: FormData
+): Promise<AssinaturaState> {
+  const nome = String(formData.get("nome") ?? "").trim();
+  const telefone = normalizarTelefone(String(formData.get("telefone") ?? ""));
+
+  if (!nome) return { erro: "Informe seu nome." };
+  if (!telefone) return { erro: "Informe seu telefone." };
+
+  const plano = await prisma.plano.findFirst({ where: { id: planoId, ativo: true } });
+  if (!plano) return { erro: "Esse plano não está mais disponível." };
+
+  const cliente = await prisma.cliente.upsert({
+    where: { telefone },
+    update: { nome },
+    create: { nome, telefone },
+  });
+
+  const jaTemAtiva = await prisma.assinatura.findFirst({
+    where: { clienteId: cliente.id, status: "ATIVA" },
+  });
+  if (jaTemAtiva) return { erro: "Você já tem uma assinatura ativa. Fale com a barbearia se precisar mudar de plano." };
+
+  await prisma.assinatura.create({
+    data: { clienteId: cliente.id, planoId, diaVencimento: new Date().getDate(), status: "ATIVA" },
+  });
+
+  revalidarPaginas();
+  return { sucesso: true };
+}
+
 export async function cancelarAssinatura(id: string) {
   await requireSession(["ADMIN"]);
   await prisma.assinatura.update({
