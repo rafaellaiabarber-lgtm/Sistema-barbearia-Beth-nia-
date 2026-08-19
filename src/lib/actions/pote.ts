@@ -41,3 +41,36 @@ export async function excluirDistribuicaoPote(id: string) {
   await prisma.distribuicaoPote.delete({ where: { id } });
   revalidatePath("/admin/rateio-assinatura");
 }
+
+export type EditarCompetenciaPagamentoState = { erro?: string; sucesso?: boolean };
+
+// Deixa corrigir a competência (mês) de um pagamento de assinatura já registrado — pra quando ele foi
+// marcado com a data errada e acabou entrando no pote do mês errado.
+export async function editarCompetenciaPagamento(
+  pagamentoId: string,
+  _prevState: EditarCompetenciaPagamentoState,
+  formData: FormData
+): Promise<EditarCompetenciaPagamentoState> {
+  await requireSession(["ADMIN"]);
+
+  const dataStr = String(formData.get("data") ?? "");
+  const pagoEm = new Date(`${dataStr}T12:00:00`);
+  if (Number.isNaN(pagoEm.getTime())) return { erro: "Data inválida." };
+  const competencia = `${pagoEm.getFullYear()}-${String(pagoEm.getMonth() + 1).padStart(2, "0")}`;
+
+  const pagamento = await prisma.pagamentoAssinatura.findUnique({ where: { id: pagamentoId } });
+  if (!pagamento) return { erro: "Pagamento não encontrado." };
+
+  if (competencia !== pagamento.competencia) {
+    const conflito = await prisma.pagamentoAssinatura.findUnique({
+      where: { assinaturaId_competencia: { assinaturaId: pagamento.assinaturaId, competencia } },
+    });
+    if (conflito) return { erro: `Essa assinatura já tem um pagamento registrado em ${competencia}.` };
+  }
+
+  await prisma.pagamentoAssinatura.update({ where: { id: pagamentoId }, data: { pagoEm, competencia } });
+
+  revalidatePath("/admin/rateio-assinatura");
+  revalidatePath("/admin/assinaturas");
+  return { sucesso: true };
+}

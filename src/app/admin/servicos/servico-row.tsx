@@ -135,7 +135,7 @@ export function ServicoRow({ servico, comissoesPadrao }: { servico: Servico; com
               <ComissaoServicoForm servicoId={servico.id} comissaoPercentual={servico.comissaoPercentual} />
             </div>
             <div className="flex flex-col items-start gap-1">
-              <span className="text-xs text-slate-400 dark:text-slate-500" title="Usado no Rateio de Assinatura pra dividir o pote proporcionalmente">
+              <span className="text-xs text-slate-400 dark:text-slate-500" title="Usado na Distribuição de Assinatura pra dividir o pote proporcionalmente">
                 Fichas
               </span>
               <FichasServicoForm servicoId={servico.id} fichas={servico.fichas} />
