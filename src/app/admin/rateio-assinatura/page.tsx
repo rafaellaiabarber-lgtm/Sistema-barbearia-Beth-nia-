@@ -5,7 +5,7 @@ import { calcularPote } from "@/lib/pote";
 import { formatarReais } from "@/lib/format";
 import { excluirDistribuicaoPote } from "@/lib/actions/pote";
 import { DistribuirButton } from "./distribuir-button";
-import { EditarPagamento } from "./editar-pagamento";
+import { EditarPagamento } from "../editar-pagamento";
 import { Valor } from "../../valor";
 
 export const dynamic = "force-dynamic";
