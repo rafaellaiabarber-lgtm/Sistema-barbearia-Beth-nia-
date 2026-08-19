@@ -11,6 +11,7 @@ import {
   desmarcarPagamentoAssinatura,
   marcarPagamentoComData,
 } from "@/lib/actions/assinaturas";
+import { EditarPagamento } from "../editar-pagamento";
 import { Valor } from "../../valor";
 
 type Pagamento = { id: string; competencia: string; pagoEm: Date };
@@ -173,11 +174,17 @@ export function ListaAssinaturas({
                 {a.status === "ATIVA" && (
                   <>
                     {pago ? (
-                      <form action={desmarcarPagamentoAssinatura.bind(null, a.id, competencia)}>
-                        <button className="rounded-lg bg-green-50 dark:bg-green-950 text-green-700 border border-green-200 px-3 py-1.5 text-sm font-medium">
-                          ✓ Pago — desmarcar
-                        </button>
-                      </form>
+                      <>
+                        <form action={desmarcarPagamentoAssinatura.bind(null, a.id, competencia)}>
+                          <button className="rounded-lg bg-green-50 dark:bg-green-950 text-green-700 border border-green-200 px-3 py-1.5 text-sm font-medium">
+                            ✓ Pago — desmarcar
+                          </button>
+                        </form>
+                        <EditarPagamento
+                          pagamentoId={pagamentoAtual!.id}
+                          dataAtual={pagamentoAtual!.pagoEm.toISOString().slice(0, 10)}
+                        />
+                      </>
                     ) : (
                       <form action={marcarPagamentoAssinatura.bind(null, a.id, a.plano.precoCentavos, competencia)}>
                         <button className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-sm font-medium">
@@ -222,13 +229,16 @@ export function ListaAssinaturas({
             )}
 
             {outrosPagamentos.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-2">
+              <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center gap-2">
                 {outrosPagamentos.map((p) => (
-                  <form key={p.id} action={desmarcarPagamentoAssinatura.bind(null, a.id, p.competencia)}>
-                    <button className="rounded-lg bg-green-50 dark:bg-green-950 text-green-700 border border-green-200 px-2.5 py-1 text-xs font-medium">
-                      ✓ {p.pagoEm.toLocaleDateString("pt-BR")} ({formatarCompetencia(p.competencia)}) — desmarcar
-                    </button>
-                  </form>
+                  <div key={p.id} className="flex items-center gap-1.5">
+                    <form action={desmarcarPagamentoAssinatura.bind(null, a.id, p.competencia)}>
+                      <button className="rounded-lg bg-green-50 dark:bg-green-950 text-green-700 border border-green-200 px-2.5 py-1 text-xs font-medium">
+                        ✓ {p.pagoEm.toLocaleDateString("pt-BR")} ({formatarCompetencia(p.competencia)}) — desmarcar
+                      </button>
+                    </form>
+                    <EditarPagamento pagamentoId={p.id} dataAtual={p.pagoEm.toISOString().slice(0, 10)} />
+                  </div>
                 ))}
               </div>
             )}
