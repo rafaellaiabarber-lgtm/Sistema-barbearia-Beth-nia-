@@ -37,6 +37,12 @@ export function estaInadimplente(diaVencimento: number, pagouCompetenciaAtual: b
   return agora.getDate() > diaVencimento;
 }
 
+export function prestesAVencer(diaVencimento: number, pagouCompetenciaAtual: boolean, agora: Date = new Date()): boolean {
+  if (pagouCompetenciaAtual) return false;
+  const diasRestantes = diaVencimento - agora.getDate();
+  return diasRestantes >= 0 && diasRestantes <= 3;
+}
+
 export const NOMES_DIAS_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 export function diaCobertoHoje(diasSemana: number[], agora: Date = new Date()): boolean {
