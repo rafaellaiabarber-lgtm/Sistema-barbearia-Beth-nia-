@@ -30,7 +30,10 @@ type Linha = {
   pago: boolean;
   outrosPagamentos: Pagamento[];
   inadimplente: boolean;
+  vencendo: boolean;
 };
+
+type Filtro = "todos" | "inadimplentes" | "vencendo";
 
 function normalizarDigitos(valor: string) {
   return valor.replace(/\D/g, "");
@@ -40,26 +43,82 @@ export function ListaAssinaturas({
   linhas,
   competencia,
   hoje,
+  totalAtivas,
 }: {
   linhas: Linha[];
   competencia: string;
   hoje: string;
+  totalAtivas: number;
 }) {
   const [busca, setBusca] = useState("");
+  const [filtro, setFiltro] = useState<Filtro>("todos");
+
+  const inadimplentes = linhas.filter((l) => l.inadimplente);
+  const vencendo = linhas.filter((l) => l.vencendo);
 
   const linhasFiltradas = useMemo(() => {
+    let base = linhas;
+    if (filtro === "inadimplentes") base = base.filter((l) => l.inadimplente);
+    if (filtro === "vencendo") base = base.filter((l) => l.vencendo);
+
     const termo = busca.trim().toLowerCase();
-    if (!termo) return linhas;
+    if (!termo) return base;
     const termoDigitos = normalizarDigitos(termo);
-    return linhas.filter(({ assinatura: a }) => {
+    return base.filter(({ assinatura: a }) => {
       const nomeBate = a.cliente.nome.toLowerCase().includes(termo);
       const telefoneBate = termoDigitos.length > 0 && (a.cliente.telefone ?? "").includes(termoDigitos);
       return nomeBate || telefoneBate;
     });
-  }, [linhas, busca]);
+  }, [linhas, busca, filtro]);
+
+  function alternarFiltro(novo: Filtro) {
+    setFiltro((atual) => (atual === novo ? "todos" : novo));
+  }
 
   return (
     <div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Assinaturas ativas</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{totalAtivas}</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => alternarFiltro("inadimplentes")}
+          className={`text-left bg-white dark:bg-slate-900 border rounded-xl p-5 shadow-sm transition ${
+            filtro === "inadimplentes" ? "border-red-400 ring-2 ring-red-200 dark:ring-red-900" : "border-slate-200 dark:border-slate-800"
+          }`}
+        >
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Inadimplentes ({formatarCompetencia(competencia)})</p>
+          <p className={`text-2xl font-bold ${inadimplentes.length > 0 ? "text-red-600" : "text-green-600"}`}>
+            {inadimplentes.length}
+          </p>
+        </button>
+        <button
+          type="button"
+          onClick={() => alternarFiltro("vencendo")}
+          className={`text-left bg-white dark:bg-slate-900 border rounded-xl p-5 shadow-sm transition ${
+            filtro === "vencendo" ? "border-amber-400 ring-2 ring-amber-200 dark:ring-amber-900" : "border-slate-200 dark:border-slate-800"
+          }`}
+        >
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Vencendo em até 3 dias</p>
+          <p className={`text-2xl font-bold ${vencendo.length > 0 ? "text-amber-600" : "text-green-600"}`}>
+            {vencendo.length}
+          </p>
+        </button>
+      </div>
+
+      {filtro !== "todos" && (
+        <div className="mb-4 flex items-center gap-2 text-sm">
+          <span className="text-slate-500 dark:text-slate-400">
+            Mostrando só {filtro === "inadimplentes" ? "inadimplentes" : "quem vence em até 3 dias"}.
+          </span>
+          <button type="button" onClick={() => setFiltro("todos")} className="text-blue-600 dark:text-blue-400 hover:underline">
+            Ver todas
+          </button>
+        </div>
+      )}
+
       <div className="relative mb-4 max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
         <input
@@ -71,7 +130,7 @@ export function ListaAssinaturas({
       </div>
 
       <div className="space-y-2">
-        {linhasFiltradas.map(({ assinatura: a, pagamentoAtual, pago, outrosPagamentos, inadimplente }) => (
+        {linhasFiltradas.map(({ assinatura: a, pagamentoAtual, pago, outrosPagamentos, inadimplente, vencendo: linhaVencendo }) => (
           <div
             key={a.id}
             className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm ${
@@ -92,6 +151,8 @@ export function ListaAssinaturas({
                     </span>
                   ) : inadimplente ? (
                     <span className="text-red-600 font-medium">inadimplente ({formatarCompetencia(competencia)})</span>
+                  ) : linhaVencendo ? (
+                    <span className="text-amber-600 font-medium">vence em até 3 dias</span>
                   ) : (
                     <span className="text-slate-500 dark:text-slate-400">aguardando pagamento de {formatarCompetencia(competencia)}</span>
                   )}
@@ -176,8 +237,8 @@ export function ListaAssinaturas({
         {linhasFiltradas.length === 0 && linhas.length === 0 && (
           <p className="text-slate-400 dark:text-slate-500">Nenhuma assinatura cadastrada ainda.</p>
         )}
-        {linhasFiltradas.length === 0 && linhas.length > 0 && busca.trim() !== "" && (
-          <p className="text-slate-400 dark:text-slate-500">Nenhuma assinatura encontrada pra essa busca.</p>
+        {linhasFiltradas.length === 0 && linhas.length > 0 && (busca.trim() !== "" || filtro !== "todos") && (
+          <p className="text-slate-400 dark:text-slate-500">Nenhuma assinatura encontrada com esse filtro.</p>
         )}
       </div>
     </div>
