@@ -107,6 +107,27 @@ export async function alterarPlanoAssinatura(
   return { sucesso: true };
 }
 
+export type AlterarVencimentoState = { erro?: string; sucesso?: boolean };
+
+// Deixa corrigir o dia de vencimento de uma assinatura já ativa, sem precisar cancelar e criar de novo.
+export async function alterarVencimentoAssinatura(
+  assinaturaId: string,
+  _prevState: AlterarVencimentoState,
+  formData: FormData
+): Promise<AlterarVencimentoState> {
+  await requireSession(["ADMIN"]);
+
+  const diaVencimento = Number(formData.get("diaVencimento") ?? 0);
+  if (!Number.isFinite(diaVencimento) || diaVencimento < 1 || diaVencimento > 31) {
+    return { erro: "Dia de vencimento deve ser entre 1 e 31." };
+  }
+
+  await prisma.assinatura.update({ where: { id: assinaturaId }, data: { diaVencimento: Math.round(diaVencimento) } });
+
+  revalidarPaginas();
+  return { sucesso: true };
+}
+
 const COMPETENCIA_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
 
 export async function marcarPagamentoAssinatura(assinaturaId: string, valorCentavos: number, competencia?: string) {
