@@ -84,6 +84,29 @@ export async function reativarAssinatura(id: string) {
   revalidarPaginas();
 }
 
+export type AlterarPlanoState = { erro?: string; sucesso?: boolean };
+
+// Deixa trocar o plano de uma assinatura já ativa (ex.: cliente que era segunda a sexta
+// e agora quer segunda a sábado) sem precisar cancelar e criar uma assinatura nova.
+export async function alterarPlanoAssinatura(
+  assinaturaId: string,
+  _prevState: AlterarPlanoState,
+  formData: FormData
+): Promise<AlterarPlanoState> {
+  await requireSession(["ADMIN"]);
+
+  const planoId = String(formData.get("planoId") ?? "").trim();
+  if (!planoId) return { erro: "Escolha um plano." };
+
+  const plano = await prisma.plano.findFirst({ where: { id: planoId, ativo: true } });
+  if (!plano) return { erro: "Plano inválido." };
+
+  await prisma.assinatura.update({ where: { id: assinaturaId }, data: { planoId } });
+
+  revalidarPaginas();
+  return { sucesso: true };
+}
+
 const COMPETENCIA_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
 
 export async function marcarPagamentoAssinatura(assinaturaId: string, valorCentavos: number, competencia?: string) {

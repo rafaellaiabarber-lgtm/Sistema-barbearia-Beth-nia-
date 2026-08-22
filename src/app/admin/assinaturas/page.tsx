@@ -52,7 +52,13 @@ export default async function AssinaturasPage({
         nomeInicial={sp.nome}
       />
 
-      <ListaAssinaturas linhas={linhas} competencia={competencia} hoje={hoje} totalAtivas={ativas.length} />
+      <ListaAssinaturas
+        linhas={linhas}
+        competencia={competencia}
+        hoje={hoje}
+        totalAtivas={ativas.length}
+        planos={planosAtivos}
+      />
     </div>
   );
 }
