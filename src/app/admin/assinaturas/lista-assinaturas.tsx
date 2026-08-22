@@ -12,6 +12,7 @@ import {
   marcarPagamentoComData,
 } from "@/lib/actions/assinaturas";
 import { EditarPagamento } from "../editar-pagamento";
+import { TrocarPlano } from "./trocar-plano";
 import { Valor } from "../../valor";
 
 type Pagamento = { id: string; competencia: string; pagoEm: Date };
@@ -21,7 +22,7 @@ type Assinatura = {
   status: string;
   diaVencimento: number;
   cliente: { nome: string; telefone: string | null };
-  plano: { nome: string; precoCentavos: number };
+  plano: { id: string; nome: string; precoCentavos: number };
   barbeiro: { nome: string } | null;
 };
 
@@ -45,11 +46,13 @@ export function ListaAssinaturas({
   competencia,
   hoje,
   totalAtivas,
+  planos,
 }: {
   linhas: Linha[];
   competencia: string;
   hoje: string;
   totalAtivas: number;
+  planos: { id: string; nome: string }[];
 }) {
   const [busca, setBusca] = useState("");
   const [filtro, setFiltro] = useState<Filtro>("todos");
@@ -192,6 +195,7 @@ export function ListaAssinaturas({
                         </button>
                       </form>
                     )}
+                    <TrocarPlano assinaturaId={a.id} planoAtualId={a.plano.id} planos={planos} />
                     <form action={cancelarAssinatura.bind(null, a.id)}>
                       <button className="text-sm text-slate-400 dark:text-slate-500 hover:text-red-600">Cancelar</button>
                     </form>
