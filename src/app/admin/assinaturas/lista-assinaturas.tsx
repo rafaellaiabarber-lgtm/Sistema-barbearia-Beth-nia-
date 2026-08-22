@@ -13,6 +13,7 @@ import {
 } from "@/lib/actions/assinaturas";
 import { EditarPagamento } from "../editar-pagamento";
 import { TrocarPlano } from "./trocar-plano";
+import { EditarVencimento } from "./editar-vencimento";
 import { Valor } from "../../valor";
 
 type Pagamento = { id: string; competencia: string; pagoEm: Date };
@@ -196,6 +197,7 @@ export function ListaAssinaturas({
                       </form>
                     )}
                     <TrocarPlano assinaturaId={a.id} planoAtualId={a.plano.id} planos={planos} />
+                    <EditarVencimento assinaturaId={a.id} diaAtual={a.diaVencimento} />
                     <form action={cancelarAssinatura.bind(null, a.id)}>
                       <button className="text-sm text-slate-400 dark:text-slate-500 hover:text-red-600">Cancelar</button>
                     </form>
