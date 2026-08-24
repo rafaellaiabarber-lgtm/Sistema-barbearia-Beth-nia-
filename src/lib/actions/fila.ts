@@ -218,6 +218,7 @@ export async function concluirAtendimento(
             servicoId: s.id,
             nomeSnapshot: s.nome,
             precoCentavos: cobertoPorAssinatura ? 0 : s.precoCentavos,
+            precoComissaoCentavos: s.precoCentavos,
             custoCentavos: s.custoCentavos,
             comissaoPercentual: s.comissaoPercentual ?? comissaoPadrao,
             fichas: s.fichas,
