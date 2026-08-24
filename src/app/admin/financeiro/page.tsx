@@ -5,6 +5,7 @@ import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 import { BotaoExcluirAtendimento } from "../excluir-atendimento-button";
 import { EditarHorarioAtendimento } from "../editar-horario-atendimento";
+import { EditarComissaoServico } from "../editar-comissao-servico";
 import { TaxaCartaoForm } from "./taxa-cartao-form";
 import { Valor } from "../../valor";
 
@@ -222,6 +223,22 @@ export default async function FinanceiroPage({
               chamadoEmValor={a.chamadoEm ? paraCampoDataHora(a.chamadoEm) : null}
               concluidoEmValor={a.concluidoEm ? paraCampoDataHora(a.concluidoEm) : ""}
             />
+            {a.barbeiro && (
+              <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-slate-800">
+                {a.servicos.map((s) => (
+                  <div key={s.id} className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-slate-400 dark:text-slate-500 text-xs">
+                      {s.nomeSnapshot} · comissão{" "}
+                      <Valor>{formatarReais(comissaoServicos([s], a.barbeiro!.comissaoPercentual))}</Valor>
+                    </span>
+                    <EditarComissaoServico
+                      atendimentoServicoId={s.id}
+                      valorAtualCentavos={s.precoComissaoCentavos ?? s.precoCentavos}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ))}
         {atendimentos.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum atendimento no período.</p>}

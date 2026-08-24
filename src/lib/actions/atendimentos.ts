@@ -139,6 +139,35 @@ export async function corrigirComissaoAtendimentosCobertos(): Promise<CorrigirCo
   return { sucesso: true, corrigidos: pendentes.length };
 }
 
+export type EditarComissaoServicoState = { erro?: string; sucesso?: boolean };
+
+// Deixa corrigir manualmente o valor base usado pra calcular a comissão de um serviço específico
+// dentro de um atendimento — útil pra ajustar casos que a correção automática não cobriu.
+export async function editarComissaoServico(
+  atendimentoServicoId: string,
+  _prevState: EditarComissaoServicoState,
+  formData: FormData
+): Promise<EditarComissaoServicoState> {
+  await requireSession(["ADMIN"]);
+
+  const valorStr = String(formData.get("valor") ?? "").replace(",", ".");
+  const valorCentavos = Math.round(Number(valorStr) * 100);
+  if (!Number.isFinite(valorCentavos) || valorCentavos < 0) {
+    return { erro: "Informe um valor válido." };
+  }
+
+  const atualizado = await prisma.atendimentoServico.updateMany({
+    where: { id: atendimentoServicoId },
+    data: { precoComissaoCentavos: valorCentavos },
+  });
+  if (atualizado.count === 0) return { erro: "Serviço não encontrado." };
+
+  revalidarRelatorios();
+  revalidatePath("/admin/metas");
+  revalidatePath("/admin/gerente-virtual");
+  return { sucesso: true };
+}
+
 export type SugestaoCliente = { nome: string; telefone: string };
 
 export async function buscarClientesPorNome(query: string): Promise<SugestaoCliente[]> {
