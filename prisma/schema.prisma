@@ -319,6 +319,11 @@ model AtendimentoServico {
   custoCentavos      Int         @default(0)
   comissaoPercentual Int?
   fichas             Int         @default(0)
+  // Preço do serviço usado como base pra calcular a comissão do barbeiro. Igual a precoCentavos na
+  // maioria dos casos, mas continua com o valor cheio mesmo quando o atendimento é coberto pela
+  // assinatura (precoCentavos fica zerado nesse caso, pra não contar como faturamento de novo).
+  // Nulo em atendimentos antigos, de antes dessa coluna existir — nesse caso cai pra precoCentavos.
+  precoComissaoCentavos Int?
 }
 
 model Plano {

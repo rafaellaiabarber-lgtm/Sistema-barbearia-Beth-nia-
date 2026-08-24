@@ -65,6 +65,7 @@ export async function lancarAtendimentoManual(
           servicoId: s.id,
           nomeSnapshot: s.nome,
           precoCentavos: s.precoCentavos,
+          precoComissaoCentavos: s.precoCentavos,
           custoCentavos: s.custoCentavos,
           comissaoPercentual: s.comissaoPercentual ?? barbeiro.comissaoPercentual,
         })),
