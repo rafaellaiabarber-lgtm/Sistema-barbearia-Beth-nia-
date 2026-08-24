@@ -111,6 +111,34 @@ export async function editarHorarioAtendimento(
   return { sucesso: true };
 }
 
+export type CorrigirComissaoCobertosState = { sucesso?: boolean; corrigidos?: number };
+
+// Corrige, de uma vez só, a comissão de atendimentos antigos marcados como cobertos pela
+// assinatura de antes da coluna precoComissaoCentavos existir (por isso ficaram com comissão
+// zerada). Usa o preço atual do serviço como base — é a melhor aproximação disponível, já que
+// o valor original não foi salvo nesses atendimentos.
+export async function corrigirComissaoAtendimentosCobertos(): Promise<CorrigirComissaoCobertosState> {
+  await requireSession(["ADMIN"]);
+
+  const pendentes = await prisma.atendimentoServico.findMany({
+    where: { precoComissaoCentavos: null, atendimento: { cobertoPorAssinatura: true } },
+    include: { servico: true },
+  });
+
+  for (const item of pendentes) {
+    await prisma.atendimentoServico.update({
+      where: { id: item.id },
+      data: { precoComissaoCentavos: item.servico.precoCentavos },
+    });
+  }
+
+  revalidarRelatorios();
+  revalidatePath("/admin/metas");
+  revalidatePath("/admin/gerente-virtual");
+
+  return { sucesso: true, corrigidos: pendentes.length };
+}
+
 export type SugestaoCliente = { nome: string; telefone: string };
 
 export async function buscarClientesPorNome(query: string): Promise<SugestaoCliente[]> {

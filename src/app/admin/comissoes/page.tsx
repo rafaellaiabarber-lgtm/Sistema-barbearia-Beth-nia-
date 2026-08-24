@@ -4,6 +4,7 @@ import { type Periodo, calcularIntervalo, chavePeriodo, validarPeriodo } from "@
 import { marcarComissaoPaga, desmarcarComissaoPaga } from "@/lib/actions/comissoes";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
+import { CorrigirComissaoCobertaButton } from "./corrigir-comissao-coberta-button";
 import { Valor } from "../../valor";
 
 export default async function ComissoesPage({
@@ -102,6 +103,8 @@ export default async function ComissoesPage({
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Comissões</h1>
+
+      <CorrigirComissaoCobertaButton />
 
       <FiltroRelatorio
         basePath="/admin/comissoes"
