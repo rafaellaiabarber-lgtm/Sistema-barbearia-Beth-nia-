@@ -5,6 +5,7 @@ import { calcularPote } from "@/lib/pote";
 import { formatarReais } from "@/lib/format";
 import { excluirDistribuicaoPote } from "@/lib/actions/pote";
 import { DistribuirButton } from "./distribuir-button";
+import { SimuladorDistribuicao } from "./simulador-distribuicao";
 import { EditarPagamento } from "../editar-pagamento";
 import { Valor } from "../../valor";
 
@@ -25,7 +26,7 @@ export default async function RateioAssinaturaPage({
   const competencia =
     competenciaParam && /^\d{4}-\d{2}$/.test(competenciaParam) ? competenciaParam : competenciaAtual();
 
-  const [distribuicaoExistente, historico] = await Promise.all([
+  const [distribuicaoExistente, historico, servicos, barbeiros] = await Promise.all([
     prisma.distribuicaoPote.findUnique({
       where: { competencia },
       include: { itens: { include: { barbeiro: true }, orderBy: { valorCentavos: "desc" } } },
@@ -36,6 +37,8 @@ export default async function RateioAssinaturaPage({
       orderBy: { competencia: "desc" },
       take: 6,
     }),
+    prisma.servico.findMany({ where: { ativo: true, fichas: { gt: 0 } }, orderBy: { nome: "asc" }, select: { id: true, nome: true, fichas: true } }),
+    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" }, select: { id: true, nome: true } }),
   ]);
 
   const preview = distribuicaoExistente ? null : await calcularPote(competencia);
@@ -170,6 +173,8 @@ export default async function RateioAssinaturaPage({
           </div>
         </div>
       )}
+
+      <SimuladorDistribuicao servicos={servicos} barbeiros={barbeiros} />
 
       {historico.length > 0 && (
         <>
