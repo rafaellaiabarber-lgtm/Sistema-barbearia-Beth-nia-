@@ -22,7 +22,7 @@ export function CampanhaRow({
 
   return (
     <div
-      className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm ${
+      className={`bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm ${
         !ativa ? "opacity-50" : ""
       }`}
     >
@@ -33,18 +33,18 @@ export function CampanhaRow({
             {titulo ? ` — ${titulo}` : ""}
             {completa && ativa && <span className="ml-2 text-green-600 text-sm font-medium">🎉 Completa!</span>}
           </p>
-          <p className="text-slate-500 dark:text-slate-400 text-xs">
+          <p className="text-neutral-500 dark:text-neutral-400 text-xs">
             criada em {criadoEm.toLocaleDateString("pt-BR")} {!ativa && "· encerrada"}
           </p>
         </div>
         <div className="flex items-center gap-4">
           <form action={alternarAtivaCampanha.bind(null, id, !ativa)}>
-            <button className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400">
+            <button className="text-sm text-neutral-600 dark:text-neutral-300 hover:text-orange-600 dark:hover:text-orange-400">
               {ativa ? "Encerrar" : "Reativar"}
             </button>
           </form>
           <form action={excluirCampanha.bind(null, id)}>
-            <button className="text-sm text-slate-400 dark:text-slate-500 hover:text-red-600">Excluir</button>
+            <button className="text-sm text-neutral-400 dark:text-neutral-500 hover:text-red-600">Excluir</button>
           </form>
         </div>
       </div>
@@ -55,7 +55,7 @@ export function CampanhaRow({
             <div
               key={item.itemId}
               className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm ${
-                feito ? "bg-green-50 dark:bg-green-950 text-green-700" : "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                feito ? "bg-green-50 dark:bg-green-950 text-green-700" : "bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200"
               }`}
             >
               <span>

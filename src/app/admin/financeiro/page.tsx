@@ -119,38 +119,38 @@ export default async function FinanceiroPage({
       />
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Faturamento total</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(totalCentavos)}</Valor></p>
-          <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Faturamento total</p>
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400"><Valor>{formatarReais(totalCentavos)}</Valor></p>
+          <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">
             serviços <Valor>{formatarReais(totalServicosCentavos)}</Valor> · produtos <Valor>{formatarReais(totalProdutosCentavos)}</Valor>
           </p>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Atendimentos concluídos</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{atendimentos.length}</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Atendimentos concluídos</p>
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{atendimentos.length}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Despesas no período</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Despesas no período</p>
           <p className="text-2xl font-bold text-red-600"><Valor>{formatarReais(totalDespesasCentavos)}</Valor></p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">Faturamento por forma de pagamento</h2>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 mb-3">Faturamento por forma de pagamento</h2>
           {porFormaPagamento.size === 0 ? (
-            <p className="text-slate-400 dark:text-slate-500 text-sm">Sem lançamentos com forma de pagamento no período.</p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-sm">Sem lançamentos com forma de pagamento no período.</p>
           ) : (
             <div className="space-y-2 mb-3">
               {[...porFormaPagamento.entries()].map(([forma, valor]) => (
                 <div key={forma}>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600 dark:text-slate-300">{LABEL_FORMA_PAGAMENTO[forma] ?? forma}</span>
-                    <span className="font-semibold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(valor)}</Valor></span>
+                    <span className="text-neutral-600 dark:text-neutral-300">{LABEL_FORMA_PAGAMENTO[forma] ?? forma}</span>
+                    <span className="font-semibold text-orange-600 dark:text-orange-400"><Valor>{formatarReais(valor)}</Valor></span>
                   </div>
                   {forma === "CARTAO" && taxaCartaoEstimadaCentavos !== null && (
-                    <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 pl-2">
+                    <div className="flex items-center justify-between text-xs text-neutral-400 dark:text-neutral-500 pl-2">
                       <span>Taxa estimada da maquininha</span>
                       <span>-<Valor>{formatarReais(taxaCartaoEstimadaCentavos)}</Valor></span>
                     </div>
@@ -159,19 +159,19 @@ export default async function FinanceiroPage({
               ))}
             </div>
           )}
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+          <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800">
             <TaxaCartaoForm taxaCartaoPercentualX100={taxaCartaoPercentualX100} />
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">Despesas por categoria</h2>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 mb-3">Despesas por categoria</h2>
           {despesasPorCategoria.size === 0 ? (
-            <p className="text-slate-400 dark:text-slate-500 text-sm">Nenhuma despesa lançada no período.</p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-sm">Nenhuma despesa lançada no período.</p>
           ) : (
             <div className="space-y-2">
               {[...despesasPorCategoria.entries()].map(([categoria, valor]) => (
                 <div key={categoria} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600 dark:text-slate-300">{LABEL_CATEGORIA_DESPESA[categoria] ?? categoria}</span>
+                  <span className="text-neutral-600 dark:text-neutral-300">{LABEL_CATEGORIA_DESPESA[categoria] ?? categoria}</span>
                   <span className="font-semibold text-red-600"><Valor>{formatarReais(valor)}</Valor></span>
                 </div>
               ))}
@@ -185,36 +185,36 @@ export default async function FinanceiroPage({
         {[...porBarbeiro.values()].map((b) => (
           <div
             key={b.nome}
-            className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
+            className="flex items-center justify-between bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm"
           >
             <div>
               <p className="font-semibold">{b.nome}</p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">{b.qtd} atendimento(s)</p>
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm">{b.qtd} atendimento(s)</p>
             </div>
             <div className="text-right">
-              <p className="text-blue-600 dark:text-blue-400 font-semibold"><Valor>{formatarReais(b.totalCentavos)}</Valor></p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">comissão: <Valor>{formatarReais(b.comissaoCentavos)}</Valor></p>
+              <p className="text-orange-600 dark:text-orange-400 font-semibold"><Valor>{formatarReais(b.totalCentavos)}</Valor></p>
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm">comissão: <Valor>{formatarReais(b.comissaoCentavos)}</Valor></p>
             </div>
           </div>
         ))}
-        {porBarbeiro.size === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum atendimento no período.</p>}
+        {porBarbeiro.size === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum atendimento no período.</p>}
       </div>
 
       <h2 className="text-lg font-semibold mb-3">Atendimentos</h2>
       <div className="space-y-2">
         {atendimentos.map((a) => (
-          <div key={a.id} className="flex flex-col gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm shadow-sm">
+          <div key={a.id} className="flex flex-col gap-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 text-sm shadow-sm">
             <div className="flex items-center justify-between gap-2">
               <div>
-                <p className="text-slate-800 dark:text-slate-100">
+                <p className="text-neutral-800 dark:text-neutral-100">
                   {a.cliente.nome} — {a.servicos.map((s) => s.nomeSnapshot).join(", ")}
                 </p>
-                <p className="text-slate-400 dark:text-slate-500">
+                <p className="text-neutral-400 dark:text-neutral-500">
                   {a.barbeiro?.nome ?? "—"} · {a.concluidoEm?.toLocaleString("pt-BR")}
                 </p>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <p className="text-blue-600 dark:text-blue-400 font-semibold"><Valor>{formatarReais(a.precoTotalCentavos)}</Valor></p>
+                <p className="text-orange-600 dark:text-orange-400 font-semibold"><Valor>{formatarReais(a.precoTotalCentavos)}</Valor></p>
                 <BotaoExcluirAtendimento atendimentoId={a.id} />
               </div>
             </div>
@@ -224,10 +224,10 @@ export default async function FinanceiroPage({
               concluidoEmValor={a.concluidoEm ? paraCampoDataHora(a.concluidoEm) : ""}
             />
             {a.barbeiro && (
-              <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-slate-800">
+              <div className="space-y-1 pt-1 border-t border-neutral-100 dark:border-neutral-800">
                 {a.servicos.map((s) => (
                   <div key={s.id} className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-slate-400 dark:text-slate-500 text-xs">
+                    <span className="text-neutral-400 dark:text-neutral-500 text-xs">
                       {s.nomeSnapshot} · comissão{" "}
                       <Valor>{formatarReais(comissaoServicos([s], a.barbeiro!.comissaoPercentual))}</Valor>
                     </span>
@@ -241,7 +241,7 @@ export default async function FinanceiroPage({
             )}
           </div>
         ))}
-        {atendimentos.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum atendimento no período.</p>}
+        {atendimentos.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum atendimento no período.</p>}
       </div>
     </div>
   );

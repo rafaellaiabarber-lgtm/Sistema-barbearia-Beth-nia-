@@ -69,7 +69,7 @@ export function ConcluirForm({
         </label>
       )}
 
-      <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
+      <p className="text-neutral-700 dark:text-neutral-200 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
       <div className="grid grid-cols-2 gap-2 mb-3">
         {servicos.map((s) => {
           const ativo = selecionados.includes(s.id);
@@ -80,12 +80,12 @@ export function ConcluirForm({
               onClick={() => alternarServico(s.id)}
               className={`rounded-lg border-2 px-3 py-2 text-left text-sm transition-colors ${
                 ativo
-                  ? "border-blue-600 bg-blue-50 dark:bg-blue-950"
-                  : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300"
+                  ? "border-orange-600 bg-orange-50 dark:bg-orange-950"
+                  : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300"
               }`}
             >
-              <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
-              <span className="block text-blue-600 dark:text-blue-400 text-xs">
+              <span className="block text-neutral-900 dark:text-white font-medium">{s.nome}</span>
+              <span className="block text-orange-600 dark:text-orange-400 text-xs">
                 {cobertoPorAssinatura ? "coberto pela assinatura" : <Valor>{formatarReais(s.precoCentavos)}</Valor>}
               </span>
             </button>
@@ -98,7 +98,7 @@ export function ConcluirForm({
 
       {produtos.length > 0 && (
         <>
-          <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Produto(s) vendido(s) (opcional):</p>
+          <p className="text-neutral-700 dark:text-neutral-200 text-sm font-semibold mb-2">Produto(s) vendido(s) (opcional):</p>
           <div className="space-y-2 mb-3">
             {produtos.map((p) => {
               const quantidade = quantidadesProduto[p.id] ?? 0;
@@ -107,28 +107,28 @@ export function ConcluirForm({
                   key={p.id}
                   className={`flex items-center justify-between gap-3 rounded-lg border-2 px-3 py-2 text-sm transition-colors ${
                     quantidade > 0
-                      ? "border-blue-600 bg-blue-50 dark:bg-blue-950"
-                      : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+                      ? "border-orange-600 bg-orange-50 dark:bg-orange-950"
+                      : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900"
                   }`}
                 >
                   <div>
-                    <span className="block text-slate-900 dark:text-white font-medium">{p.nome}</span>
-                    <span className="block text-blue-600 dark:text-blue-400 text-xs"><Valor>{formatarReais(p.precoCentavos)}</Valor></span>
+                    <span className="block text-neutral-900 dark:text-white font-medium">{p.nome}</span>
+                    <span className="block text-orange-600 dark:text-orange-400 text-xs"><Valor>{formatarReais(p.precoCentavos)}</Valor></span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={() => ajustarQuantidadeProduto(p.id, -1)}
                       disabled={quantidade === 0}
-                      className="w-8 h-8 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 disabled:opacity-40 font-bold"
+                      className="w-8 h-8 rounded-lg border border-neutral-300 dark:border-neutral-600 text-neutral-600 dark:text-neutral-300 disabled:opacity-40 font-bold"
                     >
                       −
                     </button>
-                    <span className="w-5 text-center font-semibold text-slate-900 dark:text-white">{quantidade}</span>
+                    <span className="w-5 text-center font-semibold text-neutral-900 dark:text-white">{quantidade}</span>
                     <button
                       type="button"
                       onClick={() => ajustarQuantidadeProduto(p.id, 1)}
-                      className="w-8 h-8 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 font-bold"
+                      className="w-8 h-8 rounded-lg border border-neutral-300 dark:border-neutral-600 text-neutral-600 dark:text-neutral-300 font-bold"
                     >
                       +
                     </button>
@@ -147,12 +147,12 @@ export function ConcluirForm({
       )}
 
       {totalCentavos > 0 && (
-        <p className="text-blue-600 dark:text-blue-400 font-semibold mb-3">Total: <Valor>{formatarReais(totalCentavos)}</Valor></p>
+        <p className="text-orange-600 dark:text-orange-400 font-semibold mb-3">Total: <Valor>{formatarReais(totalCentavos)}</Valor></p>
       )}
 
       {precisaFormaPagamento && (
         <>
-          <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Forma de pagamento:</p>
+          <p className="text-neutral-700 dark:text-neutral-200 text-sm font-semibold mb-2">Forma de pagamento:</p>
           <div className="mb-3">
             <SeletorFormaPagamento />
           </div>

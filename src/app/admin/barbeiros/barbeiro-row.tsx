@@ -25,31 +25,31 @@ export function BarbeiroRow({ barbeiro }: { barbeiro: Barbeiro & { usuario: Usua
   return (
     <div
       ref={rowRef}
-      className={`flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm scroll-mt-20 ${
+      className={`flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm scroll-mt-20 ${
         !barbeiro.ativo ? "opacity-50" : ""
       }`}
     >
       {editando ? (
         <form ref={formRef} action={formAction} className="flex flex-wrap items-end gap-3 w-full">
           <div className="w-full sm:w-auto">
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Nome</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Nome</label>
             <input
               name="nome"
               required
               defaultValue={barbeiro.nome}
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-full sm:w-40"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-full sm:w-40"
             />
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Telefone</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Telefone</label>
             <input
               name="telefone"
               defaultValue={barbeiro.telefone ?? ""}
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-36"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-36"
             />
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Comissão (%)</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Comissão (%)</label>
             <input
               name="comissao"
               type="number"
@@ -57,28 +57,28 @@ export function BarbeiroRow({ barbeiro }: { barbeiro: Barbeiro & { usuario: Usua
               max={100}
               required
               defaultValue={barbeiro.comissaoPercentual}
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-20"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-20"
             />
           </div>
           {barbeiro.usuario && (
             <>
               <div>
-                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Usuário (login)</label>
+                <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Usuário (login)</label>
                 <input
                   name="login"
                   required
                   defaultValue={barbeiro.usuario.login}
-                  className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-32"
+                  className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-32"
                 />
               </div>
               <div>
-                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Nova senha</label>
+                <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Nova senha</label>
                 <input
                   name="senha"
                   type="password"
                   placeholder="deixe em branco pra manter"
                   autoComplete="new-password"
-                  className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-44"
+                  className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-44"
                 />
               </div>
             </>
@@ -86,14 +86,14 @@ export function BarbeiroRow({ barbeiro }: { barbeiro: Barbeiro & { usuario: Usua
           <button
             type="submit"
             disabled={pendente}
-            className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold px-3 py-2"
+            className="rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white text-sm font-semibold px-3 py-2"
           >
             {pendente ? "Salvando..." : "Salvar"}
           </button>
           <button
             type="button"
             onClick={() => setEditando(false)}
-            className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 px-2 py-2"
+            className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 px-2 py-2"
           >
             Cancelar
           </button>
@@ -105,7 +105,7 @@ export function BarbeiroRow({ barbeiro }: { barbeiro: Barbeiro & { usuario: Usua
             <FotoBarbeiroForm barbeiroId={barbeiro.id} nome={barbeiro.nome} fotoUrl={barbeiro.fotoUrl} />
             <div>
               <p className="font-semibold">{barbeiro.nome}</p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm">
                 {barbeiro.telefone ?? "sem telefone"} · comissão {barbeiro.comissaoPercentual}% · login:{" "}
                 {barbeiro.usuario?.login}
               </p>
@@ -115,12 +115,12 @@ export function BarbeiroRow({ barbeiro }: { barbeiro: Barbeiro & { usuario: Usua
             <button
               type="button"
               onClick={() => setEditando(true)}
-              className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400"
+              className="text-sm text-neutral-600 dark:text-neutral-300 hover:text-orange-600 dark:hover:text-orange-400"
             >
               Editar
             </button>
             <form action={alternarAtivoBarbeiro.bind(null, barbeiro.id, !barbeiro.ativo)}>
-              <button className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400">
+              <button className="text-sm text-neutral-600 dark:text-neutral-300 hover:text-orange-600 dark:hover:text-orange-400">
                 {barbeiro.ativo ? "Desativar" : "Ativar"}
               </button>
             </form>
@@ -133,7 +133,7 @@ export function BarbeiroRow({ barbeiro }: { barbeiro: Barbeiro & { usuario: Usua
                   }
                 }}
               >
-                <button type="submit" className="text-sm text-slate-400 dark:text-slate-500 hover:text-red-600">
+                <button type="submit" className="text-sm text-neutral-400 dark:text-neutral-500 hover:text-red-600">
                   Excluir
                 </button>
               </form>

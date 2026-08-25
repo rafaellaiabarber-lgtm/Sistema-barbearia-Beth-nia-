@@ -18,17 +18,17 @@ export function CustoServicoForm({
 
   return (
     <form ref={formRef} action={formAction} className="flex items-center gap-1.5">
-      <span className="text-xs text-slate-400 dark:text-slate-500">R$</span>
+      <span className="text-xs text-neutral-400 dark:text-neutral-500">R$</span>
       <input
         name="custo"
         defaultValue={(custoCentavos / 100).toFixed(2).replace(".", ",")}
         placeholder="0,00"
-        className="w-16 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1 text-xs"
+        className="w-16 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-2 py-1 text-xs"
       />
       <button
         type="submit"
         disabled={pendente}
-        className="text-xs text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-60"
+        className="text-xs text-orange-600 dark:text-orange-400 hover:underline disabled:opacity-60"
       >
         {pendente ? "..." : "Salvar"}
       </button>

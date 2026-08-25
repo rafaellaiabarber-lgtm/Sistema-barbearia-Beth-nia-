@@ -14,7 +14,7 @@ export function RankingLista({
 }) {
   if (ranking.length === 0) {
     return (
-      <p className="text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+      <p className="text-neutral-400 dark:text-neutral-500 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
         Nenhum barbeiro ativo ainda.
       </p>
     );
@@ -27,7 +27,7 @@ export function RankingLista({
   return (
     <div>
       {temPremioConfigurado && pontuacaoMinima !== null && (
-        <p className="text-slate-500 dark:text-slate-400 text-xs mb-2">
+        <p className="text-neutral-500 dark:text-neutral-400 text-xs mb-2">
           Prêmio só vale a partir de {pontuacaoMinima} pontos.
         </p>
       )}
@@ -40,11 +40,11 @@ export function RankingLista({
           return (
             <div
               key={p.barbeiroId}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm text-center"
+              className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm text-center"
             >
               <p className="text-3xl mb-1">{MEDALHA[p.posicao]}</p>
               <p className="font-semibold">{p.nome}</p>
-              <p className="text-blue-600 dark:text-blue-400 font-bold text-lg">{p.pontos} pts</p>
+              <p className="text-orange-600 dark:text-orange-400 font-bold text-lg">{p.pontos} pts</p>
               {premio !== null && (
                 <p className="text-green-600 text-xs font-medium mt-1">Prêmio: {premio}</p>
               )}
@@ -63,12 +63,12 @@ export function RankingLista({
           {resto.map((p) => (
             <div
               key={p.barbeiroId}
-              className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 shadow-sm"
+              className="flex items-center justify-between bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-2.5 shadow-sm"
             >
-              <span className="text-slate-500 dark:text-slate-400 text-sm">
+              <span className="text-neutral-500 dark:text-neutral-400 text-sm">
                 {p.posicao}º · {p.nome}
               </span>
-              <span className="text-slate-700 dark:text-slate-200 font-semibold text-sm">{p.pontos} pts</span>
+              <span className="text-neutral-700 dark:text-neutral-200 font-semibold text-sm">{p.pontos} pts</span>
             </div>
           ))}
         </div>

@@ -85,7 +85,7 @@ export function MetaCard({
 
   if (editando) {
     return (
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
         <form action={formAction}>
           <input type="hidden" name="metaId" value={metaId} />
           <input type="hidden" name="barbeiroId" value={barbeiroId} />
@@ -94,30 +94,30 @@ export function MetaCard({
 
           <div className="flex flex-wrap items-end gap-3 mb-3">
             <div>
-              <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Data início</label>
+              <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Data início</label>
               <input
                 name="dataInicio"
                 type="date"
                 defaultValue={paraInputDate(dataInicio)}
-                className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Data fim</label>
+              <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Data fim</label>
               <input
                 name="dataFim"
                 type="date"
                 defaultValue={paraInputDate(dataFim)}
-                className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
               />
             </div>
             {ehVendaProduto ? (
               <div>
-                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Produto</label>
+                <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Produto</label>
                 <select
                   name="produtoId"
                   defaultValue={produtoId ?? ""}
-                  className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                  className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
                 >
                   <option value="">Todos os produtos</option>
                   {produtos.map((p) => (
@@ -129,11 +129,11 @@ export function MetaCard({
               </div>
             ) : (
               <div>
-                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Serviço</label>
+                <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Serviço</label>
                 <select
                   name="servicoId"
                   defaultValue={servicoId ?? ""}
-                  className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                  className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
                 >
                   <option value="">Todos os serviços</option>
                   {servicos.map((s) => (
@@ -145,7 +145,7 @@ export function MetaCard({
               </div>
             )}
           </div>
-          <p className="text-slate-400 dark:text-slate-500 text-xs mb-3">Deixe as datas em branco pra usar sempre o mês atual.</p>
+          <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-3">Deixe as datas em branco pra usar sempre o mês atual.</p>
 
           <NivelInputs
             tipo={tipo}
@@ -160,14 +160,14 @@ export function MetaCard({
             <button
               type="submit"
               disabled={pendente}
-              className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold px-4 py-2"
+              className="rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white text-sm font-semibold px-4 py-2"
             >
               {pendente ? "Salvando..." : "Salvar"}
             </button>
             <button
               type="button"
               onClick={() => setEditando(false)}
-              className="text-slate-500 dark:text-slate-400 hover:text-slate-800 text-sm"
+              className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 text-sm"
             >
               Cancelar
             </button>
@@ -178,15 +178,15 @@ export function MetaCard({
   }
 
   return (
-    <div className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm ${!ativa ? "opacity-50" : ""}`}>
+    <div className={`bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm ${!ativa ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between mb-1">
         <p className="font-semibold">{LABEL_TIPO_META[tipo]}</p>
         <div className="flex items-center gap-3">
-          <button type="button" onClick={() => setEditando(true)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">
+          <button type="button" onClick={() => setEditando(true)} className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-orange-600 dark:hover:text-orange-400">
             Editar
           </button>
           <form action={alternarAtivaMeta.bind(null, metaId, !ativa)}>
-            <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">{ativa ? "Desativar" : "Ativar"}</button>
+            <button className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-orange-600 dark:hover:text-orange-400">{ativa ? "Desativar" : "Ativar"}</button>
           </form>
           <form
             action={excluirMeta.bind(null, metaId)}
@@ -194,13 +194,13 @@ export function MetaCard({
               if (!confirm(`Excluir a meta de ${LABEL_TIPO_META[tipo]}?`)) e.preventDefault();
             }}
           >
-            <button className="text-sm text-slate-400 dark:text-slate-500 hover:text-red-600">Excluir</button>
+            <button className="text-sm text-neutral-400 dark:text-neutral-500 hover:text-red-600">Excluir</button>
           </form>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-1 mb-3">
-        <span className="inline-block rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 text-xs px-2 py-0.5">
+        <span className="inline-block rounded-full bg-orange-50 dark:bg-orange-950 text-orange-700 text-xs px-2 py-0.5">
           Período: {periodoTexto}
         </span>
         {escopoTexto && (
@@ -215,7 +215,7 @@ export function MetaCard({
           <span
             key={n.ordem}
             className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
-              n.atingido ? "bg-green-100 dark:bg-green-900 text-green-700" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+              n.atingido ? "bg-green-100 dark:bg-green-900 text-green-700" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400"
             }`}
           >
             {n.atingido ? "✓" : "○"} {n.nome} — {formatarValorMeta(tipo, n.valorAlvo)}
@@ -224,13 +224,13 @@ export function MetaCard({
         ))}
       </div>
 
-      <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
+      <div className="w-full h-2 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden mb-1">
         <div
-          className={`h-full rounded-full ${atual ? "bg-green-500" : "bg-blue-500"}`}
+          className={`h-full rounded-full ${atual ? "bg-green-500" : "bg-orange-500"}`}
           style={{ width: `${percentualAteProximo}%` }}
         />
       </div>
-      <p className="text-xs text-slate-500 dark:text-slate-400">
+      <p className="text-xs text-neutral-500 dark:text-neutral-400">
         Atual: {formatarValorMeta(tipo, valorAtual)}
         {proximo && ` · faltam ${formatarValorMeta(tipo, Math.max(proximo.valorAlvo - valorAtual, 0))} para ${proximo.nome}`}
         {!proximo && atual && " · todos os níveis atingidos! 🎉"}

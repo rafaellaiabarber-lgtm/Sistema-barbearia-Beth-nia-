@@ -39,42 +39,42 @@ export function NivelInputs({
         {niveis.map((n, i) => (
           <div key={i} className="flex flex-wrap items-end gap-2">
             <div>
-              <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Nível {i + 1}</label>
+              <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Nível {i + 1}</label>
               <input
                 name="nivelNome"
                 required
                 placeholder="Nome"
                 value={n.nome}
                 onChange={(e) => atualizar(i, "nome", e.target.value)}
-                className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1.5 text-sm w-28"
+                className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-2 py-1.5 text-sm w-28"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">{emCentavos ? "Alvo (R$)" : "Alvo (qtd)"}</label>
+              <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">{emCentavos ? "Alvo (R$)" : "Alvo (qtd)"}</label>
               <input
                 name="nivelValor"
                 required
                 placeholder={emCentavos ? "3000,00" : "80"}
                 value={n.valor}
                 onChange={(e) => atualizar(i, "valor", e.target.value)}
-                className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1.5 text-sm w-28"
+                className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-2 py-1.5 text-sm w-28"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Bônus (R$)</label>
+              <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Bônus (R$)</label>
               <input
                 name="nivelBonificacao"
                 placeholder="0,00"
                 value={n.bonificacao}
                 onChange={(e) => atualizar(i, "bonificacao", e.target.value)}
-                className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1.5 text-sm w-24"
+                className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-2 py-1.5 text-sm w-24"
               />
             </div>
             {niveis.length > 1 && (
               <button
                 type="button"
                 onClick={() => remover(i)}
-                className="text-slate-400 dark:text-slate-500 hover:text-red-600 text-sm py-1.5"
+                className="text-neutral-400 dark:text-neutral-500 hover:text-red-600 text-sm py-1.5"
               >
                 Remover
               </button>
@@ -82,7 +82,7 @@ export function NivelInputs({
           </div>
         ))}
       </div>
-      <button type="button" onClick={adicionar} className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
+      <button type="button" onClick={adicionar} className="text-orange-600 dark:text-orange-400 hover:underline text-sm">
         + Adicionar nível
       </button>
     </div>

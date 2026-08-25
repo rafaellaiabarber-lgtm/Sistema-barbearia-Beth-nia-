@@ -17,7 +17,7 @@ export function JornadaForm({ barbeiroId, jornadas }: { barbeiroId: string; jorn
 
   return (
     <details className="mt-4">
-      <summary className="cursor-pointer text-sm text-blue-600 dark:text-blue-400 hover:underline select-none">
+      <summary className="cursor-pointer text-sm text-orange-600 dark:text-orange-400 hover:underline select-none">
         Horário de trabalho — {formatarJornada(jornadas)}
       </summary>
       <form action={formAction} className="mt-3 space-y-2">
@@ -31,7 +31,7 @@ export function JornadaForm({ barbeiroId, jornadas }: { barbeiroId: string; jorn
                   name={`ativo-${dia}`}
                   defaultChecked={ativos[dia]}
                   onChange={(e) => setAtivos((atual) => ({ ...atual, [dia]: e.target.checked }))}
-                  className="accent-blue-600"
+                  className="accent-orange-600"
                 />
                 {NOMES_DIAS_SEMANA[dia]}
               </label>
@@ -40,43 +40,43 @@ export function JornadaForm({ barbeiroId, jornadas }: { barbeiroId: string; jorn
                 name={`inicio-${dia}`}
                 defaultValue={jornada?.horaInicio ?? "09:00"}
                 disabled={!ativos[dia]}
-                className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1 text-sm disabled:opacity-40"
+                className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-2 py-1 text-sm disabled:opacity-40"
               />
-              <span className="text-slate-400">até</span>
+              <span className="text-neutral-400">até</span>
               <input
                 type="time"
                 name={`fim-${dia}`}
                 defaultValue={jornada?.horaFim ?? "18:00"}
                 disabled={!ativos[dia]}
-                className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1 text-sm disabled:opacity-40"
+                className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-2 py-1 text-sm disabled:opacity-40"
               />
-              <span className="text-slate-400 text-xs ml-2">almoço</span>
+              <span className="text-neutral-400 text-xs ml-2">almoço</span>
               <input
                 type="time"
                 name={`almoco-inicio-${dia}`}
                 defaultValue={jornada?.almocoInicio ?? ""}
                 disabled={!ativos[dia]}
-                className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1 text-sm disabled:opacity-40"
+                className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-2 py-1 text-sm disabled:opacity-40"
               />
-              <span className="text-slate-400">até</span>
+              <span className="text-neutral-400">até</span>
               <input
                 type="time"
                 name={`almoco-fim-${dia}`}
                 defaultValue={jornada?.almocoFim ?? ""}
                 disabled={!ativos[dia]}
-                className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1 text-sm disabled:opacity-40"
+                className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-2 py-1 text-sm disabled:opacity-40"
               />
             </div>
           );
         })}
-        <p className="text-slate-400 dark:text-slate-500 text-xs">
+        <p className="text-neutral-400 dark:text-neutral-500 text-xs">
           Almoço é opcional — deixe os dois campos em branco se o barbeiro não tiver horário fixo de almoço nesse dia.
         </p>
         <div className="flex items-center gap-3 pt-1">
           <button
             type="submit"
             disabled={pendente}
-            className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold px-3 py-1.5"
+            className="rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white text-sm font-semibold px-3 py-1.5"
           >
             {pendente ? "Salvando..." : "Salvar horário"}
           </button>

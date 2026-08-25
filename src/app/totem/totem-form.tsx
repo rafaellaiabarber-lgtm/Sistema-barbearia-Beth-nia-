@@ -38,20 +38,20 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
           // eslint-disable-next-line @next/next/no-img-element
           <img src={logoUrl} alt="Logo" className="h-14 mx-auto mb-4 object-contain" />
         )}
-        <p className="text-slate-300 text-lg mb-2">Você entrou na fila!</p>
-        <p className="text-7xl font-black text-blue-400 mb-4">{estado.posicao}º</p>
+        <p className="text-neutral-300 text-lg mb-2">Você entrou na fila!</p>
+        <p className="text-7xl font-black text-orange-400 mb-4">{estado.posicao}º</p>
         {estado.acompanhanteNome && estado.acompanhantePosicao && (
-          <p className="text-slate-300 mb-2">
+          <p className="text-neutral-300 mb-2">
             {estado.acompanhanteNome} também entrou na fila, na posição{" "}
-            <span className="font-bold text-blue-400">{estado.acompanhantePosicao}º</span>.
+            <span className="font-bold text-orange-400">{estado.acompanhantePosicao}º</span>.
           </p>
         )}
-        <p className="text-slate-200 mb-8">
+        <p className="text-neutral-200 mb-8">
           É só aguardar, o profissional já vai te chamar.
         </p>
         <a
           href="/totem"
-          className="inline-block rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-6 py-3 transition-colors"
+          className="inline-block rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-lg px-6 py-3 transition-colors"
         >
           Concluir
         </a>
@@ -71,7 +71,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
       ) : (
         <h1 className="text-3xl font-black text-white text-center mb-1">Barbearia Bethânia</h1>
       )}
-      <p className="text-slate-300 text-center mb-8">Toque para entrar na fila</p>
+      <p className="text-neutral-300 text-center mb-8">Toque para entrar na fila</p>
 
       {etapa === "telefone" && (
         <div>
@@ -132,7 +132,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
                 setBoasVindas(false);
                 setClienteInfo(null);
               }}
-              className="flex-1 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-bold text-lg py-4 transition-colors"
+              className="flex-1 rounded-xl bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-700 font-bold text-lg py-4 transition-colors"
             >
               Não
             </button>
@@ -153,7 +153,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
             Como te chamamos?
           </p>
           {boasVindas && (
-            <p className="text-blue-400 text-sm mb-3 text-center">
+            <p className="text-orange-400 text-sm mb-3 text-center">
               Bem-vindo(a) de volta! Confirme ou edite seu nome abaixo.
             </p>
           )}
@@ -176,15 +176,15 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               setNome(e.target.value);
               setBoasVindas(false);
             }}
-            className={`w-full rounded-xl bg-white border text-slate-900 text-2xl text-center px-4 py-4 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              boasVindas ? "border-blue-400" : "border-slate-300"
+            className={`w-full rounded-xl bg-white border text-neutral-900 text-2xl text-center px-4 py-4 mb-6 focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+              boasVindas ? "border-orange-400" : "border-neutral-300"
             }`}
           />
           <div className="flex gap-3">
             <button
               type="button"
               onClick={() => setEtapa("telefone")}
-              className="rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-semibold px-6 py-4"
+              className="rounded-xl bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-700 font-semibold px-6 py-4"
             >
               Voltar
             </button>
@@ -219,13 +219,13 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
                 setBarbeiroPreferidoId(null);
                 setEtapa("acompanhante");
               }}
-              className="rounded-2xl border-2 border-slate-200 hover:border-slate-300 overflow-hidden transition-colors"
+              className="rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 overflow-hidden transition-colors"
             >
-              <div className="w-full aspect-square bg-slate-100 flex items-center justify-center text-6xl">
+              <div className="w-full aspect-square bg-neutral-100 flex items-center justify-center text-6xl">
                 🤝
               </div>
               <div className="py-2 bg-white">
-                <span className="text-slate-900 font-semibold text-sm">Sem preferência</span>
+                <span className="text-neutral-900 font-semibold text-sm">Sem preferência</span>
               </div>
             </button>
 
@@ -237,18 +237,18 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
                   setBarbeiroPreferidoId(b.id);
                   setEtapa("acompanhante");
                 }}
-                className="rounded-2xl border-2 border-slate-200 hover:border-slate-300 overflow-hidden transition-colors"
+                className="rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 overflow-hidden transition-colors"
               >
                 {b.fotoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={b.fotoUrl} alt={b.nome} className="w-full aspect-square object-cover" />
                 ) : (
-                  <div className="w-full aspect-square bg-slate-100 flex items-center justify-center text-6xl">
+                  <div className="w-full aspect-square bg-neutral-100 flex items-center justify-center text-6xl">
                     💈
                   </div>
                 )}
                 <div className="py-2 bg-white">
-                  <span className="text-slate-900 font-semibold text-sm">{b.nome}</span>
+                  <span className="text-neutral-900 font-semibold text-sm">{b.nome}</span>
                 </div>
               </button>
             ))}
@@ -257,7 +257,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
           <button
             type="button"
             onClick={() => setEtapa("nome")}
-            className="rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-semibold px-6 py-4"
+            className="rounded-xl bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-700 font-semibold px-6 py-4"
           >
             Voltar
           </button>
@@ -275,7 +275,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
           <p className="text-white text-xl font-semibold mb-1 text-center">
             Tem alguém com você?
           </p>
-          <p className="text-slate-300 text-sm mb-4 text-center">
+          <p className="text-neutral-300 text-sm mb-4 text-center">
             Se tiver alguém que também vai cortar o cabelo (mesmo sem celular), pode cadastrar aqui.
           </p>
 
@@ -289,8 +289,8 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               }}
               className={`flex-1 rounded-xl border-2 py-4 font-semibold transition-colors ${
                 temAcompanhante === false
-                  ? "border-blue-500 bg-blue-50 text-blue-700"
-                  : "border-white/20 text-slate-200 hover:border-white/40"
+                  ? "border-orange-500 bg-orange-50 text-orange-700"
+                  : "border-white/20 text-neutral-200 hover:border-white/40"
               }`}
             >
               Não, só eu
@@ -300,8 +300,8 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               onClick={() => setTemAcompanhante(true)}
               className={`flex-1 rounded-xl border-2 py-4 font-semibold transition-colors ${
                 temAcompanhante === true
-                  ? "border-blue-500 bg-blue-50 text-blue-700"
-                  : "border-white/20 text-slate-200 hover:border-white/40"
+                  ? "border-orange-500 bg-orange-50 text-orange-700"
+                  : "border-white/20 text-neutral-200 hover:border-white/40"
               }`}
             >
               Sim, tem alguém
@@ -316,7 +316,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
                 placeholder="Nome da pessoa"
                 value={acompanhanteNome}
                 onChange={(e) => setAcompanhanteNome(e.target.value)}
-                className="w-full rounded-xl bg-white border border-slate-300 text-slate-900 text-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-xl bg-white border border-neutral-300 text-neutral-900 text-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
               <input
                 type="tel"
@@ -324,7 +324,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
                 placeholder="Celular (opcional)"
                 value={acompanhanteTelefone}
                 onChange={(e) => setAcompanhanteTelefone(e.target.value)}
-                className="w-full rounded-xl bg-white border border-slate-300 text-slate-900 text-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-xl bg-white border border-neutral-300 text-neutral-900 text-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
           )}
@@ -337,7 +337,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
             <button
               type="button"
               onClick={() => setEtapa("barbeiro")}
-              className="rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-semibold px-6 py-4"
+              className="rounded-xl bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-700 font-semibold px-6 py-4"
             >
               Voltar
             </button>

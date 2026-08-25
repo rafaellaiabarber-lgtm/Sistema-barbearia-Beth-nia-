@@ -11,7 +11,7 @@ export default async function TreinamentoPage() {
     <div className="p-6">
       <header className="mb-6">
         <h1 className="text-2xl font-bold">Treinamento</h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm">
+        <p className="text-neutral-500 dark:text-neutral-400 text-sm">
           Cronograma, POP e vídeo-aulas da barbearia.
         </p>
       </header>
@@ -20,18 +20,18 @@ export default async function TreinamentoPage() {
         {materiais.map((m) => (
           <div
             key={m.id}
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
+            className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm"
           >
             <p className="font-semibold mb-2">{m.titulo}</p>
             {m.tipo === "TEXTO" && (
-              <p className="text-slate-600 dark:text-slate-300 text-sm whitespace-pre-wrap">{m.conteudo}</p>
+              <p className="text-neutral-600 dark:text-neutral-300 text-sm whitespace-pre-wrap">{m.conteudo}</p>
             )}
             {m.tipo === "LINK" && (
               <a
                 href={m.conteudo}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+                className="text-orange-600 dark:text-orange-400 hover:underline text-sm"
               >
                 Abrir material →
               </a>
@@ -41,7 +41,7 @@ export default async function TreinamentoPage() {
                 href={m.conteudo}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+                className="text-orange-600 dark:text-orange-400 hover:underline text-sm"
               >
                 Baixar arquivo →
               </a>
@@ -61,7 +61,7 @@ export default async function TreinamentoPage() {
                   href={m.conteudo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+                  className="text-orange-600 dark:text-orange-400 hover:underline text-sm"
                 >
                   Assistir vídeo →
                 </a>
@@ -69,7 +69,7 @@ export default async function TreinamentoPage() {
           </div>
         ))}
         {materiais.length === 0 && (
-          <p className="text-slate-400 dark:text-slate-500">Nenhum material de treinamento por aqui ainda.</p>
+          <p className="text-neutral-400 dark:text-neutral-500">Nenhum material de treinamento por aqui ainda.</p>
         )}
       </div>
     </div>

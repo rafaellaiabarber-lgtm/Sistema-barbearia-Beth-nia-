@@ -35,19 +35,19 @@ export function NovaVendaProdutoForm({ barbeiros, produtos }: { barbeiros: Barbe
   if (produtos.length === 0) return null;
 
   return (
-    <details className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm">
-      <summary className="cursor-pointer font-semibold text-slate-800 dark:text-slate-100 select-none">Nova venda de produto</summary>
+    <details className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 mb-6 shadow-sm">
+      <summary className="cursor-pointer font-semibold text-neutral-800 dark:text-neutral-100 select-none">Nova venda de produto</summary>
       <form ref={formRef} action={formAction} className="mt-4">
         <div className="flex flex-wrap items-end gap-3 mb-4">
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Produto</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Produto</label>
             <select
               ref={produtoSelectRef}
               name="produtoId"
               required
               value={produtoId}
               onChange={(e) => setProdutoId(e.target.value)}
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-48"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-48"
             >
               <option value="" disabled>
                 Escolha
@@ -60,12 +60,12 @@ export function NovaVendaProdutoForm({ barbeiros, produtos }: { barbeiros: Barbe
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Barbeiro</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Barbeiro</label>
             <select
               name="barbeiroId"
               required
               defaultValue=""
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
             >
               <option value="" disabled>
                 Escolha
@@ -78,24 +78,24 @@ export function NovaVendaProdutoForm({ barbeiros, produtos }: { barbeiros: Barbe
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Quantidade</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Quantidade</label>
             <input
               name="quantidade"
               type="number"
               min={1}
               defaultValue={1}
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-20"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-20"
             />
           </div>
         </div>
 
         {produtoSelecionado && (
-          <p className="text-blue-600 dark:text-blue-400 font-semibold mb-3">
+          <p className="text-orange-600 dark:text-orange-400 font-semibold mb-3">
             Preço unitário: <Valor>{formatarReais(produtoSelecionado.precoCentavos)}</Valor>
           </p>
         )}
 
-        <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Forma de pagamento:</p>
+        <p className="text-neutral-700 dark:text-neutral-200 text-sm font-semibold mb-2">Forma de pagamento:</p>
         <div className="mb-3 max-w-sm">
           <SeletorFormaPagamento />
         </div>
@@ -105,7 +105,7 @@ export function NovaVendaProdutoForm({ barbeiros, produtos }: { barbeiros: Barbe
         <button
           type="submit"
           disabled={pendente}
-          className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+          className="rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
         >
           {pendente ? "Registrando..." : "Registrar venda"}
         </button>

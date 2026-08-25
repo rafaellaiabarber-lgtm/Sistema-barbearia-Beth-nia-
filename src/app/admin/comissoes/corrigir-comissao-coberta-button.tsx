@@ -30,11 +30,11 @@ export function CorrigirComissaoCobertaButton() {
         type="button"
         onClick={corrigir}
         disabled={pendente}
-        className="text-sm text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-60"
+        className="text-sm text-orange-600 dark:text-orange-400 hover:underline disabled:opacity-60"
       >
         {pendente ? "Corrigindo..." : "Corrigir comissão de atendimentos antigos cobertos pela assinatura"}
       </button>
-      <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">
+      <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">
         Corrige de uma vez só os atendimentos cobertos pela assinatura que ficaram com comissão zerada antes
         dessa correção existir, usando o preço atual do serviço.
       </p>

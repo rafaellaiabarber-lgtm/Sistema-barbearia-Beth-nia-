@@ -143,19 +143,19 @@ export default async function EficienciaPage({
         mostrarServico={false}
       />
 
-      <p className="text-slate-400 dark:text-slate-500 text-xs mb-6">
+      <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-6">
         Tempo de atendimento = do início ao fim do corte. Tempo de espera = da chegada na fila até
         ser chamado. Considera só atendimentos concluídos que passaram pela fila.
       </p>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wide">Média da equipe — atendimento</p>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white">{mediaEquipeAtendimento.toFixed(1)} min</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-xs uppercase tracking-wide">Média da equipe — atendimento</p>
+          <p className="text-2xl font-bold text-neutral-900 dark:text-white">{mediaEquipeAtendimento.toFixed(1)} min</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wide">Média da equipe — espera</p>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white">{mediaEquipeEspera.toFixed(1)} min</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-xs uppercase tracking-wide">Média da equipe — espera</p>
+          <p className="text-2xl font-bold text-neutral-900 dark:text-white">{mediaEquipeEspera.toFixed(1)} min</p>
         </div>
       </div>
 
@@ -173,10 +173,10 @@ export default async function EficienciaPage({
         </div>
       )}
 
-      <div className="overflow-x-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+      <div className="overflow-x-auto bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-sm">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-slate-500 dark:text-slate-400">
+            <tr className="border-b border-neutral-200 dark:border-neutral-800 text-left text-neutral-500 dark:text-neutral-400">
               <th className="p-3 font-medium">Barbeiro</th>
               <th className="p-3 font-medium">Atendimentos</th>
               <th className="p-3 font-medium">Tempo médio de atendimento</th>
@@ -185,7 +185,7 @@ export default async function EficienciaPage({
           </thead>
           <tbody>
             {linhas.map((l) => (
-              <tr key={l.id} className="border-b border-slate-100 dark:border-slate-800 last:border-0">
+              <tr key={l.id} className="border-b border-neutral-100 dark:border-neutral-800 last:border-0">
                 <td className="p-3 font-semibold">{l.nome}</td>
                 <td className="p-3">{l.qtd}</td>
                 <td className="p-3">{l.mediaAtendimento.toFixed(1)} min</td>
@@ -194,7 +194,7 @@ export default async function EficienciaPage({
             ))}
             {linhas.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-4 text-center text-slate-400 dark:text-slate-500">
+                <td colSpan={4} className="p-4 text-center text-neutral-400 dark:text-neutral-500">
                   Nenhum atendimento concluído no período.
                 </td>
               </tr>
@@ -204,7 +204,7 @@ export default async function EficienciaPage({
       </div>
 
       <h2 className="text-lg font-semibold mt-8 mb-3">Taxa de ocupação</h2>
-      <p className="text-slate-400 dark:text-slate-500 text-xs mb-4">
+      <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-4">
         Ocupação = tempo total atendendo dividido pelo tempo disponível, conforme o horário de trabalho cadastrado
         em Barbeiros (já descontando o horário de almoço, se estiver cadastrado). Cadastre o horário de cada um pra
         essa conta ficar precisa.
@@ -220,10 +220,10 @@ export default async function EficienciaPage({
         </div>
       ))}
 
-      <div className="overflow-x-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm mb-8">
+      <div className="overflow-x-auto bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-sm mb-8">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-slate-500 dark:text-slate-400">
+            <tr className="border-b border-neutral-200 dark:border-neutral-800 text-left text-neutral-500 dark:text-neutral-400">
               <th className="p-3 font-medium">Barbeiro</th>
               <th className="p-3 font-medium">Horas disponíveis</th>
               <th className="p-3 font-medium">Horas atendendo</th>
@@ -232,10 +232,10 @@ export default async function EficienciaPage({
           </thead>
           <tbody>
             {ocupacaoPorBarbeiro.map((o) => (
-              <tr key={o.id} className="border-b border-slate-100 dark:border-slate-800 last:border-0">
+              <tr key={o.id} className="border-b border-neutral-100 dark:border-neutral-800 last:border-0">
                 <td className="p-3">
                   <p className="font-semibold">{o.nome}</p>
-                  <p className="text-slate-400 dark:text-slate-500 text-xs">{o.jornadaTexto}</p>
+                  <p className="text-neutral-400 dark:text-neutral-500 text-xs">{o.jornadaTexto}</p>
                 </td>
                 <td className="p-3">{o.horasDisponiveis.toFixed(1)}h</td>
                 <td className="p-3">{o.horasAtendendo.toFixed(1)}h</td>
@@ -243,14 +243,14 @@ export default async function EficienciaPage({
                   {o.percentual !== null ? (
                     <span className={`font-semibold ${classeOcupacao(o.percentual)}`}>{o.percentual.toFixed(0)}%</span>
                   ) : (
-                    <span className="text-slate-400 dark:text-slate-500">sem horário cadastrado</span>
+                    <span className="text-neutral-400 dark:text-neutral-500">sem horário cadastrado</span>
                   )}
                 </td>
               </tr>
             ))}
             {ocupacaoPorBarbeiro.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-4 text-center text-slate-400 dark:text-slate-500">
+                <td colSpan={4} className="p-4 text-center text-neutral-400 dark:text-neutral-500">
                   Nenhum barbeiro ativo.
                 </td>
               </tr>
@@ -260,21 +260,21 @@ export default async function EficienciaPage({
       </div>
 
       <h2 className="text-lg font-semibold mb-3">Horários de mais fluxo</h2>
-      <p className="text-slate-400 dark:text-slate-500 text-xs mb-4">
+      <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-4">
         Quantidade de clientes que entraram na fila (pelo totem ou lançamento manual) em cada horário, considerando
         todos os barbeiros no período.
       </p>
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
         {picoQtd > 0 ? (
           <>
             <GraficoBarras dados={dadosHistograma} formatarValor={(v) => `${v} cliente(s)`} />
-            <p className="text-slate-500 dark:text-slate-400 text-sm mt-3">
-              Horário de pico: <span className="font-semibold text-slate-700 dark:text-slate-200">{String(picoHora).padStart(2, "0")}h</span>{" "}
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-3">
+              Horário de pico: <span className="font-semibold text-neutral-700 dark:text-neutral-200">{String(picoHora).padStart(2, "0")}h</span>{" "}
               — {picoQtd} cliente(s) entrando na fila nesse horário.
             </p>
           </>
         ) : (
-          <p className="text-slate-400 dark:text-slate-500 text-sm">Nenhum cliente entrou na fila no período.</p>
+          <p className="text-neutral-400 dark:text-neutral-500 text-sm">Nenhum cliente entrou na fila no período.</p>
         )}
       </div>
     </div>

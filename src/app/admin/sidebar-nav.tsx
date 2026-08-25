@@ -32,12 +32,12 @@ export function SidebarNav({ grupos }: { grupos: NavGrupo[] }) {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <div className="relative mb-4">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400" />
+        <Search className="absolute left-2.5 top-1/2 -tranneutral-y-1/2 w-4 h-4 text-orange-400" />
         <input
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
           placeholder="Procurar opção do menu..."
-          className="w-full rounded-lg bg-white/5 border border-blue-500/20 pl-9 pr-3 py-2 text-sm text-white placeholder:text-blue-400/60 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full rounded-lg bg-white/5 border border-orange-500/20 pl-9 pr-3 py-2 text-sm text-white placeholder:text-orange-400/60 focus:outline-none focus:ring-2 focus:ring-orange-400"
         />
       </div>
 
@@ -55,7 +55,7 @@ export function SidebarNav({ grupos }: { grupos: NavGrupo[] }) {
                 key={link.href}
                 href={link.href}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  ativo ? "bg-blue-600 text-white" : "text-blue-100/80 hover:bg-blue-500/10 hover:text-white"
+                  ativo ? "bg-orange-600 text-white" : "text-orange-100/80 hover:bg-orange-500/10 hover:text-white"
                 }`}
               >
                 <Icone className="w-4 h-4 shrink-0" />
@@ -73,7 +73,7 @@ export function SidebarNav({ grupos }: { grupos: NavGrupo[] }) {
                 type="button"
                 onClick={() => alternarGrupo(g.titulo ?? "")}
                 className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  algumAtivo && colapsado ? "bg-blue-500/15 text-white" : "text-blue-100/80 hover:bg-blue-500/10 hover:text-white"
+                  algumAtivo && colapsado ? "bg-orange-500/15 text-white" : "text-orange-100/80 hover:bg-orange-500/10 hover:text-white"
                 }`}
               >
                 <Icone className="w-4 h-4 shrink-0" />
@@ -81,7 +81,7 @@ export function SidebarNav({ grupos }: { grupos: NavGrupo[] }) {
                 {colapsado ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
               {!colapsado && (
-                <div className="flex flex-col gap-1 mt-1 ml-4 pl-3 border-l border-blue-500/20">
+                <div className="flex flex-col gap-1 mt-1 ml-4 pl-3 border-l border-orange-500/20">
                   {g.links.map((l) => {
                     const ativo = pathname === l.href;
                     const IconeLink = ICONES_NAV[l.icone];
@@ -90,7 +90,7 @@ export function SidebarNav({ grupos }: { grupos: NavGrupo[] }) {
                         key={l.href}
                         href={l.href}
                         className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
-                          ativo ? "bg-blue-600 text-white font-medium" : "text-blue-200/80 hover:bg-blue-500/10 hover:text-white"
+                          ativo ? "bg-orange-600 text-white font-medium" : "text-orange-200/80 hover:bg-orange-500/10 hover:text-white"
                         }`}
                       >
                         <IconeLink className="w-3.5 h-3.5 shrink-0" />
@@ -104,7 +104,7 @@ export function SidebarNav({ grupos }: { grupos: NavGrupo[] }) {
           );
         })}
         {gruposFiltrados.length === 0 && (
-          <p className="text-blue-300 text-sm px-3 py-2">Nenhuma opção encontrada.</p>
+          <p className="text-orange-300 text-sm px-3 py-2">Nenhuma opção encontrada.</p>
         )}
       </nav>
     </div>

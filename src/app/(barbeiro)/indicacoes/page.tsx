@@ -39,31 +39,31 @@ export default async function IndicacoesPage({
     <div className="p-6">
       <header className="mb-6">
         <h1 className="text-2xl font-bold">Indicações</h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm">
+        <p className="text-neutral-500 dark:text-neutral-400 text-sm">
           Contatos indicados por clientes — use pra preencher os horários vazios.
         </p>
       </header>
 
       <div className="grid grid-cols-2 gap-4 mb-6 max-w-md">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{totalPendentes}</p>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Pendente(s)</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{totalPendentes}</p>
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Pendente(s)</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-2xl font-bold text-slate-700 dark:text-slate-200">{totalSemana}</p>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Indicações essa semana</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
+          <p className="text-2xl font-bold text-neutral-700 dark:text-neutral-200">{totalSemana}</p>
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Indicações essa semana</p>
         </div>
       </div>
 
       <NovaIndicacaoForm barbeiros={barbeiros} souAdmin={souAdmin} />
 
-      <form method="get" className="flex flex-wrap items-end gap-3 mb-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+      <form method="get" className="flex flex-wrap items-end gap-3 mb-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Status</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Status</label>
           <select
             name="status"
             defaultValue={statusFiltro}
-            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+            className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
           >
             <option value="todas">Todas</option>
             <option value="pendentes">Pendentes</option>
@@ -72,11 +72,11 @@ export default async function IndicacoesPage({
         </div>
         {souAdmin && (
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Barbeiro</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Barbeiro</label>
             <select
               name="barbeiroId"
               defaultValue={barbeiroIdParam ?? ""}
-              className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+              className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
             >
               <option value="">Todos</option>
               {barbeiros.map((b) => (
@@ -87,7 +87,7 @@ export default async function IndicacoesPage({
             </select>
           </div>
         )}
-        <button type="submit" className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
+        <button type="submit" className="rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2 text-sm">
           Filtrar
         </button>
       </form>
@@ -105,7 +105,7 @@ export default async function IndicacoesPage({
             criadoEm={i.criadoEm}
           />
         ))}
-        {indicacoes.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhuma indicação por aqui ainda.</p>}
+        {indicacoes.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhuma indicação por aqui ainda.</p>}
       </div>
     </div>
   );

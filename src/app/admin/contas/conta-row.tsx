@@ -16,21 +16,21 @@ export function ContaRow({ conta, atrasada }: { conta: ContaFinanceira; atrasada
 
   return (
     <div
-      className={`bg-white dark:bg-slate-900 border rounded-xl p-4 shadow-sm ${
-        atrasada ? "border-red-300" : "border-slate-200 dark:border-slate-800"
+      className={`bg-white dark:bg-neutral-900 border rounded-xl p-4 shadow-sm ${
+        atrasada ? "border-red-300" : "border-neutral-200 dark:border-neutral-800"
       } ${conta.status === "PAGO" ? "opacity-60" : ""}`}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="font-medium">{conta.descricao}</p>
-          <p className={`text-xs mt-0.5 ${atrasada ? "text-red-600 font-semibold" : "text-slate-400 dark:text-slate-500"}`}>
+          <p className={`text-xs mt-0.5 ${atrasada ? "text-red-600 font-semibold" : "text-neutral-400 dark:text-neutral-500"}`}>
             Vence em {conta.vencimento.toLocaleDateString("pt-BR")}
             {atrasada ? " — atrasada" : ""}
             {conta.categoria && ` · ${LABEL_CATEGORIA_DESPESA[conta.categoria]}`}
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-semibold text-slate-700 dark:text-slate-200"><Valor>{formatarReais(conta.valorCentavos)}</Valor></span>
+          <span className="font-semibold text-neutral-700 dark:text-neutral-200"><Valor>{formatarReais(conta.valorCentavos)}</Valor></span>
           {conta.status === "PENDENTE" && !pagando && (
             <button
               type="button"
@@ -47,15 +47,15 @@ export function ContaRow({ conta, atrasada }: { conta: ContaFinanceira; atrasada
           )}
           {conta.status === "PENDENTE" && (
             <form action={excluirConta.bind(null, conta.id)}>
-              <button className="text-slate-400 dark:text-slate-500 hover:text-red-600 text-sm">Excluir</button>
+              <button className="text-neutral-400 dark:text-neutral-500 hover:text-red-600 text-sm">Excluir</button>
             </form>
           )}
         </div>
       </div>
 
       {pagando && (
-        <form action={formAction} className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-          <p className="text-slate-600 dark:text-slate-300 text-sm font-medium mb-2">Forma de pagamento:</p>
+        <form action={formAction} className="mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+          <p className="text-neutral-600 dark:text-neutral-300 text-sm font-medium mb-2">Forma de pagamento:</p>
           <div className="max-w-sm mb-2">
             <SeletorFormaPagamento />
           </div>
@@ -70,7 +70,7 @@ export function ContaRow({ conta, atrasada }: { conta: ContaFinanceira; atrasada
             <button
               type="button"
               onClick={() => setPagando(false)}
-              className="text-slate-500 dark:text-slate-400 hover:text-slate-800 text-sm"
+              className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 text-sm"
             >
               Cancelar
             </button>

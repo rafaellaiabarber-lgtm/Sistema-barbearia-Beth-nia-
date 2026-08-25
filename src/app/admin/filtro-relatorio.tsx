@@ -26,14 +26,14 @@ export function FiltroRelatorio({
     <form
       method="get"
       action={basePath}
-      className="flex flex-wrap items-end gap-3 mb-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
+      className="flex flex-wrap items-end gap-3 mb-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm"
     >
       <div>
-        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Período</label>
+        <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Período</label>
         <select
           name="periodo"
           defaultValue={periodo}
-          className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+          className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
         >
           <option value="hoje">Hoje</option>
           <option value="dia">Um dia específico</option>
@@ -43,32 +43,32 @@ export function FiltroRelatorio({
         </select>
       </div>
       <div>
-        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">{periodo === "dia" ? "Dia" : "De"}</label>
+        <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">{periodo === "dia" ? "Dia" : "De"}</label>
         <input
           type="date"
           name="dataInicio"
           defaultValue={dataInicio}
-          className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+          className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
         />
       </div>
       {periodo !== "dia" && (
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Até</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Até</label>
           <input
             type="date"
             name="dataFim"
             defaultValue={dataFim}
-            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
           />
         </div>
       )}
       {mostrarServico && (
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Serviço</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Serviço</label>
           <select
             name="servicoId"
             defaultValue={servicoId ?? ""}
-            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+            className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
           >
             <option value="">Todos</option>
             {servicos.map((s) => (
@@ -80,11 +80,11 @@ export function FiltroRelatorio({
         </div>
       )}
       <div>
-        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Barbeiro</label>
+        <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Barbeiro</label>
         <select
           name="barbeiroId"
           defaultValue={barbeiroId ?? ""}
-          className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+          className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
         >
           <option value="">Todos</option>
           {barbeiros.map((b) => (
@@ -96,12 +96,12 @@ export function FiltroRelatorio({
       </div>
       <button
         type="submit"
-        className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm"
+        className="rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2 text-sm"
       >
         Buscar
       </button>
       {(servicoId || barbeiroId || periodo === "personalizado" || periodo === "dia") && (
-        <a href={basePath} className="text-slate-400 dark:text-slate-500 hover:text-slate-700 text-sm">
+        <a href={basePath} className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 text-sm">
           Limpar filtros
         </a>
       )}

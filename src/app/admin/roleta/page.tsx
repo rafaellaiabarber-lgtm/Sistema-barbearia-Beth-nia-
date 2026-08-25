@@ -30,7 +30,7 @@ export default async function RoletaAdminPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-2">Roleta de Prêmios</h1>
-      <p className="text-slate-400 dark:text-slate-500 text-sm mb-6">
+      <p className="text-neutral-400 dark:text-neutral-500 text-sm mb-6">
         Cadastre até 6 prêmios ativos por vez. Cada barbeiro tem um link/QR Code próprio — o cliente escaneia,
         gira a roleta e ganha um prêmio. Quando ele voltar pra usar, um aviso aparece na Fila.
       </p>
@@ -41,7 +41,7 @@ export default async function RoletaAdminPage() {
         {ofertas.map((o) => (
           <OfertaRow key={o.id} oferta={o} />
         ))}
-        {ofertas.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum prêmio cadastrado ainda.</p>}
+        {ofertas.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum prêmio cadastrado ainda.</p>}
       </div>
 
       <h2 className="text-lg font-semibold mb-3">QR Code por barbeiro</h2>
@@ -49,7 +49,7 @@ export default async function RoletaAdminPage() {
         {barbeiros.map((b) => (
           <BarbeiroQr key={b.id} barbeiroId={b.id} nome={b.nome} baseUrl={baseUrl} />
         ))}
-        {barbeiros.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum barbeiro ativo.</p>}
+        {barbeiros.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum barbeiro ativo.</p>}
       </div>
 
       <h2 className="text-lg font-semibold mb-3">Prêmios pendentes de resgate ({pendentes.length})</h2>
@@ -57,13 +57,13 @@ export default async function RoletaAdminPage() {
         {pendentes.map((g) => (
           <div
             key={g.id}
-            className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm"
+            className="flex items-center justify-between bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-sm"
           >
             <div>
-              <p className="font-semibold text-slate-900 dark:text-white">
+              <p className="font-semibold text-neutral-900 dark:text-white">
                 {g.cliente.nome} — {textoPremioRoleta(g.oferta)}
               </p>
-              <p className="text-slate-400 dark:text-slate-500 text-sm">
+              <p className="text-neutral-400 dark:text-neutral-500 text-sm">
                 {g.cliente.telefone} · girou com {g.barbeiro.nome} · {g.criadoEm.toLocaleDateString("pt-BR")}
               </p>
             </div>
@@ -74,7 +74,7 @@ export default async function RoletaAdminPage() {
             </form>
           </div>
         ))}
-        {pendentes.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum prêmio pendente.</p>}
+        {pendentes.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum prêmio pendente.</p>}
       </div>
 
       <h2 className="text-lg font-semibold mb-3">Resgatados recentemente</h2>
@@ -82,20 +82,20 @@ export default async function RoletaAdminPage() {
         {resgatados.slice(0, 15).map((g) => (
           <div
             key={g.id}
-            className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm opacity-60"
+            className="flex items-center justify-between bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-sm opacity-60"
           >
             <div>
-              <p className="font-semibold text-slate-900 dark:text-white">
+              <p className="font-semibold text-neutral-900 dark:text-white">
                 {g.cliente.nome} — {textoPremioRoleta(g.oferta)}
               </p>
-              <p className="text-slate-400 dark:text-slate-500 text-sm">
+              <p className="text-neutral-400 dark:text-neutral-500 text-sm">
                 girou com {g.barbeiro.nome} · resgatado em {g.resgatadoEm?.toLocaleDateString("pt-BR")}
               </p>
             </div>
             <span className="text-green-600 text-sm font-semibold">✓ resgatado</span>
           </div>
         ))}
-        {resgatados.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum prêmio resgatado ainda.</p>}
+        {resgatados.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum prêmio resgatado ainda.</p>}
       </div>
     </div>
   );

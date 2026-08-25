@@ -15,7 +15,7 @@ export default async function TotemConfigPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1">Personalizar totem</h1>
-      <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+      <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-6">
         Defina as logos e a imagem de fundo usadas no sistema.
       </p>
 

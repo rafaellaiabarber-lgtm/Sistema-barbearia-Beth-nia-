@@ -52,7 +52,7 @@ export function RoletaWheel({
 
   return (
     <div className="w-full max-w-sm flex flex-col items-center text-center">
-      <p className="text-slate-400 text-sm mb-1">Roleta de prêmios de</p>
+      <p className="text-neutral-400 text-sm mb-1">Roleta de prêmios de</p>
       <h1 className="text-white text-2xl font-bold mb-6">{barbeiroNome}</h1>
 
       {etapa === "form" && (
@@ -61,13 +61,13 @@ export function RoletaWheel({
             name="nome"
             required
             placeholder="Seu nome"
-            className="w-full rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 px-4 py-3 text-center"
+            className="w-full rounded-xl bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 px-4 py-3 text-center"
           />
           <input
             name="telefone"
             required
             placeholder="Seu telefone (WhatsApp)"
-            className="w-full rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 px-4 py-3 text-center"
+            className="w-full rounded-xl bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 px-4 py-3 text-center"
           />
           {estado.erro && <p className="text-red-400 text-sm">{estado.erro}</p>}
           <button
@@ -83,7 +83,7 @@ export function RoletaWheel({
       {(etapa === "girando" || etapa === "resultado") && (
         <div className="relative w-72 h-72">
           <div
-            className="absolute -top-2 left-1/2 -translate-x-1/2 z-10"
+            className="absolute -top-2 left-1/2 -tranneutral-x-1/2 z-10"
             style={{
               width: 0,
               height: 0,
@@ -93,7 +93,7 @@ export function RoletaWheel({
             }}
           />
           <div
-            className="w-72 h-72 rounded-full border-4 border-slate-700 relative overflow-hidden"
+            className="w-72 h-72 rounded-full border-4 border-neutral-700 relative overflow-hidden"
             style={{
               background: `conic-gradient(${gradiente})`,
               transform: `rotate(${rotacao}deg)`,
@@ -116,7 +116,7 @@ export function RoletaWheel({
               );
             })}
           </div>
-          <div className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-slate-900 border-4 border-slate-700 flex items-center justify-center text-white text-xs font-bold">
+          <div className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-neutral-900 border-4 border-neutral-700 flex items-center justify-center text-white text-xs font-bold">
             {etapa === "girando" ? "..." : "🎉"}
           </div>
         </div>

@@ -29,7 +29,7 @@ export default async function MetasPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1">Metas</h1>
-      <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+      <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-6">
         Crie metas por barbeiro com vários níveis (ex.: Bronze/Prata/Ouro) e bonificações. Por padrão o progresso é
         calculado no mês atual, mas cada meta pode ter seu próprio período de datas e ser restrita a um serviço ou
         produto específico.
@@ -42,7 +42,7 @@ export default async function MetasPage() {
           if (b.metas.length === 0) return null;
           return (
             <div key={b.id}>
-              <p className="font-semibold text-slate-700 dark:text-slate-200 mb-2">{b.nome}</p>
+              <p className="font-semibold text-neutral-700 dark:text-neutral-200 mb-2">{b.nome}</p>
               <div className="grid gap-3 sm:grid-cols-2">
                 {b.metas.map((meta) => (
                   <MetaCard
@@ -68,11 +68,11 @@ export default async function MetasPage() {
           );
         })}
         {barbeiros.every((b) => b.metas.length === 0) && (
-          <p className="text-slate-400 dark:text-slate-500">Nenhuma meta cadastrada ainda.</p>
+          <p className="text-neutral-400 dark:text-neutral-500">Nenhuma meta cadastrada ainda.</p>
         )}
       </div>
 
-      <p className="text-slate-300 text-xs mt-8">Tipos disponíveis: {Object.values(LABEL_TIPO_META).join(" · ")}</p>
+      <p className="text-neutral-300 text-xs mt-8">Tipos disponíveis: {Object.values(LABEL_TIPO_META).join(" · ")}</p>
     </div>
   );
 }

@@ -28,8 +28,8 @@ export function TecladoNumerico({
 
   return (
     <div>
-      <div className="w-full rounded-xl bg-white border border-slate-300 text-slate-900 text-3xl tracking-wide text-center px-4 py-4 mb-6 min-h-[4rem] flex items-center justify-center">
-        {valor ? formatarTelefoneExibicao(valor) : <span className="text-slate-300">(11) 99999-9999</span>}
+      <div className="w-full rounded-xl bg-white border border-neutral-300 text-neutral-900 text-3xl tracking-wide text-center px-4 py-4 mb-6 min-h-[4rem] flex items-center justify-center">
+        {valor ? formatarTelefoneExibicao(valor) : <span className="text-neutral-300">(11) 99999-9999</span>}
       </div>
       <div className="grid grid-cols-3 gap-3">
         {TECLAS.map((tecla, i) =>
@@ -40,7 +40,7 @@ export function TecladoNumerico({
               key={tecla}
               type="button"
               onClick={() => apertar(tecla)}
-              className="rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-blue-600 active:text-white active:scale-95 text-slate-900 text-2xl font-bold py-4 transition-all"
+              className="rounded-xl bg-neutral-100 hover:bg-neutral-200 active:bg-orange-600 active:text-white active:scale-95 text-neutral-900 text-2xl font-bold py-4 transition-all"
             >
               {tecla}
             </button>

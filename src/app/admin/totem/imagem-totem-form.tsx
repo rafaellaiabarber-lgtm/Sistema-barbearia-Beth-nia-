@@ -33,9 +33,9 @@ export function ImagemTotemForm({
   }, [estado, pendente]);
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
       <h2 className="font-semibold mb-1">{label}</h2>
-      <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">{descricao}</p>
+      <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-4">{descricao}</p>
 
       {imagemUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -44,12 +44,12 @@ export function ImagemTotemForm({
           alt={label}
           className={
             aspecto === "logo"
-              ? "h-24 object-contain bg-slate-50 dark:bg-black rounded-lg border border-slate-200 dark:border-slate-800 p-2 mb-4"
-              : "w-full h-40 object-cover rounded-lg border border-slate-200 dark:border-slate-800 mb-4"
+              ? "h-24 object-contain bg-neutral-50 dark:bg-black rounded-lg border border-neutral-200 dark:border-neutral-800 p-2 mb-4"
+              : "w-full h-40 object-cover rounded-lg border border-neutral-200 dark:border-neutral-800 mb-4"
           }
         />
       ) : (
-        <div className="w-full h-24 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 dark:text-slate-500 text-sm mb-4">
+        <div className="w-full h-24 rounded-lg border border-dashed border-neutral-300 dark:border-neutral-600 flex items-center justify-center text-neutral-400 dark:text-neutral-500 text-sm mb-4">
           Nenhuma imagem definida
         </div>
       )}
@@ -60,7 +60,7 @@ export function ImagemTotemForm({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={pendente}
-          className="text-sm rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-3 py-2"
+          className="text-sm rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white font-semibold px-3 py-2"
         >
           {pendente ? "Enviando..." : imagemUrl ? "Trocar imagem" : "Enviar imagem"}
         </button>
@@ -68,7 +68,7 @@ export function ImagemTotemForm({
           <button
             type="button"
             onClick={() => acaoRemover()}
-            className="text-sm text-slate-500 dark:text-slate-400 hover:text-red-600"
+            className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-red-600"
           >
             Remover
           </button>

@@ -39,28 +39,28 @@ function CadastrarClienteForm({ busca }: { busca: string }) {
   return (
     <form action={formAction} className="mt-3 flex flex-wrap items-end gap-3">
       <div>
-        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Nome</label>
+        <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Nome</label>
         <input
           name="nome"
           required
           defaultValue={ehTelefone ? "" : busca}
           placeholder="Nome do cliente"
-          className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-48"
+          className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-48"
         />
       </div>
       <div>
-        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Telefone (opcional)</label>
+        <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Telefone (opcional)</label>
         <input
           name="telefone"
           defaultValue={ehTelefone ? busca : ""}
           placeholder="11999999999"
-          className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-40"
+          className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-40"
         />
       </div>
       <button
         type="submit"
         disabled={pendente}
-        className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+        className="rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
       >
         {pendente ? "Cadastrando..." : "Cadastrar cliente"}
       </button>
@@ -86,12 +86,12 @@ export function ListaClientes({ clientes }: { clientes: ClienteComDados[] }) {
   return (
     <div>
       <div className="relative mb-4 max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
+        <Search className="absolute left-3 top-1/2 -tranneutral-y-1/2 text-neutral-400 dark:text-neutral-500" size={16} />
         <input
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
           placeholder="Buscar por nome ou telefone..."
-          className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 pl-9 pr-3 py-2 text-sm"
+          className="w-full rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 pl-9 pr-3 py-2 text-sm"
         />
       </div>
 
@@ -99,13 +99,13 @@ export function ListaClientes({ clientes }: { clientes: ClienteComDados[] }) {
         {clientesFiltrados.map((c) => {
           const totalGasto = c.atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
           return (
-            <details key={c.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+            <details key={c.id} className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
               <summary className="cursor-pointer flex items-center justify-between">
                 <span>
                   <span className="font-semibold">{c.nome}</span>{" "}
-                  <span className="text-slate-500 dark:text-slate-400 text-sm">{c.telefone ?? "sem telefone"}</span>
+                  <span className="text-neutral-500 dark:text-neutral-400 text-sm">{c.telefone ?? "sem telefone"}</span>
                 </span>
-                <span className="text-slate-500 dark:text-slate-400 text-sm">
+                <span className="text-neutral-500 dark:text-neutral-400 text-sm">
                   {c.atendimentos.length} atendimento(s) · <Valor>{formatarReais(totalGasto)}</Valor>
                 </span>
               </summary>
@@ -128,25 +128,25 @@ export function ListaClientes({ clientes }: { clientes: ClienteComDados[] }) {
                 ) : c.telefone ? (
                   <a
                     href={`/admin/assinaturas?telefone=${encodeURIComponent(c.telefone)}&nome=${encodeURIComponent(c.nome)}`}
-                    className="inline-block text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                    className="inline-block text-sm text-orange-600 dark:text-orange-400 hover:underline"
                   >
                     + Adicionar assinatura
                   </a>
                 ) : (
-                  <p className="text-sm text-slate-400 dark:text-slate-500">
+                  <p className="text-sm text-neutral-400 dark:text-neutral-500">
                     Cadastre um telefone pra esse cliente pra poder criar uma assinatura.
                   </p>
                 )}
                 {c.atendimentos.length === 0 && (
-                  <p className="text-slate-400 dark:text-slate-500 text-sm">Sem atendimentos concluídos ainda.</p>
+                  <p className="text-neutral-400 dark:text-neutral-500 text-sm">Sem atendimentos concluídos ainda.</p>
                 )}
                 {c.atendimentos.map((a) => (
-                  <div key={a.id} className="text-sm border-t border-slate-200 dark:border-slate-800 pt-2">
-                    <p className="text-slate-700 dark:text-slate-200">
+                  <div key={a.id} className="text-sm border-t border-neutral-200 dark:border-neutral-800 pt-2">
+                    <p className="text-neutral-700 dark:text-neutral-200">
                       {a.concluidoEm?.toLocaleDateString("pt-BR")} — {a.barbeiro?.nome ?? "—"} —{" "}
                       <Valor>{formatarReais(a.precoTotalCentavos)}</Valor>
                     </p>
-                    <p className="text-slate-400 dark:text-slate-500">{a.servicos.map((s) => s.nomeSnapshot).join(", ")}</p>
+                    <p className="text-neutral-400 dark:text-neutral-500">{a.servicos.map((s) => s.nomeSnapshot).join(", ")}</p>
                   </div>
                 ))}
               </div>
@@ -154,11 +154,11 @@ export function ListaClientes({ clientes }: { clientes: ClienteComDados[] }) {
           );
         })}
         {clientesFiltrados.length === 0 && clientes.length === 0 && (
-          <p className="text-slate-400 dark:text-slate-500">Nenhum cliente cadastrado ainda.</p>
+          <p className="text-neutral-400 dark:text-neutral-500">Nenhum cliente cadastrado ainda.</p>
         )}
         {clientesFiltrados.length === 0 && clientes.length > 0 && busca.trim() !== "" && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm">
               Esse cliente não foi encontrado. Quer cadastrar ele?
             </p>
             <CadastrarClienteForm key={busca} busca={busca.trim()} />

@@ -296,9 +296,9 @@ export default async function FilaPage({
       </header>
 
       {session.barbeiroId && (
-        <div className="mb-8 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm flex items-start gap-3">
-          <Quote className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-          <p className="text-sm text-slate-600 dark:text-slate-300 italic">{fraseDoDia()}</p>
+        <div className="mb-8 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-sm flex items-start gap-3">
+          <Quote className="w-5 h-5 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-neutral-600 dark:text-neutral-300 italic">{fraseDoDia()}</p>
         </div>
       )}
 
@@ -307,10 +307,10 @@ export default async function FilaPage({
           className={`mb-8 rounded-xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3 ${
             pausadoHoje
               ? "bg-amber-100 dark:bg-amber-950 border border-amber-300 dark:border-amber-800"
-              : "border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+              : "border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900"
           }`}
         >
-          <p className={`text-sm ${pausadoHoje ? "text-amber-800 dark:text-amber-300 font-medium" : "text-slate-500 dark:text-slate-400"}`}>
+          <p className={`text-sm ${pausadoHoje ? "text-amber-800 dark:text-amber-300 font-medium" : "text-neutral-500 dark:text-neutral-400"}`}>
             {pausadoHoje
               ? "Você está marcado como indisponível hoje — não aparece no totem."
               : "Você aparece no totem hoje. Não vai atender?"}
@@ -320,7 +320,7 @@ export default async function FilaPage({
               className={`rounded-lg font-semibold text-sm px-3 py-1.5 ${
                 pausadoHoje
                   ? "bg-green-600 hover:bg-green-700 text-white"
-                  : "bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300"
+                  : "bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 text-neutral-600 dark:text-neutral-300"
               }`}
             >
               {pausadoHoje ? "Voltar a atender hoje" : "Não vou atender hoje"}
@@ -332,7 +332,7 @@ export default async function FilaPage({
       {session.barbeiroId && dicasPessoais.length > 0 && (
         <section className="mb-8">
           <h2 className="text-lg font-semibold mb-3">Dicas pra você</h2>
-          <div className="bg-blue-600 text-white rounded-xl p-5 shadow-sm">
+          <div className="bg-orange-600 text-white rounded-xl p-5 shadow-sm">
             <ul className="space-y-2">
               {dicasPessoais.map((texto, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm">
@@ -368,8 +368,8 @@ export default async function FilaPage({
                     href={`/fila?periodo=${p}`}
                     className={`rounded-lg px-3 py-1.5 text-sm font-medium border ${
                       !personalizado && periodoFila === p
-                        ? "bg-blue-600 border-blue-600 text-white"
-                        : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-slate-400"
+                        ? "bg-orange-600 border-orange-600 text-white"
+                        : "bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-600 text-neutral-600 dark:text-neutral-300 hover:border-neutral-400"
                     }`}
                   >
                     {p === "hoje" ? "Hoje" : p === "ontem" ? "Ontem" : p === "semana" ? "Esta semana" : "Este mês"}
@@ -378,37 +378,37 @@ export default async function FilaPage({
               </div>
 
               <details className="mb-4" open={!!personalizado}>
-                <summary className="cursor-pointer text-sm text-blue-600 dark:text-blue-400 hover:underline select-none">
+                <summary className="cursor-pointer text-sm text-orange-600 dark:text-orange-400 hover:underline select-none">
                   Personalizar por data
                 </summary>
                 <form
                   method="get"
-                  className="flex flex-wrap items-end gap-3 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3"
+                  className="flex flex-wrap items-end gap-3 mt-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3"
                 >
                   <div>
-                    <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">De</label>
+                    <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">De</label>
                     <input
                       type="date"
                       name="dataInicio"
                       defaultValue={dataInicio}
                       required
-                      className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+                      className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Até</label>
+                    <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Até</label>
                     <input
                       type="date"
                       name="dataFim"
                       defaultValue={dataFim}
-                      className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+                      className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
                     />
                   </div>
-                  <button type="submit" className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
+                  <button type="submit" className="rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2 text-sm">
                     Ver por data
                   </button>
                   {personalizado && (
-                    <Link href="/fila" className="text-slate-400 dark:text-slate-500 hover:text-slate-700 text-sm">
+                    <Link href="/fila" className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 text-sm">
                       Limpar
                     </Link>
                   )}
@@ -444,10 +444,10 @@ export default async function FilaPage({
                 )}
 
                 {minhasMetas.map((m) => (
-                  <div key={m.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+                  <div key={m.id} className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-3">
-                      <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                      <Target className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                      <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">
                         {LABEL_TIPO_META[m.tipo]}
                         {m.escopoTexto ? ` — ${m.escopoTexto}` : ""}
                       </p>
@@ -459,7 +459,7 @@ export default async function FilaPage({
                           className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
                             n.atingido
                               ? "bg-green-100 dark:bg-green-900 text-green-700"
-                              : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                              : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400"
                           }`}
                         >
                           {n.atingido ? "✓" : "○"} {n.nome} — {formatarValorMeta(m.tipo, n.valorAlvo)}
@@ -467,13 +467,13 @@ export default async function FilaPage({
                         </span>
                       ))}
                     </div>
-                    <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
+                    <div className="w-full h-2 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden mb-1">
                       <div
-                        className={`h-full rounded-full ${m.atual ? "bg-green-500" : "bg-blue-500"}`}
+                        className={`h-full rounded-full ${m.atual ? "bg-green-500" : "bg-orange-500"}`}
                         style={{ width: `${m.percentualAteProximo}%` }}
                       />
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
                       Atual: {formatarValorMeta(m.tipo, m.valorAtual)}
                       {m.proximo &&
                         ` · faltam ${formatarValorMeta(m.tipo, Math.max(m.proximo.valorAlvo - m.valorAtual, 0))} para ${m.proximo.nome}`}
@@ -491,7 +491,7 @@ export default async function FilaPage({
               <form action={chamarProximo.bind(null, undefined)}>
                 <button
                   disabled={aguardando.length === 0}
-                  className="rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold px-6 py-4 text-lg"
+                  className="rounded-xl bg-orange-600 hover:bg-orange-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold px-6 py-4 text-lg"
                 >
                   Chamar próximo cliente
                 </button>
@@ -503,37 +503,37 @@ export default async function FilaPage({
             <section className="mb-8">
               <h2 className="text-lg font-semibold mb-3">Em atendimento</h2>
               {emAtendimento.length === 0 ? (
-                <p className="text-slate-400 dark:text-slate-500">Ninguém sendo atendido no momento.</p>
+                <p className="text-neutral-400 dark:text-neutral-500">Ninguém sendo atendido no momento.</p>
               ) : (
                 <div className="grid gap-3 md:grid-cols-2">
                   {emAtendimento.map((a) => (
-                    <div key={a.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+                    <div key={a.id} className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
                       <div className="flex items-start justify-between gap-2">
                         <p className="font-semibold">
                           {a.cliente.nome}
                           <BadgeAssinante info={planoInfoPorCliente.get(a.clienteId)} />
                           <BadgePremio premios={premiosPorCliente.get(a.clienteId)} />{" "}
-                          <span className="text-slate-500 dark:text-slate-400 text-sm">com {a.barbeiro?.nome}</span>
+                          <span className="text-neutral-500 dark:text-neutral-400 text-sm">com {a.barbeiro?.nome}</span>
                         </p>
                         <form action={cancelarAtendimento.bind(null, a.id)}>
-                          <button className="text-slate-400 dark:text-slate-500 hover:text-red-600 text-xs shrink-0">
+                          <button className="text-neutral-400 dark:text-neutral-500 hover:text-red-600 text-xs shrink-0">
                             Cancelar
                           </button>
                         </form>
                       </div>
-                      <p className="text-blue-600 dark:text-blue-400 text-sm"><Valor>{formatarReais(a.precoTotalCentavos)}</Valor></p>
+                      <p className="text-orange-600 dark:text-orange-400 text-sm"><Valor>{formatarReais(a.precoTotalCentavos)}</Valor></p>
                     </div>
                   ))}
                 </div>
               )}
               <div className="mt-4">
-                <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">Chamar próximo em nome de:</p>
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-2">Chamar próximo em nome de:</p>
                 <div className="flex flex-wrap gap-2">
                   {barbeirosAtivos.map((b) => (
                     <form key={b.id} action={chamarProximo.bind(null, b.id)}>
                       <button
                         disabled={aguardando.length === 0}
-                        className="rounded-lg bg-white dark:bg-slate-900 hover:bg-slate-100 disabled:opacity-40 border border-slate-300 dark:border-slate-600 px-4 py-2 text-sm"
+                        className="rounded-lg bg-white dark:bg-neutral-900 hover:bg-neutral-100 disabled:opacity-40 border border-neutral-300 dark:border-neutral-600 px-4 py-2 text-sm"
                       >
                         {b.nome}
                       </button>
@@ -547,16 +547,16 @@ export default async function FilaPage({
           <section>
             <h2 className="text-lg font-semibold mb-3">Aguardando ({aguardando.length})</h2>
             {aguardando.length === 0 ? (
-              <p className="text-slate-400 dark:text-slate-500">Fila vazia.</p>
+              <p className="text-neutral-400 dark:text-neutral-500">Fila vazia.</p>
             ) : (
               <ol className="space-y-2">
                 {aguardando.map((a, i) => (
                   <li
                     key={a.id}
-                    className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
+                    className="flex items-center justify-between bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm"
                   >
                     <div className="flex items-center gap-4">
-                      <span className="text-2xl font-black text-blue-600 dark:text-blue-400 w-10 text-center">{i + 1}º</span>
+                      <span className="text-2xl font-black text-orange-600 dark:text-orange-400 w-10 text-center">{i + 1}º</span>
                       <div>
                         <p className="font-semibold">
                           {a.cliente.nome}
@@ -568,7 +568,7 @@ export default async function FilaPage({
                             meuId={session.barbeiroId}
                           />
                         </p>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">
+                        <p className="text-neutral-500 dark:text-neutral-400 text-sm">
                           {a.barbeiroPreferido ? `Pediu: ${a.barbeiroPreferido.nome}` : "Sem preferência de barbeiro"}
                           {" · "}
                           {tempoEspera(a.criadoEm)}
@@ -578,13 +578,13 @@ export default async function FilaPage({
                     <div className="flex items-center gap-3">
                       {session.barbeiroId && !meuAtendimento && (
                         <form action={chamarCliente.bind(null, a.id)}>
-                          <button className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-3 py-1.5">
+                          <button className="rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-semibold text-sm px-3 py-1.5">
                             Atender
                           </button>
                         </form>
                       )}
                       <form action={cancelarAtendimento.bind(null, a.id)}>
-                        <button className="text-slate-400 dark:text-slate-500 hover:text-red-600 text-sm">Cancelar</button>
+                        <button className="text-neutral-400 dark:text-neutral-500 hover:text-red-600 text-sm">Cancelar</button>
                       </form>
                     </div>
                   </li>

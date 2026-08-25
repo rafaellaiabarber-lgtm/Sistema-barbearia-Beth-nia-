@@ -116,25 +116,25 @@ export function NovoAtendimentoForm({
     .reduce((soma, s) => soma + s.precoCentavos, 0);
 
   return (
-    <details className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm">
-      <summary className="cursor-pointer font-semibold text-slate-800 dark:text-slate-100 select-none">
+    <details className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 mb-6 shadow-sm">
+      <summary className="cursor-pointer font-semibold text-neutral-800 dark:text-neutral-100 select-none">
         Lançar atendimento manual
       </summary>
       <form ref={formRef} action={formAction} className="mt-4">
         <div className="flex flex-wrap items-end gap-3 mb-4">
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Telefone</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Telefone</label>
             <input
               name="telefone"
               required
               placeholder="11999999999"
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-40"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-40"
             />
           </div>
           <div className="relative">
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Nome do cliente</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Nome do cliente</label>
             <input
               name="nome"
               required
@@ -147,32 +147,32 @@ export function NovoAtendimentoForm({
               }}
               onFocus={() => setSugestoesAbertas(true)}
               onBlur={() => setTimeout(() => setSugestoesAbertas(false), 150)}
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-48"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-48"
             />
             {sugestoesAbertas && sugestoes.length > 0 && (
-              <div className="absolute z-10 mt-1 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg overflow-hidden">
+              <div className="absolute z-10 mt-1 w-56 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg overflow-hidden">
                 {sugestoes.map((s) => (
                   <button
                     type="button"
                     key={s.telefone}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => selecionarSugestao(s)}
-                    className="block w-full text-left px-3 py-2 text-sm hover:bg-blue-50"
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-orange-50"
                   >
-                    <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
-                    <span className="block text-slate-400 dark:text-slate-500 text-xs">{s.telefone}</span>
+                    <span className="block text-neutral-900 dark:text-white font-medium">{s.nome}</span>
+                    <span className="block text-neutral-400 dark:text-neutral-500 text-xs">{s.telefone}</span>
                   </button>
                 ))}
               </div>
             )}
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Barbeiro</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Barbeiro</label>
             <select
               name="barbeiroId"
               required
               defaultValue=""
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
             >
               <option value="" disabled>
                 Escolha
@@ -187,10 +187,10 @@ export function NovoAtendimentoForm({
         </div>
 
         {clienteEncontrado && (
-          <p className="text-blue-600 dark:text-blue-400 text-xs mb-3">Cliente já cadastrado — nome preenchido automaticamente.</p>
+          <p className="text-orange-600 dark:text-orange-400 text-xs mb-3">Cliente já cadastrado — nome preenchido automaticamente.</p>
         )}
 
-        <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
+        <p className="text-neutral-700 dark:text-neutral-200 text-sm font-semibold mb-2">Serviço(s) realizado(s):</p>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
           {servicos.map((s) => {
             const ativo = selecionados.includes(s.id);
@@ -200,11 +200,11 @@ export function NovoAtendimentoForm({
                 key={s.id}
                 onClick={() => alternarServico(s.id)}
                 className={`rounded-lg border-2 px-3 py-2 text-left text-sm transition-colors ${
-                  ativo ? "border-blue-600 bg-blue-50 dark:bg-blue-950" : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300"
+                  ativo ? "border-orange-600 bg-orange-50 dark:bg-orange-950" : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300"
                 }`}
               >
-                <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
-                <span className="block text-blue-600 dark:text-blue-400 text-xs"><Valor>{formatarReais(s.precoCentavos)}</Valor></span>
+                <span className="block text-neutral-900 dark:text-white font-medium">{s.nome}</span>
+                <span className="block text-orange-600 dark:text-orange-400 text-xs"><Valor>{formatarReais(s.precoCentavos)}</Valor></span>
               </button>
             );
           })}
@@ -214,10 +214,10 @@ export function NovoAtendimentoForm({
         ))}
 
         {totalCentavos > 0 && (
-          <p className="text-blue-600 dark:text-blue-400 font-semibold mb-3">Total: <Valor>{formatarReais(totalCentavos)}</Valor></p>
+          <p className="text-orange-600 dark:text-orange-400 font-semibold mb-3">Total: <Valor>{formatarReais(totalCentavos)}</Valor></p>
         )}
 
-        <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Forma de pagamento:</p>
+        <p className="text-neutral-700 dark:text-neutral-200 text-sm font-semibold mb-2">Forma de pagamento:</p>
         <div className="mb-3 max-w-sm">
           <SeletorFormaPagamento />
         </div>
@@ -227,7 +227,7 @@ export function NovoAtendimentoForm({
         <button
           type="submit"
           disabled={pendente}
-          className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+          className="rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
         >
           {pendente ? "Lançando..." : "Lançar atendimento"}
         </button>

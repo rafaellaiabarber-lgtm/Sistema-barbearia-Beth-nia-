@@ -15,7 +15,7 @@ export default async function ProdutosPage() {
         {produtos.map((p) => (
           <ProdutoRow key={p.id} produto={p} />
         ))}
-        {produtos.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum produto cadastrado ainda.</p>}
+        {produtos.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum produto cadastrado ainda.</p>}
       </div>
     </div>
   );

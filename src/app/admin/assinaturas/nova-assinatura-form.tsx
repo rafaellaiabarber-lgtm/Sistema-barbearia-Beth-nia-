@@ -111,26 +111,26 @@ export function NovaAssinaturaForm({
   return (
     <details
       open={!!telefoneInicial}
-      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm"
+      className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 mb-6 shadow-sm"
     >
-      <summary className="cursor-pointer font-semibold text-slate-800 dark:text-slate-100 select-none">
+      <summary className="cursor-pointer font-semibold text-neutral-800 dark:text-neutral-100 select-none">
         Nova assinatura
       </summary>
       <form ref={formRef} action={formAction} className="mt-4">
         <div className="flex flex-wrap items-end gap-3 mb-1">
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Telefone</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Telefone</label>
             <input
               name="telefone"
               required
               placeholder="11999999999"
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-40"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-40"
             />
           </div>
           <div className="relative">
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Nome do cliente</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Nome do cliente</label>
             <input
               name="nome"
               required
@@ -144,32 +144,32 @@ export function NovaAssinaturaForm({
               }}
               onFocus={() => setSugestoesAbertas(true)}
               onBlur={() => setTimeout(() => setSugestoesAbertas(false), 150)}
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-48"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-48"
             />
             {sugestoesAbertas && sugestoes.length > 0 && (
-              <div className="absolute z-10 mt-1 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg overflow-hidden">
+              <div className="absolute z-10 mt-1 w-56 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg overflow-hidden">
                 {sugestoes.map((s) => (
                   <button
                     type="button"
                     key={s.telefone}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => selecionarSugestao(s)}
-                    className="block w-full text-left px-3 py-2 text-sm hover:bg-blue-50"
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-orange-50"
                   >
-                    <span className="block text-slate-900 dark:text-white font-medium">{s.nome}</span>
-                    <span className="block text-slate-400 dark:text-slate-500 text-xs">{s.telefone}</span>
+                    <span className="block text-neutral-900 dark:text-white font-medium">{s.nome}</span>
+                    <span className="block text-neutral-400 dark:text-neutral-500 text-xs">{s.telefone}</span>
                   </button>
                 ))}
               </div>
             )}
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Plano</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Plano</label>
             <select
               name="planoId"
               required
               defaultValue=""
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
             >
               <option value="" disabled>
                 Escolha
@@ -182,7 +182,7 @@ export function NovaAssinaturaForm({
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Dia de vencimento</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Dia de vencimento</label>
             <input
               name="diaVencimento"
               type="number"
@@ -190,15 +190,15 @@ export function NovaAssinaturaForm({
               max={31}
               defaultValue={5}
               required
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-20"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-20"
             />
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Vendido por (opcional)</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Vendido por (opcional)</label>
             <select
               name="barbeiroId"
               defaultValue=""
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
             >
               <option value="">Sem vendedor</option>
               {barbeiros.map((b) => (
@@ -209,17 +209,17 @@ export function NovaAssinaturaForm({
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Já foi pago? Em que dia (opcional)</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Já foi pago? Em que dia (opcional)</label>
             <input
               name="dataPagamento"
               type="date"
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
             />
           </div>
         </div>
 
         {clienteEncontrado && (
-          <p className="text-blue-600 dark:text-blue-400 text-xs mb-3">Cliente já cadastrado — nome preenchido automaticamente.</p>
+          <p className="text-orange-600 dark:text-orange-400 text-xs mb-3">Cliente já cadastrado — nome preenchido automaticamente.</p>
         )}
         {telefoneNaoEncontrado && !clienteEncontrado && (
           <p className="text-green-600 dark:text-green-400 text-xs mb-3">
@@ -233,7 +233,7 @@ export function NovaAssinaturaForm({
         <button
           type="submit"
           disabled={pendente}
-          className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+          className="rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
         >
           {pendente ? "Criando..." : "Criar assinatura"}
         </button>

@@ -16,7 +16,7 @@ export default async function PrecificacaoPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1">Precificação</h1>
-      <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+      <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-6">
         Descubra o preço certo pra cobrar em um produto, serviço ou procedimento químico, já contando a taxa da
         maquininha, o imposto, a comissão do barbeiro e a margem de lucro que você quer ter.
       </p>

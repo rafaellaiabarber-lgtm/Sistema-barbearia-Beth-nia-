@@ -90,8 +90,8 @@ export default async function BarbeirosPage({
             href={`/admin/barbeiros?periodo=${p}`}
             className={`rounded-lg px-3 py-1.5 text-sm font-medium border ${
               periodo === p
-                ? "bg-blue-600 border-blue-600 text-white"
-                : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-slate-400"
+                ? "bg-orange-600 border-orange-600 text-white"
+                : "bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-600 text-neutral-600 dark:text-neutral-300 hover:border-neutral-400"
             }`}
           >
             {p === "hoje" ? "Hoje" : p === "semana" ? "Esta semana" : "Este mês"}
@@ -100,8 +100,8 @@ export default async function BarbeirosPage({
       </div>
 
       {ranking.length > 0 && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm mb-6">
-          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-2">
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm mb-6">
+          <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 mb-3 flex items-center gap-2">
             <Trophy className="w-4 h-4 text-amber-500" />
             Ranking de desempenho ({LABEL_PERIODO[periodo]}) — por faturamento
           </h2>
@@ -110,15 +110,15 @@ export default async function BarbeirosPage({
               <div key={m.barbeiro.id} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-3">
                   <span
-                    className={`font-bold w-6 text-center ${i === 0 ? "text-amber-500" : "text-blue-600 dark:text-blue-400"}`}
+                    className={`font-bold w-6 text-center ${i === 0 ? "text-amber-500" : "text-orange-600 dark:text-orange-400"}`}
                   >
                     {i + 1}º
                   </span>
                   <span className="font-medium">{m.barbeiro.nome}</span>
                 </div>
                 <div className="text-right">
-                  <span className="font-semibold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(m.faturamentoCentavos)}</Valor></span>
-                  <span className="text-slate-400 dark:text-slate-500 text-xs ml-2">
+                  <span className="font-semibold text-orange-600 dark:text-orange-400"><Valor>{formatarReais(m.faturamentoCentavos)}</Valor></span>
+                  <span className="text-neutral-400 dark:text-neutral-500 text-xs ml-2">
                     {m.qtdAtendimentos} atend. · ticket médio <Valor>{formatarReais(m.ticketMedioCentavos)}</Valor>
                   </span>
                 </div>
@@ -136,26 +136,26 @@ export default async function BarbeirosPage({
             <BarbeiroRow barbeiro={m.barbeiro} />
 
             <div
-              className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm ${
+              className={`bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm ${
                 !m.barbeiro.ativo ? "opacity-50" : ""
               }`}
             >
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
                 <div>
-                  <p className="text-slate-400 dark:text-slate-500 text-xs">Faturamento ({LABEL_PERIODO[periodo]})</p>
-                  <p className="font-semibold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(m.faturamentoCentavos)}</Valor></p>
+                  <p className="text-neutral-400 dark:text-neutral-500 text-xs">Faturamento ({LABEL_PERIODO[periodo]})</p>
+                  <p className="font-semibold text-orange-600 dark:text-orange-400"><Valor>{formatarReais(m.faturamentoCentavos)}</Valor></p>
                 </div>
                 <div>
-                  <p className="text-slate-400 dark:text-slate-500 text-xs">Atendimentos ({LABEL_PERIODO[periodo]})</p>
+                  <p className="text-neutral-400 dark:text-neutral-500 text-xs">Atendimentos ({LABEL_PERIODO[periodo]})</p>
                   <p className="font-semibold">{m.qtdAtendimentos}</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 dark:text-slate-500 text-xs">Ticket médio ({LABEL_PERIODO[periodo]})</p>
+                  <p className="text-neutral-400 dark:text-neutral-500 text-xs">Ticket médio ({LABEL_PERIODO[periodo]})</p>
                   <p className="font-semibold"><Valor>{formatarReais(m.ticketMedioCentavos)}</Valor></p>
                 </div>
               </div>
 
-              <Link href="/admin/metas" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+              <Link href="/admin/metas" className="text-sm text-orange-600 dark:text-orange-400 hover:underline">
                 Configurar metas e bonificação →
               </Link>
 
@@ -163,14 +163,14 @@ export default async function BarbeirosPage({
 
               {m.servicosRealizados.length > 0 && (
                 <details className="mt-4">
-                  <summary className="cursor-pointer text-sm text-blue-600 dark:text-blue-400 hover:underline select-none">
+                  <summary className="cursor-pointer text-sm text-orange-600 dark:text-orange-400 hover:underline select-none">
                     Serviços realizados ({LABEL_PERIODO[periodo]}) — {m.qtdAtendimentos}
                   </summary>
                   <div className="mt-2 space-y-1">
                     {m.servicosRealizados.map((s) => (
                       <div key={s.nome} className="flex items-center justify-between text-sm py-0.5">
                         <span>{s.nome}</span>
-                        <span className="text-slate-500 dark:text-slate-400">{s.qtd}x</span>
+                        <span className="text-neutral-500 dark:text-neutral-400">{s.qtd}x</span>
                       </div>
                     ))}
                   </div>
@@ -179,12 +179,12 @@ export default async function BarbeirosPage({
             </div>
           </div>
         ))}
-        {ativos.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum barbeiro ativo no momento.</p>}
+        {ativos.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum barbeiro ativo no momento.</p>}
       </div>
 
       {inativos.length > 0 && (
         <details className="mt-8">
-          <summary className="cursor-pointer text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 select-none">
+          <summary className="cursor-pointer text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 select-none">
             Barbeiros inativos ({inativos.length})
           </summary>
           <div className="space-y-2 mt-3">
