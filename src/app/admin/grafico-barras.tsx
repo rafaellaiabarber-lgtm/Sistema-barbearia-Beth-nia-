@@ -18,10 +18,10 @@ export function GraficoBarras({
           return (
             <div key={i} className="flex-1 h-full flex items-end group relative">
               <div
-                className="w-full bg-blue-500 group-hover:bg-blue-600 rounded-t transition-colors"
+                className="w-full bg-orange-500 group-hover:bg-orange-600 rounded-t transition-colors"
                 style={{ height: alturaPx }}
               />
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-slate-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
+              <div className="absolute bottom-full left-1/2 -tranneutral-x-1/2 mb-1 hidden group-hover:block bg-neutral-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
                 {d.label}: {formatarValor(d.valor)}
               </div>
             </div>
@@ -30,7 +30,7 @@ export function GraficoBarras({
       </div>
       <div className="flex gap-1 mt-1">
         {dados.map((d, i) => (
-          <div key={i} className="flex-1 text-center text-[10px] text-slate-400 dark:text-slate-500 truncate">
+          <div key={i} className="flex-1 text-center text-[10px] text-neutral-400 dark:text-neutral-500 truncate">
             {d.label}
           </div>
         ))}

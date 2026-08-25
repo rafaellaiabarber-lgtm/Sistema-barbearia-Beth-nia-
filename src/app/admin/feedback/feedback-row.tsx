@@ -12,14 +12,14 @@ function corNota(nota: number) {
 
 export function FeedbackRow({ feedback, mostrarBarbeiro }: { feedback: Feedback & { barbeiro: { nome: string } }; mostrarBarbeiro: boolean }) {
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3 mb-1">
         <div>
-          <p className="font-semibold text-slate-900 dark:text-white">
+          <p className="font-semibold text-neutral-900 dark:text-white">
             {mostrarBarbeiro ? `${feedback.barbeiro.nome} — ` : ""}
             {feedback.temaNomeSnapshot}
           </p>
-          <p className="text-slate-400 dark:text-slate-500 text-xs">
+          <p className="text-neutral-400 dark:text-neutral-500 text-xs">
             {LABEL_PERIODICIDADE_FEEDBACK[feedback.periodicidade] ?? feedback.periodicidade} ·{" "}
             {feedback.criadoEm.toLocaleDateString("pt-BR")}
           </p>
@@ -29,12 +29,12 @@ export function FeedbackRow({ feedback, mostrarBarbeiro }: { feedback: Feedback 
             {feedback.nota}
           </span>
           <form action={excluirFeedback.bind(null, feedback.id)}>
-            <button className="text-slate-400 dark:text-slate-500 hover:text-red-600 text-xs">Excluir</button>
+            <button className="text-neutral-400 dark:text-neutral-500 hover:text-red-600 text-xs">Excluir</button>
           </form>
         </div>
       </div>
       {feedback.observacoes && (
-        <p className="text-slate-600 dark:text-slate-300 text-sm mt-2 whitespace-pre-wrap">{feedback.observacoes}</p>
+        <p className="text-neutral-600 dark:text-neutral-300 text-sm mt-2 whitespace-pre-wrap">{feedback.observacoes}</p>
       )}
     </div>
   );

@@ -41,7 +41,7 @@ export default async function FeedbackPage({
   return (
     <div>
       <h1 className="text-2xl font-bold mb-2">Feedback da equipe</h1>
-      <p className="text-slate-400 dark:text-slate-500 text-sm mb-6">
+      <p className="text-neutral-400 dark:text-neutral-500 text-sm mb-6">
         Registre aqui as conversas de devolutiva com cada barbeiro — semanal, mensal ou avulsa — com nota de 0 a 10
         por tema e o que foi combinado.
       </p>
@@ -56,11 +56,11 @@ export default async function FeedbackPage({
             {[...mediaPorBarbeiro.values()].map((m) => (
               <div
                 key={m.nome}
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
+                className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm"
               >
-                <p className="text-slate-500 dark:text-slate-400 text-sm">{m.nome}</p>
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm">{m.nome}</p>
                 <p className={`text-2xl font-bold ${corMedia(m.soma / m.qtd)}`}>{(m.soma / m.qtd).toFixed(1)}</p>
-                <p className="text-slate-400 dark:text-slate-500 text-xs">{m.qtd} feedback(s){barbeiroId ? "" : " no total"}</p>
+                <p className="text-neutral-400 dark:text-neutral-500 text-xs">{m.qtd} feedback(s){barbeiroId ? "" : " no total"}</p>
               </div>
             ))}
           </div>
@@ -69,11 +69,11 @@ export default async function FeedbackPage({
 
       <form method="get" action="/admin/feedback" className="flex items-end gap-3 mb-4">
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Filtrar por barbeiro</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Filtrar por barbeiro</label>
           <select
             name="barbeiroId"
             defaultValue={barbeiroId ?? ""}
-            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900 w-48"
+            className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900 w-48"
           >
             <option value="">Todos</option>
             {barbeiros.map((b) => (
@@ -85,7 +85,7 @@ export default async function FeedbackPage({
         </div>
         <button
           type="submit"
-          className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm text-slate-600 dark:text-slate-300"
+          className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm text-neutral-600 dark:text-neutral-300"
         >
           Filtrar
         </button>
@@ -95,7 +95,7 @@ export default async function FeedbackPage({
         {feedbacks.map((f) => (
           <FeedbackRow key={f.id} feedback={f} mostrarBarbeiro={!barbeiroId} />
         ))}
-        {feedbacks.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum feedback registrado ainda.</p>}
+        {feedbacks.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum feedback registrado ainda.</p>}
       </div>
     </div>
   );

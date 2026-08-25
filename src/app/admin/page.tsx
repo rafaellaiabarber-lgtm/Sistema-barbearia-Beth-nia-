@@ -153,13 +153,13 @@ export default async function AdminHomePage() {
       <h1 className="text-2xl font-bold mb-6">Visão geral</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="rounded-xl p-5 shadow-sm bg-blue-600 text-white flex items-start justify-between">
+        <div className="rounded-xl p-5 shadow-sm bg-orange-600 text-white flex items-start justify-between">
           <div>
             <p className="text-2xl font-bold mb-1"><Valor>{formatarReais(faturamentoHoje)}</Valor></p>
-            <p className="text-blue-100 text-sm mb-2">Faturamento hoje</p>
+            <p className="text-orange-100 text-sm mb-2">Faturamento hoje</p>
             <Variacao atual={faturamentoHoje} anterior={faturamentoDiaAnterior} claro />
           </div>
-          <ShoppingCart className="w-8 h-8 text-blue-200 shrink-0" />
+          <ShoppingCart className="w-8 h-8 text-orange-200 shrink-0" />
         </div>
         <div className="rounded-xl p-5 shadow-sm bg-amber-500 text-white flex items-start justify-between">
           <div>
@@ -192,17 +192,17 @@ export default async function AdminHomePage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Faturamento (últimos 14 dias)</h2>
+        <div className="lg:col-span-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 mb-4">Faturamento (últimos 14 dias)</h2>
           <GraficoBarras dados={dadosGrafico} />
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">Serviços mais vendidos (mês)</h2>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 mb-3">Serviços mais vendidos (mês)</h2>
           <div className="space-y-2">
             {rankingServicos.map((r, i) => (
               <div key={r.nome} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-blue-600 dark:text-blue-400 font-bold w-5 text-center">{i + 1}º</span>
+                  <span className="text-orange-600 dark:text-orange-400 font-bold w-5 text-center">{i + 1}º</span>
                   <span className="font-medium">{r.nome}</span>
                 </div>
                 <div className="text-right">
@@ -211,7 +211,7 @@ export default async function AdminHomePage() {
               </div>
             ))}
             {rankingServicos.length === 0 && (
-              <p className="text-slate-400 dark:text-slate-500 text-sm">Nenhum serviço vendido no mês.</p>
+              <p className="text-neutral-400 dark:text-neutral-500 text-sm">Nenhum serviço vendido no mês.</p>
             )}
           </div>
         </div>
@@ -219,46 +219,46 @@ export default async function AdminHomePage() {
 
       <h2 className="text-lg font-semibold mb-3">Este mês</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Faturamento da semana</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1"><Valor>{formatarReais(faturamentoSemana)}</Valor></p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Faturamento da semana</p>
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-1"><Valor>{formatarReais(faturamentoSemana)}</Valor></p>
           <Variacao atual={faturamentoSemana} anterior={faturamentoSemanaAnterior} />
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Lucro estimado</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Lucro estimado</p>
           <p className={`text-2xl font-bold mb-1 ${lucroMes < 0 ? "text-red-600" : "text-green-600"}`}>
             <Valor>{formatarReais(lucroMes)}</Valor>
           </p>
           <Variacao atual={lucroMes} anterior={lucroMesAnterior} />
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Atendimentos</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">{qtdAtendimentosMes}</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Atendimentos</p>
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-1">{qtdAtendimentosMes}</p>
           <Variacao atual={qtdAtendimentosMes} anterior={qtdAtendimentosMesAnterior} />
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Ticket médio</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1"><Valor>{formatarReais(ticketMedioMes)}</Valor></p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Ticket médio</p>
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-1"><Valor>{formatarReais(ticketMedioMes)}</Valor></p>
           <Variacao atual={ticketMedioMes} anterior={ticketMedioMesAnterior} />
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Na fila agora</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{aguardando}</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Na fila agora</p>
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{aguardando}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Em atendimento</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{emAtendimento}</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Em atendimento</p>
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{emAtendimento}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Clientes novos (mês)</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{clientesNovos}</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Clientes novos (mês)</p>
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{clientesNovos}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Clientes recorrentes (mês)</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{clientesRecorrentes}</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Clientes recorrentes (mês)</p>
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{clientesRecorrentes}</p>
         </div>
       </div>
 
@@ -268,29 +268,29 @@ export default async function AdminHomePage() {
           {rankingBarbeiros.map((b) => (
             <div
               key={b.nome}
-              className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm shadow-sm"
+              className="flex items-center justify-between bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 text-sm shadow-sm"
             >
               <span className="font-medium">{b.nome}</span>
               <div className="text-right">
-                <p className="font-semibold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(b.totalCentavos)}</Valor></p>
-                <p className="text-slate-400 dark:text-slate-500 text-xs">{b.qtd} atendimento(s)</p>
+                <p className="font-semibold text-orange-600 dark:text-orange-400"><Valor>{formatarReais(b.totalCentavos)}</Valor></p>
+                <p className="text-neutral-400 dark:text-neutral-500 text-xs">{b.qtd} atendimento(s)</p>
               </div>
             </div>
           ))}
           {rankingBarbeiros.length === 0 && (
-            <p className="text-slate-400 dark:text-slate-500 text-sm">Nenhum atendimento no mês.</p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-sm">Nenhum atendimento no mês.</p>
           )}
         </div>
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Link href="/admin/financeiro" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
+        <Link href="/admin/financeiro" className="text-orange-600 dark:text-orange-400 hover:underline text-sm">
           Ver relatório financeiro completo →
         </Link>
-        <Link href="/admin/eficiencia" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
+        <Link href="/admin/eficiencia" className="text-orange-600 dark:text-orange-400 hover:underline text-sm">
           Ver eficiência dos barbeiros →
         </Link>
-        <Link href="/fila" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
+        <Link href="/fila" className="text-orange-600 dark:text-orange-400 hover:underline text-sm">
           Abrir painel da fila →
         </Link>
       </div>

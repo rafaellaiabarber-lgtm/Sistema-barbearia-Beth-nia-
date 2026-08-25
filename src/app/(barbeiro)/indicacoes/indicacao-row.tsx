@@ -23,13 +23,13 @@ export function IndicacaoRow({
 }) {
   return (
     <div
-      className={`flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm ${
+      className={`flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm ${
         contatada && !convertida ? "opacity-60" : ""
       }`}
     >
       <div>
         <p className="font-semibold">{nome}</p>
-        <p className="text-slate-500 dark:text-slate-400 text-sm">
+        <p className="text-neutral-500 dark:text-neutral-400 text-sm">
           {formatarTelefone(telefone)}
           {barbeiroNome && ` · ${barbeiroNome}`} ·{" "}
           {criadoEm.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}
@@ -37,7 +37,7 @@ export function IndicacaoRow({
         <span
           className={`inline-block mt-1 rounded-full text-xs px-2 py-0.5 ${
             convertida
-              ? "bg-blue-100 dark:bg-blue-900 text-blue-700"
+              ? "bg-orange-100 dark:bg-orange-900 text-orange-700"
               : contatada
                 ? "bg-green-100 dark:bg-green-900 text-green-700"
                 : "bg-amber-100 dark:bg-amber-900 text-amber-700"
@@ -57,17 +57,17 @@ export function IndicacaoRow({
           WhatsApp
         </a>
         <form action={alternarContatada.bind(null, id, !contatada)}>
-          <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">
+          <button className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-orange-600 dark:hover:text-orange-400">
             {contatada ? "Marcar pendente" : "Marcar contatada"}
           </button>
         </form>
         <form action={alternarConvertida.bind(null, id, !convertida)}>
-          <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">
+          <button className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-orange-600 dark:hover:text-orange-400">
             {convertida ? "Desfazer conversão" : "Marcar que virou cliente"}
           </button>
         </form>
         <form action={excluirIndicacao.bind(null, id)}>
-          <button className="text-sm text-slate-400 dark:text-slate-500 hover:text-red-600">Excluir</button>
+          <button className="text-sm text-neutral-400 dark:text-neutral-500 hover:text-red-600">Excluir</button>
         </form>
       </div>
     </div>

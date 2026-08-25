@@ -118,7 +118,7 @@ export default async function ComissoesPage({
       />
 
       {!podeMarcarPago && (
-        <p className="text-slate-400 dark:text-slate-500 text-xs mb-4">
+        <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-4">
           Período personalizado: marcar comissão como paga fica disponível só em Hoje/Semana/Mês.
         </p>
       )}
@@ -129,17 +129,17 @@ export default async function ComissoesPage({
           return (
             <div
               key={id}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
+              className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm"
             >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold">{b.nome}</p>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">
+                  <p className="text-neutral-500 dark:text-neutral-400 text-sm">
                     {b.qtd} atendimento(s) · faturamento <Valor>{formatarReais(b.totalCentavos)}</Valor>
                   </p>
                 </div>
                 <div className="text-right flex items-center gap-3">
-                  <p className="text-blue-600 dark:text-blue-400 font-bold text-lg"><Valor>{formatarReais(b.comissaoCentavos)}</Valor></p>
+                  <p className="text-orange-600 dark:text-orange-400 font-bold text-lg"><Valor>{formatarReais(b.comissaoCentavos)}</Valor></p>
                   {podeMarcarPago &&
                     (pago ? (
                       <form action={desmarcarComissaoPaga.bind(null, id, periodo as "hoje" | "semana" | "mes", chave)}>
@@ -157,7 +157,7 @@ export default async function ComissoesPage({
                           b.comissaoCentavos
                         )}
                       >
-                      <button className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-sm font-medium">
+                      <button className="rounded-lg bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 text-sm font-medium">
                         Marcar como pago
                       </button>
                     </form>
@@ -167,7 +167,7 @@ export default async function ComissoesPage({
             </div>
           );
         })}
-        {porBarbeiro.size === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum atendimento no período.</p>}
+        {porBarbeiro.size === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum atendimento no período.</p>}
       </div>
 
       <h2 className="text-lg font-semibold mb-3">Serviços mais vendidos no período</h2>
@@ -175,19 +175,19 @@ export default async function ComissoesPage({
         {ranking.map((r, i) => (
           <div
             key={r.nome}
-            className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm shadow-sm"
+            className="flex items-center justify-between bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 text-sm shadow-sm"
           >
             <div className="flex items-center gap-3">
-              <span className="text-blue-600 dark:text-blue-400 font-bold w-6 text-center">{i + 1}º</span>
+              <span className="text-orange-600 dark:text-orange-400 font-bold w-6 text-center">{i + 1}º</span>
               <span className="font-medium">{r.nome}</span>
             </div>
             <div className="text-right">
               <p className="font-semibold">{r.qtd}x</p>
-              <p className="text-slate-400 dark:text-slate-500 text-xs"><Valor>{formatarReais(r.totalCentavos)}</Valor></p>
+              <p className="text-neutral-400 dark:text-neutral-500 text-xs"><Valor>{formatarReais(r.totalCentavos)}</Valor></p>
             </div>
           </div>
         ))}
-        {ranking.length === 0 && <p className="text-slate-400 dark:text-slate-500">Nenhum serviço vendido no período.</p>}
+        {ranking.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum serviço vendido no período.</p>}
       </div>
     </div>
   );

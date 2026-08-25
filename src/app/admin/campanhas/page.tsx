@@ -34,7 +34,7 @@ export default async function CampanhasPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1">Campanhas de venda</h1>
-      <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+      <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-6">
         Monte uma lista de produtos e serviços com quantidade alvo pra um barbeiro — aparece pra ele assim que começa a
         atender um cliente, lembrando o que ainda falta vender.
       </p>
@@ -46,7 +46,7 @@ export default async function CampanhasPage() {
           <CampanhaRow key={c.id} {...c} />
         ))}
         {campanhasComProgresso.length === 0 && (
-          <p className="text-slate-400 dark:text-slate-500">Nenhuma campanha criada ainda.</p>
+          <p className="text-neutral-400 dark:text-neutral-500">Nenhuma campanha criada ainda.</p>
         )}
       </div>
     </div>

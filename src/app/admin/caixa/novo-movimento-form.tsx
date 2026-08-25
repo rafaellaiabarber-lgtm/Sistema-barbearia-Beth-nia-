@@ -23,17 +23,17 @@ export function NovoMovimentoForm() {
     <form
       ref={formRef}
       action={formAction}
-      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm"
+      className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 mb-6 shadow-sm"
     >
       <div className="flex flex-wrap items-end gap-3 mb-3">
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Tipo</label>
-          <div className="flex rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600">
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Tipo</label>
+          <div className="flex rounded-lg overflow-hidden border border-neutral-300 dark:border-neutral-600">
             <button
               type="button"
               onClick={() => setTipo("SAIDA")}
               className={`px-3 py-2 text-sm font-medium ${
-                tipo === "SAIDA" ? "bg-red-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                tipo === "SAIDA" ? "bg-red-600 text-white" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400"
               }`}
             >
               Saída
@@ -42,7 +42,7 @@ export function NovoMovimentoForm() {
               type="button"
               onClick={() => setTipo("ENTRADA")}
               className={`px-3 py-2 text-sm font-medium ${
-                tipo === "ENTRADA" ? "bg-green-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                tipo === "ENTRADA" ? "bg-green-600 text-white" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400"
               }`}
             >
               Entrada
@@ -51,31 +51,31 @@ export function NovoMovimentoForm() {
           <input type="hidden" name="tipo" value={tipo} />
         </div>
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Descrição</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Descrição</label>
           <input
             name="descricao"
             required
             placeholder="Ex: compra de material, troco..."
-            className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-56"
+            className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-56"
           />
         </div>
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Valor (R$)</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Valor (R$)</label>
           <input
             name="valor"
             required
             placeholder="20,00"
-            className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-28"
+            className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-28"
           />
         </div>
         {tipo === "SAIDA" && (
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Categoria</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Categoria</label>
             <select
               name="categoria"
               required
               defaultValue=""
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
             >
               <option value="" disabled>
                 Escolha
@@ -91,7 +91,7 @@ export function NovoMovimentoForm() {
       </div>
 
       <div className="mb-3">
-        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Forma de pagamento</label>
+        <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Forma de pagamento</label>
         <div className="max-w-sm">
           <SeletorFormaPagamento />
         </div>
@@ -100,7 +100,7 @@ export function NovoMovimentoForm() {
       <button
         type="submit"
         disabled={pendente}
-        className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+        className="rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
       >
         {pendente ? "Lançando..." : "Lançar"}
       </button>

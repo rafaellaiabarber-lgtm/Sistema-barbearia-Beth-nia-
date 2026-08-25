@@ -22,43 +22,43 @@ export function NovaDespesaForm() {
   }, [estado, pendente]);
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm">
-      <p className="font-semibold text-slate-800 dark:text-slate-100 mb-3">Nova despesa</p>
+    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 mb-6 shadow-sm">
+      <p className="font-semibold text-neutral-800 dark:text-neutral-100 mb-3">Nova despesa</p>
       <form ref={formRef} action={formAction} className="flex flex-wrap items-end gap-3">
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Descrição</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Descrição</label>
           <input
             name="descricao"
             required
             placeholder="Gasolina, pomada, almoço..."
-            className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-56"
+            className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-56"
           />
         </div>
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Valor (R$)</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Valor (R$)</label>
           <input
             name="valor"
             required
             inputMode="decimal"
             placeholder="0,00"
-            className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-28"
+            className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-28"
           />
         </div>
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Data</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Data</label>
           <input
             ref={dataRef}
             name="data"
             type="date"
             required
             defaultValue={hoje()}
-            className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+            className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
           />
         </div>
         <button
           type="submit"
           disabled={pendente}
-          className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+          className="rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
         >
           {pendente ? "Salvando..." : "Adicionar despesa"}
         </button>

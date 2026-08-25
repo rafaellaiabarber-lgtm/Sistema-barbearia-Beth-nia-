@@ -18,7 +18,7 @@ export function BarbeiroSidebarNav({ links }: { links: BarbeiroNavLink[] }) {
             key={l.href}
             href={l.href}
             className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-              ativo ? "bg-blue-600 text-white" : "text-blue-100/80 hover:bg-blue-500/10 hover:text-white"
+              ativo ? "bg-orange-600 text-white" : "text-orange-100/80 hover:bg-orange-500/10 hover:text-white"
             }`}
           >
             <Icone className="w-4 h-4 shrink-0" />

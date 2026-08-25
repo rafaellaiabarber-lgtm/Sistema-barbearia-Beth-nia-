@@ -19,7 +19,7 @@ export function CopiarLinkButton({ url }: { url: string }) {
     <button
       type="button"
       onClick={copiar}
-      className="text-sm rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5"
+      className="text-sm rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-semibold px-3 py-1.5"
     >
       {copiado ? "Copiado! ✓" : "Copiar link"}
     </button>

@@ -44,19 +44,19 @@ export function NovaCampanhaForm({
   if (produtos.length === 0 && servicos.length === 0) return null;
 
   return (
-    <details className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm">
-      <summary className="cursor-pointer font-semibold text-slate-800 dark:text-slate-100 select-none">
+    <details className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 mb-6 shadow-sm">
+      <summary className="cursor-pointer font-semibold text-neutral-800 dark:text-neutral-100 select-none">
         Nova campanha
       </summary>
       <form ref={formRef} action={formAction} className="mt-4">
         <div className="flex flex-wrap items-end gap-3 mb-4">
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Barbeiro</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Barbeiro</label>
             <select
               name="barbeiroId"
               required
               defaultValue=""
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
             >
               <option value="" disabled>
                 Escolha
@@ -69,27 +69,27 @@ export function NovaCampanhaForm({
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Título (opcional)</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Título (opcional)</label>
             <input
               name="titulo"
               placeholder="Ex: Kit inverno"
-              className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm w-48"
+              className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm w-48"
             />
           </div>
         </div>
 
-        <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">O que precisa vender:</p>
+        <p className="text-neutral-700 dark:text-neutral-200 text-sm font-semibold mb-2">O que precisa vender:</p>
         <div className="space-y-2 mb-2">
           {itens.map((item, i) => (
             <div key={i} className="flex flex-wrap items-end gap-2">
               <div>
-                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Item {i + 1}</label>
+                <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Item {i + 1}</label>
                 <select
                   name="itemSelecao"
                   required
                   value={item.selecao}
                   onChange={(e) => atualizar(i, "selecao", e.target.value)}
-                  className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1.5 text-sm w-56"
+                  className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-2 py-1.5 text-sm w-56"
                 >
                   <option value="" disabled>
                     Escolha
@@ -115,7 +115,7 @@ export function NovaCampanhaForm({
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Quantidade</label>
+                <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Quantidade</label>
                 <input
                   name="itemQuantidade"
                   type="number"
@@ -123,14 +123,14 @@ export function NovaCampanhaForm({
                   required
                   value={item.quantidade}
                   onChange={(e) => atualizar(i, "quantidade", e.target.value)}
-                  className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1.5 text-sm w-20"
+                  className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-2 py-1.5 text-sm w-20"
                 />
               </div>
               {itens.length > 1 && (
                 <button
                   type="button"
                   onClick={() => remover(i)}
-                  className="text-slate-400 dark:text-slate-500 hover:text-red-600 text-sm py-1.5"
+                  className="text-neutral-400 dark:text-neutral-500 hover:text-red-600 text-sm py-1.5"
                 >
                   Remover
                 </button>
@@ -138,7 +138,7 @@ export function NovaCampanhaForm({
             </div>
           ))}
         </div>
-        <button type="button" onClick={adicionar} className="text-blue-600 dark:text-blue-400 hover:underline text-sm mb-4 block">
+        <button type="button" onClick={adicionar} className="text-orange-600 dark:text-orange-400 hover:underline text-sm mb-4 block">
           + Adicionar item
         </button>
 
@@ -147,7 +147,7 @@ export function NovaCampanhaForm({
         <button
           type="submit"
           disabled={pendente}
-          className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+          className="rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
         >
           {pendente ? "Criando..." : "Criar campanha"}
         </button>

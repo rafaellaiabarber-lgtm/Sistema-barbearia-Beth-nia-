@@ -140,18 +140,18 @@ export default async function GerenteVirtualPage({
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1">Gerente Virtual</h1>
-      <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+      <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-6">
         Diagnóstico, previsão e oportunidades — calculados automaticamente com os dados da sua barbearia.
       </p>
 
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">O que fazer amanhã</h2>
         {recomendacoesDia.length === 0 ? (
-          <p className="text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+          <p className="text-neutral-400 dark:text-neutral-500 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
             Nenhuma recomendação por enquanto — está tudo dentro do esperado.
           </p>
         ) : (
-          <div className="bg-blue-600 text-white rounded-xl p-5 shadow-sm">
+          <div className="bg-orange-600 text-white rounded-xl p-5 shadow-sm">
             <ul className="space-y-2">
               {recomendacoesDia.map((texto, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm">
@@ -167,28 +167,28 @@ export default async function GerenteVirtualPage({
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">Diagnóstico do mês</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-            <p className="text-slate-500 dark:text-slate-400 text-xs">Faturamento</p>
-            <p className="text-xl font-bold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(comparativoAtual.faturamentoCentavos)}</Valor></p>
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
+            <p className="text-neutral-500 dark:text-neutral-400 text-xs">Faturamento</p>
+            <p className="text-xl font-bold text-orange-600 dark:text-orange-400"><Valor>{formatarReais(comparativoAtual.faturamentoCentavos)}</Valor></p>
           </div>
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-            <p className="text-slate-500 dark:text-slate-400 text-xs">Margem</p>
-            <p className={`text-xl font-bold ${margemAtual < 0 ? "text-red-600" : "text-blue-600 dark:text-blue-400"}`}>
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
+            <p className="text-neutral-500 dark:text-neutral-400 text-xs">Margem</p>
+            <p className={`text-xl font-bold ${margemAtual < 0 ? "text-red-600" : "text-orange-600 dark:text-orange-400"}`}>
               {margemAtual.toFixed(0)}%
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-            <p className="text-slate-500 dark:text-slate-400 text-xs">Ticket médio</p>
-            <p className="text-xl font-bold text-blue-600 dark:text-blue-400"><Valor>{formatarReais(ticketMedioAtual)}</Valor></p>
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
+            <p className="text-neutral-500 dark:text-neutral-400 text-xs">Ticket médio</p>
+            <p className="text-xl font-bold text-orange-600 dark:text-orange-400"><Valor>{formatarReais(ticketMedioAtual)}</Valor></p>
           </div>
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-            <p className="text-slate-500 dark:text-slate-400 text-xs">Clientes novos</p>
-            <p className="text-xl font-bold text-blue-600 dark:text-blue-400">{comparativoAtual.clientesNovos}</p>
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
+            <p className="text-neutral-500 dark:text-neutral-400 text-xs">Clientes novos</p>
+            <p className="text-xl font-bold text-orange-600 dark:text-orange-400">{comparativoAtual.clientesNovos}</p>
           </div>
         </div>
 
         {alertas.length === 0 ? (
-          <p className="text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+          <p className="text-neutral-400 dark:text-neutral-500 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
             Nada fora do padrão em relação ao mês passado ainda — sem alertas por aqui.
           </p>
         ) : (
@@ -210,15 +210,15 @@ export default async function GerenteVirtualPage({
 
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">Previsão de faturamento</h2>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm mb-3">
-          <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm mb-3">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-1">
             Você tem feito em média <Valor>{formatarReais(previsao.ritmoDiarioCentavos)}</Valor>/dia esse mês. Nesse ritmo, deve
             fechar o mês em:
           </p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-3"><Valor>{formatarReais(previsao.previsaoFechamentoCentavos)}</Valor></p>
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-3"><Valor>{formatarReais(previsao.previsaoFechamentoCentavos)}</Valor></p>
 
           {metaCentavos !== null ? (
-            <p className="text-slate-600 dark:text-slate-300 text-sm">
+            <p className="text-neutral-600 dark:text-neutral-300 text-sm">
               Meta do mês: <Valor>{formatarReais(metaCentavos)}</Valor>.{" "}
               {previsao.faltamPorDiaCentavos !== null && previsao.faltamPorDiaCentavos > 0 ? (
                 <>
@@ -232,7 +232,7 @@ export default async function GerenteVirtualPage({
               )}
             </p>
           ) : (
-            <p className="text-slate-400 dark:text-slate-500 text-sm">Defina uma meta mensal abaixo pra ver quanto falta por dia.</p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-sm">Defina uma meta mensal abaixo pra ver quanto falta por dia.</p>
           )}
         </div>
         <MetaMensalForm metaAtual={metaCentavos} />
@@ -242,16 +242,16 @@ export default async function GerenteVirtualPage({
         <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
           <h2 className="text-lg font-semibold">Clientes sumidos ({clientesSumidos.length})</h2>
           <form method="get" className="flex items-center gap-2">
-            <label className="text-slate-500 dark:text-slate-400 text-sm">Sem voltar há mais de</label>
+            <label className="text-neutral-500 dark:text-neutral-400 text-sm">Sem voltar há mais de</label>
             <input
               type="number"
               name="diasSumidos"
               defaultValue={diasSumidos}
               min={1}
-              className="w-16 rounded-lg border border-slate-300 dark:border-slate-600 px-2 py-1 text-sm"
+              className="w-16 rounded-lg border border-neutral-300 dark:border-neutral-600 px-2 py-1 text-sm"
             />
-            <span className="text-slate-500 dark:text-slate-400 text-sm">dias</span>
-            <button type="submit" className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3 py-1.5">
+            <span className="text-neutral-500 dark:text-neutral-400 text-sm">dias</span>
+            <button type="submit" className="rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium px-3 py-1.5">
               Filtrar
             </button>
           </form>
@@ -267,7 +267,7 @@ export default async function GerenteVirtualPage({
             />
           ))}
           {clientesSumidos.length === 0 && (
-            <p className="text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+            <p className="text-neutral-400 dark:text-neutral-500 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
               Nenhum cliente sumido há mais de {diasSumidos} dias — ótimo sinal!
             </p>
           )}

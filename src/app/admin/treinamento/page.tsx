@@ -8,7 +8,7 @@ export default async function TreinamentoAdminPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1">Treinamento</h1>
-      <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+      <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-6">
         Cronograma, POP, planilhas e vídeo-aulas pra quem está entrando na equipe. Todo barbeiro vê o mesmo conteúdo,
         na ordem que você configurar aqui.
       </p>
@@ -20,7 +20,7 @@ export default async function TreinamentoAdminPage() {
           <MaterialRow key={m.id} material={m} primeiro={i === 0} ultimo={i === materiais.length - 1} />
         ))}
         {materiais.length === 0 && (
-          <p className="text-slate-400 dark:text-slate-500">Nenhum material cadastrado ainda.</p>
+          <p className="text-neutral-400 dark:text-neutral-500">Nenhum material cadastrado ainda.</p>
         )}
       </div>
     </div>

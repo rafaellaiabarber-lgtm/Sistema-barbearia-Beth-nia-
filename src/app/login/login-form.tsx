@@ -11,7 +11,7 @@ export function LoginForm() {
   return (
     <form action={formAction} className="space-y-4">
       <div>
-        <label className="block text-sm text-slate-700 mb-1" htmlFor="login">
+        <label className="block text-sm text-neutral-700 mb-1" htmlFor="login">
           Usuário
         </label>
         <input
@@ -20,11 +20,11 @@ export function LoginForm() {
           type="text"
           autoComplete="username"
           required
-          className="w-full rounded-lg bg-white border border-slate-300 text-slate-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full rounded-lg bg-white border border-neutral-300 text-neutral-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
         />
       </div>
       <div>
-        <label className="block text-sm text-slate-700 mb-1" htmlFor="senha">
+        <label className="block text-sm text-neutral-700 mb-1" htmlFor="senha">
           Senha
         </label>
         <input
@@ -33,7 +33,7 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           required
-          className="w-full rounded-lg bg-white border border-slate-300 text-slate-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full rounded-lg bg-white border border-neutral-300 text-neutral-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
         />
       </div>
 
@@ -42,7 +42,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={pendente}
-        className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold py-2 transition-colors"
+        className="w-full rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white font-semibold py-2 transition-colors"
       >
         {pendente ? "Entrando..." : "Entrar"}
       </button>

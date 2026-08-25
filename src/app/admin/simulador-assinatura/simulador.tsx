@@ -180,37 +180,37 @@ export function Simulador({
   return (
     <div>
       {usandoHistorico && (
-        <p className="text-xs text-blue-600 dark:text-blue-400 mb-2">
+        <p className="text-xs text-orange-600 dark:text-orange-400 mb-2">
           Usando os dados históricos informados abaixo em vez dos dados reais do sistema.
         </p>
       )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-4">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">
             Atendimentos {usandoHistorico ? "(estimado)" : "no período"}
           </p>
           <p className="text-xl font-bold">{dadosEfetivos.nAtendimentos}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Clientes únicos {usandoHistorico ? "(estimado)" : ""}</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">Clientes únicos {usandoHistorico ? "(estimado)" : ""}</p>
           <p className="text-xl font-bold">{dadosEfetivos.clientesUnicos}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Ticket médio {usandoHistorico ? "(informado)" : "real"}</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">Ticket médio {usandoHistorico ? "(informado)" : "real"}</p>
           <p className="text-xl font-bold">{formatarReais(dadosEfetivos.ticketMedioCentavos)}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">
             Faturamento {usandoHistorico ? "(estimado)" : "real"} no período
           </p>
           <p className="text-xl font-bold">{formatarReais(dadosEfetivos.faturamentoCentavos)}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Ritmo real de retorno (histórico)</p>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">Ritmo real de retorno (histórico)</p>
           <p className="text-xl font-bold">
             {intervaloMedioDias ? `${Math.round(intervaloMedioDias)} dias` : "—"}
           </p>
-          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+          <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">
             {frequenciaRealCortesPorMes
               ? `≈ ${frequenciaRealCortesPorMes.toFixed(1).replace(".", ",")} cortes/mês`
               : "sem clientes com 2+ visitas ainda"}
@@ -225,79 +225,79 @@ export function Simulador({
         </p>
       )}
 
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm mb-4">
+      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm mb-4">
         <h2 className="font-semibold mb-1">Dados históricos (de antes do sistema atual)</h2>
-        <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
+        <p className="text-xs text-neutral-400 dark:text-neutral-500 mb-3">
           Sistema novo ainda não tem histórico suficiente? Preencha o faturamento avulso que você já tinha em outro
           sistema e em quantos meses isso foi — os cards acima e a simulação passam a usar esses números (junto com
           o ticket avulso e o uso esperado ao lado).
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:max-w-md">
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Faturamento avulso total (R$)</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Faturamento avulso total (R$)</label>
             <input
               value={faturamentoHistorico}
               onChange={(e) => setFaturamentoHistorico(e.target.value)}
               placeholder="9.000,00"
               inputMode="decimal"
-              className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+              className="w-full rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
             />
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Em quantos meses (aprox.)</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Em quantos meses (aprox.)</label>
             <input
               value={mesesHistorico}
               onChange={(e) => setMesesHistorico(e.target.value)}
               placeholder="2"
               inputMode="decimal"
-              className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+              className="w-full rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
             />
           </div>
         </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
           <h2 className="font-semibold mb-4">Dados do plano</h2>
           <div className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Ticket médio avulso (R$)</label>
+                <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Ticket médio avulso (R$)</label>
                 <input
                   value={ticketAvulso}
                   onChange={(e) => setTicketAvulso(e.target.value)}
                   placeholder={usandoHistorico ? "informe o ticket desse histórico" : "45,00"}
                   inputMode="decimal"
-                  className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                  className="w-full rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Uso médio esperado (cortes/mês)</label>
+                <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Uso médio esperado (cortes/mês)</label>
                 <input
                   value={usoEsperado}
                   onChange={(e) => setUsoEsperado(e.target.value)}
                   placeholder={usandoHistorico ? "ex: 4" : "4"}
                   inputMode="decimal"
-                  className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                  className="w-full rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
                 />
               </div>
             </div>
             {usandoHistorico ? (
-              <p className="text-xs text-blue-600 dark:text-blue-400">
+              <p className="text-xs text-orange-600 dark:text-orange-400">
                 Como você está usando dados históricos, preencha aqui o ticket médio e o uso esperado daquele período
                 (do outro sistema) — eles não vêm mais do sistema atual, e são a base pra estimar quantos clientes
                 geraram o faturamento histórico informado abaixo.
               </p>
             ) : (
-              <p className="text-xs text-slate-400 dark:text-slate-500">
+              <p className="text-xs text-neutral-400 dark:text-neutral-500">
                 Ticket avulso já vem preenchido com o valor real do serviço/período escolhidos acima. Uso esperado já
                 vem do ritmo real de retorno dos clientes (card "Ritmo real de retorno" acima) — é só usado pra calcular
                 lucro e ticket efetivo, já que o plano é ilimitado (não tem "cortes contratados").
               </p>
             )}
 
-            <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Como está sua agenda hoje?</p>
+            <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800">
+              <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-2">Como está sua agenda hoje?</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {(Object.keys(LABEL_AGENDA) as Agenda[]).map((a) => (
                   <button
@@ -306,49 +306,49 @@ export function Simulador({
                     onClick={() => setAgenda(a)}
                     className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
                       agenda === a
-                        ? "bg-blue-600 border-blue-600 text-white"
-                        : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300"
+                        ? "bg-orange-600 border-orange-600 text-white"
+                        : "bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-600 text-neutral-600 dark:text-neutral-300"
                     }`}
                   >
                     {LABEL_AGENDA[a]}
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+              <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
                 Sobra horário → preço mais convidativo, perto do piso da faixa. Quase lotada → preço perto do teto,
                 já que a prioridade deixa de ser encher a agenda.
               </p>
             </div>
 
-            <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Conversão estimada (clientes avulsos que migram)</p>
+            <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800">
+              <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-2">Conversão estimada (clientes avulsos que migram)</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Conversão no mínimo (%)</label>
+                  <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Conversão no mínimo (%)</label>
                   <input
                     value={conversaoMin}
                     onChange={(e) => setConversaoMin(e.target.value)}
                     inputMode="decimal"
-                    className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                    className="w-full rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Conversão no máximo (%)</label>
+                  <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Conversão no máximo (%)</label>
                   <input
                     value={conversaoMax}
                     onChange={(e) => setConversaoMax(e.target.value)}
                     inputMode="decimal"
-                    className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+                    className="w-full rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
                   />
                 </div>
               </div>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+              <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
                 Você calibra isso com base no que achar razoável — depois pode ajustar com dados reais.
               </p>
               <div className="mt-3">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Mínimo</span>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Máximo</span>
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400">Mínimo</span>
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400">Máximo</span>
                 </div>
                 <input
                   type="range"
@@ -356,45 +356,45 @@ export function Simulador({
                   max={100}
                   value={slider}
                   onChange={(e) => setSlider(Number(e.target.value))}
-                  className="w-full accent-blue-600"
+                  className="w-full accent-orange-600"
                 />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
           <h2 className="font-semibold mb-4">Resultado da simulação</h2>
           {!resultado ? (
-            <p className="text-slate-400 dark:text-slate-500 text-sm">Preencha o ticket avulso pra calcular.</p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-sm">Preencha o ticket avulso pra calcular.</p>
           ) : (
             <>
-              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+              <p className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-1">
                 {formatarReais(resultado.precoAssinaturaCentavos)}
               </p>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">preço sugerido da assinatura ilimitada no mês</p>
+              <p className="text-xs text-neutral-400 dark:text-neutral-500 mb-4">preço sugerido da assinatura ilimitada no mês</p>
 
               <div className="space-y-1.5 text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Teto do plano (2× o avulso)</span>
+                  <span className="text-neutral-500 dark:text-neutral-400">Teto do plano (2× o avulso)</span>
                   <span>{formatarReais(resultado.tetoCentavos)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Posição na faixa ({LABEL_AGENDA[agenda]})</span>
+                  <span className="text-neutral-500 dark:text-neutral-400">Posição na faixa ({LABEL_AGENDA[agenda]})</span>
                   <span>{Math.round(resultado.posicaoPercentual * 100)}% do teto</span>
                 </div>
                 {resultado.ticketEfetivoPorUsoCentavos !== null && (
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-500 dark:text-slate-400">Ticket efetivo por uso</span>
+                    <span className="text-neutral-500 dark:text-neutral-400">Ticket efetivo por uso</span>
                     <span>{formatarReais(resultado.ticketEfetivoPorUsoCentavos)}</span>
                   </div>
                 )}
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Conversão estimada</span>
+                  <span className="text-neutral-500 dark:text-neutral-400">Conversão estimada</span>
                   <span>{resultado.conversao.toFixed(1).replace(".", ",")}%</span>
                 </div>
                 {resultado.novoTicketMedioGeralCentavos !== null && (
-                  <div className="flex items-center justify-between pt-1.5 border-t border-slate-200 dark:border-slate-800">
+                  <div className="flex items-center justify-between pt-1.5 border-t border-neutral-200 dark:border-neutral-800">
                     <span className="font-medium text-green-600">Novo ticket médio geral</span>
                     <span className="font-medium text-green-600">{formatarReais(resultado.novoTicketMedioGeralCentavos)}</span>
                   </div>
@@ -402,42 +402,42 @@ export function Simulador({
               </div>
 
               {resultado.lucroPorUsoCentavos !== null && resultado.lucroMensalPorAssinanteCentavos !== null && (
-                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 space-y-1.5 text-sm">
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                <div className="mt-4 pt-3 border-t border-neutral-200 dark:border-neutral-800 space-y-1.5 text-sm">
+                  <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1">
                     Lucro (custo e comissão de "{servico?.nome}")
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-500 dark:text-slate-400">Lucro por uso</span>
+                    <span className="text-neutral-500 dark:text-neutral-400">Lucro por uso</span>
                     <span>{formatarReais(resultado.lucroPorUsoCentavos)}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-blue-600 dark:text-blue-400">Lucro mensal por assinante</span>
-                    <span className="font-medium text-blue-600 dark:text-blue-400">
+                    <span className="font-medium text-orange-600 dark:text-orange-400">Lucro mensal por assinante</span>
+                    <span className="font-medium text-orange-600 dark:text-orange-400">
                       {formatarReais(resultado.lucroMensalPorAssinanteCentavos)}
                     </span>
                   </div>
                 </div>
               )}
 
-              <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 space-y-1.5 text-sm">
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+              <div className="mt-4 pt-3 border-t border-neutral-200 dark:border-neutral-800 space-y-1.5 text-sm">
+                <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1">
                   Faturamento do período, aplicando a assinatura nesses mesmos clientes
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Clientes que virariam assinantes</span>
+                  <span className="text-neutral-500 dark:text-neutral-400">Clientes que virariam assinantes</span>
                   <span>{resultado.clientesConvertidos} de {dadosEfetivos.clientesUnicos}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">
+                  <span className="text-neutral-500 dark:text-neutral-400">
                     Faturamento {usandoHistorico ? "(estimado)" : "real"} do período
                   </span>
                   <span>{formatarReais(dadosEfetivos.faturamentoCentavos)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Faturamento projetado com a assinatura</span>
+                  <span className="text-neutral-500 dark:text-neutral-400">Faturamento projetado com a assinatura</span>
                   <span>{formatarReais(resultado.faturamentoProjetadoCentavos)}</span>
                 </div>
-                <div className="flex items-center justify-between pt-1.5 border-t border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between pt-1.5 border-t border-neutral-200 dark:border-neutral-800">
                   <span className={`font-medium ${resultado.diferencaCentavos >= 0 ? "text-green-600" : "text-red-600"}`}>
                     {resultado.diferencaCentavos >= 0 ? "Aumento" : "Redução"} no período
                   </span>
@@ -447,19 +447,19 @@ export function Simulador({
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 space-y-1.5 text-sm">
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+              <div className="mt-4 pt-3 border-t border-neutral-200 dark:border-neutral-800 space-y-1.5 text-sm">
+                <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1">
                   Projeção anual (extrapolando o ritmo do período escolhido pra 12 meses)
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Faturamento anual no ritmo de hoje (avulso)</span>
+                  <span className="text-neutral-500 dark:text-neutral-400">Faturamento anual no ritmo de hoje (avulso)</span>
                   <span>{formatarReais(resultado.faturamentoAtualAnualCentavos)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Faturamento anual com a assinatura</span>
+                  <span className="text-neutral-500 dark:text-neutral-400">Faturamento anual com a assinatura</span>
                   <span>{formatarReais(resultado.faturamentoProjetadoAnualCentavos)}</span>
                 </div>
-                <div className="flex items-center justify-between pt-1.5 border-t border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between pt-1.5 border-t border-neutral-200 dark:border-neutral-800">
                   <span className={`font-medium ${resultado.diferencaAnualCentavos >= 0 ? "text-green-600" : "text-red-600"}`}>
                     {resultado.diferencaAnualCentavos >= 0 ? "Aumento" : "Redução"} no ano
                   </span>

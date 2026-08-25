@@ -18,12 +18,12 @@ export function FichasServicoForm({ servicoId, fichas }: { servicoId: string; fi
         min={0}
         defaultValue={fichas || undefined}
         placeholder="0"
-        className="w-16 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1 text-xs"
+        className="w-16 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-2 py-1 text-xs"
       />
       <button
         type="submit"
         disabled={pendente}
-        className="text-xs text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-60"
+        className="text-xs text-orange-600 dark:text-orange-400 hover:underline disabled:opacity-60"
       >
         {pendente ? "..." : "Salvar"}
       </button>

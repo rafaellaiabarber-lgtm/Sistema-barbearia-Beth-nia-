@@ -19,7 +19,7 @@ export function EditarVencimento({ assinaturaId, diaAtual }: { assinaturaId: str
       <button
         type="button"
         onClick={() => setAberto(true)}
-        className="text-sm text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400"
+        className="text-sm text-neutral-400 dark:text-neutral-500 hover:text-orange-600 dark:hover:text-orange-400"
       >
         Trocar vencimento
       </button>
@@ -35,16 +35,16 @@ export function EditarVencimento({ assinaturaId, diaAtual }: { assinaturaId: str
         max={31}
         required
         defaultValue={diaAtual}
-        className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-2 py-1.5 text-sm w-16"
+        className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 px-2 py-1.5 text-sm w-16"
       />
       <button
         type="submit"
         disabled={pendente}
-        className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-3 py-1.5 text-sm"
+        className="rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white font-semibold px-3 py-1.5 text-sm"
       >
         {pendente ? "Salvando..." : "Salvar"}
       </button>
-      <button type="button" onClick={() => setAberto(false)} className="text-sm text-slate-400 dark:text-slate-500">
+      <button type="button" onClick={() => setAberto(false)} className="text-sm text-neutral-400 dark:text-neutral-500">
         Cancelar
       </button>
       {estado.erro && <p className="text-red-600 text-sm w-full">{estado.erro}</p>}

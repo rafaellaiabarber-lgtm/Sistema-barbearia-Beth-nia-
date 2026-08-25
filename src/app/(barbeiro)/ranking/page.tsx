@@ -109,7 +109,7 @@ export default async function RankingPage({
     <div className="p-6">
       <header className="mb-6">
         <h1 className="text-2xl font-bold">Ranking dos barbeiros</h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm">
+        <p className="text-neutral-500 dark:text-neutral-400 text-sm">
           Pontos por serviço extra (configurável em Serviços), venda de produto, assinatura vendida e indicação convertida.
         </p>
       </header>
@@ -118,31 +118,31 @@ export default async function RankingPage({
 
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">Ranking de um período escolhido</h2>
-        <form method="get" className="flex flex-wrap items-end gap-3 mb-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+        <form method="get" className="flex flex-wrap items-end gap-3 mb-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm">
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">De</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">De</label>
             <input
               type="date"
               name="dataInicio"
               defaultValue={dataInicio}
               required
-              className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+              className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
             />
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Até</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Até</label>
             <input
               type="date"
               name="dataFim"
               defaultValue={dataFim}
-              className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+              className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
             />
           </div>
-          <button type="submit" className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
+          <button type="submit" className="rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2 text-sm">
             Ver ranking
           </button>
           {personalizado && (
-            <Link href="/ranking" className="text-slate-400 dark:text-slate-500 hover:text-slate-700 text-sm">
+            <Link href="/ranking" className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 text-sm">
               Limpar
             </Link>
           )}
@@ -150,7 +150,7 @@ export default async function RankingPage({
         {rankingPersonalizado ? (
           <RankingLista ranking={rankingPersonalizado} premios={premiosSemanal} pontuacaoMinima={pontuacaoMinimaPremio} />
         ) : (
-          <p className="text-slate-400 dark:text-slate-500 text-sm">
+          <p className="text-neutral-400 dark:text-neutral-500 text-sm">
             Escolhe uma data de início pra ver o ranking só daquele período — de sexta a domingo, de uma semana específica, etc.
           </p>
         )}

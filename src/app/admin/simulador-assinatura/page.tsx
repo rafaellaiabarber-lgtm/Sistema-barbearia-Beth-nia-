@@ -96,7 +96,7 @@ export default async function SimuladorAssinaturaPage({
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1">Simulador de Assinatura</h1>
-      <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+      <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-6">
         Escolha o serviço e o período que quer usar como base, ajuste como está sua agenda hoje, e veja o preço
         sugerido do plano ilimitado (teto de 2× o corte avulso) e o faturamento real desse período comparado com o
         que teria sido se parte desses clientes já fosse assinante.
@@ -104,14 +104,14 @@ export default async function SimuladorAssinaturaPage({
 
       <form
         method="get"
-        className="flex flex-wrap items-end gap-3 mb-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
+        className="flex flex-wrap items-end gap-3 mb-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm"
       >
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Serviço avulso</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Serviço avulso</label>
           <select
             name="servicoId"
             defaultValue={servicoId}
-            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+            className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
           >
             {servicos.map((s) => (
               <option key={s.id} value={s.id}>
@@ -121,11 +121,11 @@ export default async function SimuladorAssinaturaPage({
           </select>
         </div>
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Período</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Período</label>
           <select
             name="periodo"
             defaultValue={periodo}
-            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+            className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
           >
             <option value="hoje">Hoje</option>
             <option value="dia">Um dia específico</option>
@@ -135,26 +135,26 @@ export default async function SimuladorAssinaturaPage({
           </select>
         </div>
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">{periodo === "dia" ? "Dia" : "De"}</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">{periodo === "dia" ? "Dia" : "De"}</label>
           <input
             type="date"
             name="dataInicio"
             defaultValue={sp.dataInicio}
-            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
           />
         </div>
         {periodo !== "dia" && (
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Até</label>
+            <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Até</label>
             <input
               type="date"
               name="dataFim"
               defaultValue={sp.dataFim}
-              className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm"
+              className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm"
             />
           </div>
         )}
-        <button type="submit" className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
+        <button type="submit" className="rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2 text-sm">
           Buscar
         </button>
       </form>

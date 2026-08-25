@@ -28,8 +28,8 @@ export function NovoFeedbackForm({ barbeiros, temas }: { barbeiros: Barbeiro[]; 
 
   if (temas.length === 0) {
     return (
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-6 shadow-sm">
-        <p className="text-slate-400 dark:text-slate-500 text-sm">Cadastre ao menos um tema acima pra poder registrar um feedback.</p>
+      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 mb-6 shadow-sm">
+        <p className="text-neutral-400 dark:text-neutral-500 text-sm">Cadastre ao menos um tema acima pra poder registrar um feedback.</p>
       </div>
     );
   }
@@ -38,17 +38,17 @@ export function NovoFeedbackForm({ barbeiros, temas }: { barbeiros: Barbeiro[]; 
     <form
       ref={formRef}
       action={formAction}
-      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-6 shadow-sm"
+      className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 mb-6 shadow-sm"
     >
-      <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">Registrar feedback</h2>
+      <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 mb-3">Registrar feedback</h2>
       <div className="flex flex-wrap items-end gap-3 mb-3">
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Barbeiro</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Barbeiro</label>
           <select
             name="barbeiroId"
             required
             defaultValue=""
-            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900 w-48"
+            className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900 w-48"
           >
             <option value="" disabled>
               Escolha...
@@ -61,12 +61,12 @@ export function NovoFeedbackForm({ barbeiros, temas }: { barbeiros: Barbeiro[]; 
           </select>
         </div>
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Tema</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Tema</label>
           <select
             name="temaId"
             required
             defaultValue=""
-            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900 w-48"
+            className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900 w-48"
           >
             <option value="" disabled>
               Escolha...
@@ -79,12 +79,12 @@ export function NovoFeedbackForm({ barbeiros, temas }: { barbeiros: Barbeiro[]; 
           </select>
         </div>
         <div>
-          <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Periodicidade</label>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Periodicidade</label>
           <select
             name="periodicidade"
             required
             defaultValue="SEMANAL"
-            className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900 w-40"
+            className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900 w-40"
           >
             <option value="SEMANAL">Semanal</option>
             <option value="MENSAL">Mensal</option>
@@ -93,7 +93,7 @@ export function NovoFeedbackForm({ barbeiros, temas }: { barbeiros: Barbeiro[]; 
         </div>
       </div>
 
-      <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold mb-2">Nota (0 a 10):</p>
+      <p className="text-neutral-700 dark:text-neutral-200 text-sm font-semibold mb-2">Nota (0 a 10):</p>
       <div className="flex flex-wrap gap-2 mb-3">
         {NOTAS.map((n) => (
           <button
@@ -101,7 +101,7 @@ export function NovoFeedbackForm({ barbeiros, temas }: { barbeiros: Barbeiro[]; 
             key={n}
             onClick={() => setNota(n)}
             className={`w-9 h-9 rounded-lg border-2 text-sm font-bold transition-colors ${
-              nota === n ? corNota(n) : "border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300"
+              nota === n ? corNota(n) : "border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:border-neutral-300"
             }`}
           >
             {n}
@@ -111,14 +111,14 @@ export function NovoFeedbackForm({ barbeiros, temas }: { barbeiros: Barbeiro[]; 
       <input type="hidden" name="nota" value={nota ?? ""} />
 
       <div className="mb-3">
-        <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
+        <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">
           Observações da conversa (opcional)
         </label>
         <textarea
           name="observacoes"
           rows={3}
           placeholder="O que foi conversado, pontos de melhoria, combinados..."
-          className="w-full rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-900"
+          className="w-full rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
         />
       </div>
 
@@ -127,7 +127,7 @@ export function NovoFeedbackForm({ barbeiros, temas }: { barbeiros: Barbeiro[]; 
       <button
         type="submit"
         disabled={pendente}
-        className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
+        className="rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white font-semibold px-4 py-2 text-sm"
       >
         {pendente ? "Salvando..." : "Salvar feedback"}
       </button>

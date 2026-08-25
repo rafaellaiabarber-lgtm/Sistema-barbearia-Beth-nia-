@@ -97,38 +97,38 @@ export default async function FluxoCaixaPage({
         </div>
         <div
           className={`rounded-xl p-5 shadow-sm ${
-            saldoPeriodoCentavos < 0 ? "bg-red-700 text-white" : "bg-blue-600 text-white"
+            saldoPeriodoCentavos < 0 ? "bg-red-700 text-white" : "bg-orange-600 text-white"
           }`}
         >
           <p className="text-2xl font-bold mb-1"><Valor>{formatarReais(saldoPeriodoCentavos)}</Valor></p>
-          <p className={`text-sm ${saldoPeriodoCentavos < 0 ? "text-red-100" : "text-blue-100"}`}>Saldo do período</p>
+          <p className={`text-sm ${saldoPeriodoCentavos < 0 ? "text-red-100" : "text-orange-100"}`}>Saldo do período</p>
         </div>
       </div>
 
       {linhas.length > 0 && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm mb-8">
-          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Saldo diário (entradas − saídas)</h2>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm mb-8">
+          <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 mb-4">Saldo diário (entradas − saídas)</h2>
           <GraficoBarras dados={dadosGrafico} />
         </div>
       )}
 
       <h2 className="text-lg font-semibold mb-3">Detalhamento por dia</h2>
       {linhas.length === 0 ? (
-        <p className="text-slate-400 dark:text-slate-500">Nenhum lançamento no período.</p>
+        <p className="text-neutral-400 dark:text-neutral-500">Nenhum lançamento no período.</p>
       ) : (
         <div className="space-y-2">
           {linhas.map((l) => (
             <div
               key={l.chave}
-              className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm"
+              className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm"
             >
               <p className="font-medium">{formatarChaveDia(l.chave)}</p>
               <div className="flex items-center gap-6 text-sm">
                 <span className="text-green-600 font-semibold">+<Valor>{formatarReais(l.entradas)}</Valor></span>
                 <span className="text-red-600 font-semibold">-<Valor>{formatarReais(l.saidas)}</Valor></span>
-                <span className="text-slate-500 dark:text-slate-400">
+                <span className="text-neutral-500 dark:text-neutral-400">
                   saldo acumulado:{" "}
-                  <span className={`font-semibold ${l.saldoAcumulado < 0 ? "text-red-600" : "text-slate-700 dark:text-slate-200"}`}>
+                  <span className={`font-semibold ${l.saldoAcumulado < 0 ? "text-red-600" : "text-neutral-700 dark:text-neutral-200"}`}>
                     <Valor>{formatarReais(l.saldoAcumulado)}</Valor>
                   </span>
                 </span>
