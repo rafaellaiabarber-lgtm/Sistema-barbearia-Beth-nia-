@@ -5,6 +5,7 @@ import { marcarComissaoPaga, desmarcarComissaoPaga } from "@/lib/actions/comisso
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio } from "../filtro-relatorio";
 import { CorrigirComissaoCobertaButton } from "./corrigir-comissao-coberta-button";
+import { CalculadoraComissaoCombinada } from "./calculadora-comissao-combinada";
 import { Valor } from "../../valor";
 
 export default async function ComissoesPage({
@@ -100,6 +101,11 @@ export default async function ComissoesPage({
   }
   const ranking = [...rankingServicos.values()].sort((a, b) => b.qtd - a.qtd);
 
+  const barbeiroSelecionado = barbeiroId ? barbeirosPorId.get(barbeiroId) : null;
+  const servicoSelecionado = servicoId ? servicos.find((s) => s.id === servicoId) : null;
+  const itensDoServico = servicoId ? atendimentos.flatMap((a) => a.servicos.filter((s) => s.servicoId === servicoId)) : [];
+  const periodoLabel = `${inicio.toLocaleDateString("pt-BR")} até ${fim.toLocaleDateString("pt-BR")}`;
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Comissões</h1>
@@ -116,6 +122,16 @@ export default async function ComissoesPage({
         servicos={servicos}
         barbeiros={barbeiros.filter((b) => b.ativo)}
       />
+
+      {barbeiroSelecionado && servicoSelecionado && itensDoServico.length > 0 && (
+        <CalculadoraComissaoCombinada
+          barbeiroNome={barbeiroSelecionado.nome}
+          servicoNome={servicoSelecionado.nome}
+          periodoLabel={periodoLabel}
+          quantidade={itensDoServico.length}
+          comissaoAtualCentavos={comissaoServicos(itensDoServico, barbeiroSelecionado.comissaoPercentual)}
+        />
+      )}
 
       {!podeMarcarPago && (
         <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-4">
