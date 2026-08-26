@@ -200,6 +200,7 @@ export default async function FilaPage({
           barbeiroId: session.barbeiroId,
           criadoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
         },
+        include: { produto: true },
       }),
       prisma.meta.findMany({
         where: { barbeiroId: session.barbeiroId, ativa: true },
@@ -215,7 +216,16 @@ export default async function FilaPage({
       servicos: a.servicos.map((s) => s.nomeSnapshot),
       comissaoAtendimentoCentavos: comissaoServicos(a.servicos, barbeiro?.comissaoPercentual ?? 0),
     }));
-    comissaoPeriodo = { comissaoCentavos, qtd: atendimentosPeriodo.length, clientes };
+    const vendasProdutoLinhas = vendasProdutoPeriodo.map((v) => ({
+      nome: `Produto: ${v.produto.nome}`,
+      servicos: [`${v.quantidade}x`],
+      comissaoAtendimentoCentavos: comissaoProdutos([v]),
+    }));
+    comissaoPeriodo = {
+      comissaoCentavos,
+      qtd: atendimentosPeriodo.length,
+      clientes: [...clientes, ...vendasProdutoLinhas],
+    };
     pausadoHoje = estaPausadoHoje(barbeiro?.pausadoEm ?? null, agora);
 
     const DIAS_SUMIDO_PESSOAL = 45;
