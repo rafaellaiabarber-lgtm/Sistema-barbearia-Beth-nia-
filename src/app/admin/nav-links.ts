@@ -24,6 +24,7 @@ export const gruposNav: NavGrupo[] = [
       { href: "/indicacoes", label: "Indicações", icone: "indicacoes" },
       { href: "/admin/campanhas", label: "Campanhas", icone: "campanhas" },
       { href: "/admin/roleta", label: "Roleta de Prêmios", icone: "roleta" },
+      { href: "/admin/taxa-retorno", label: "Taxa de Retorno", icone: "taxaRetorno" },
     ],
   },
   {
