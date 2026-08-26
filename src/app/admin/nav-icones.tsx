@@ -28,6 +28,7 @@ import {
   PieChart,
   Disc3,
   SlidersHorizontal,
+  RotateCcw,
   type LucideIcon,
 } from "lucide-react";
 
@@ -61,4 +62,5 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   rateio: PieChart,
   roleta: Disc3,
   simuladorAssinatura: SlidersHorizontal,
+  taxaRetorno: RotateCcw,
 };
