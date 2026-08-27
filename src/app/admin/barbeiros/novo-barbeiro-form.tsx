@@ -68,6 +68,7 @@ export function NovoBarbeiroForm() {
         {pendente ? "Adicionando..." : "Adicionar barbeiro"}
       </button>
       {estado.erro && <p className="text-red-600 text-sm w-full">{estado.erro}</p>}
+      {estado.aviso && <p className="text-amber-600 dark:text-amber-400 text-sm w-full">{estado.aviso}</p>}
     </form>
   );
 }
