@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { hashSenha } from "@/lib/auth";
 
-export type BarbeiroState = { erro?: string; sucesso?: boolean };
+export type BarbeiroState = { erro?: string; aviso?: string; sucesso?: boolean };
 
 const TAMANHO_MAXIMO_FOTO = 5 * 1024 * 1024;
 
@@ -49,13 +49,16 @@ export async function criarBarbeiro(_prevState: BarbeiroState, formData: FormDat
     },
   });
 
+  // A foto é opcional — se o envio falhar, não deixa o barbeiro pela metade (criado, mas sem
+  // login pra ele entrar no sistema). Segue criando o usuário normalmente e só avisa do problema.
+  let avisoFoto: string | undefined;
   try {
     const fotoUrl = await enviarFoto(barbeiro.id, formData.get("foto"));
     if (fotoUrl) {
       await prisma.barbeiro.update({ where: { id: barbeiro.id }, data: { fotoUrl } });
     }
   } catch (e) {
-    return { erro: e instanceof Error ? e.message : "Falha ao enviar a foto." };
+    avisoFoto = e instanceof Error ? e.message : "Falha ao enviar a foto.";
   }
 
   await prisma.usuario.create({
@@ -70,7 +73,7 @@ export async function criarBarbeiro(_prevState: BarbeiroState, formData: FormDat
 
   revalidatePath("/admin/barbeiros");
   revalidatePath("/totem");
-  return {};
+  return avisoFoto ? { aviso: `Barbeiro criado, mas a foto não pôde ser enviada: ${avisoFoto}` } : {};
 }
 
 export async function atualizarBarbeiro(
