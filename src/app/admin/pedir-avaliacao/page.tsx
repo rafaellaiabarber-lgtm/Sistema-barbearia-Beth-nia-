@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { ClienteAvaliacaoRow } from "./cliente-avaliacao-row";
+import { LinkGoogleForm } from "./link-google-form";
 
 const MINUTOS_MINIMO = 45;
 const HORAS_MAXIMO = 12;
@@ -11,16 +12,20 @@ export default async function PedirAvaliacaoPage() {
   const limiteMinimo = new Date(agora.getTime() - MINUTOS_MINIMO * 60 * 1000);
   const limiteMaximo = new Date(agora.getTime() - HORAS_MAXIMO * 60 * 60 * 1000);
 
-  const atendimentos = await prisma.atendimento.findMany({
-    where: {
-      status: "CONCLUIDO",
-      concluidoEm: { lte: limiteMinimo, gte: limiteMaximo },
-      barbeiroId: { not: null },
-      cliente: { telefone: { not: null } },
-    },
-    include: { cliente: true, barbeiro: true, servicos: true },
-    orderBy: { concluidoEm: "desc" },
-  });
+  const [atendimentos, configuracao] = await Promise.all([
+    prisma.atendimento.findMany({
+      where: {
+        status: "CONCLUIDO",
+        concluidoEm: { lte: limiteMinimo, gte: limiteMaximo },
+        barbeiroId: { not: null },
+        cliente: { telefone: { not: null } },
+      },
+      include: { cliente: true, barbeiro: true, servicos: true },
+      orderBy: { concluidoEm: "desc" },
+    }),
+    prisma.configuracaoAvaliacao.findUnique({ where: { id: "singleton" } }),
+  ]);
+  const linkGoogle = configuracao?.linkGoogle ?? null;
 
   return (
     <div>
@@ -29,6 +34,8 @@ export default async function PedirAvaliacaoPage() {
         Clientes que terminaram o atendimento entre {MINUTOS_MINIMO} minutos e {HORAS_MAXIMO} horas atrás — a hora
         certa de pedir pra eles avaliarem o serviço, com uma mensagem já pronta pra mandar no WhatsApp.
       </p>
+
+      <LinkGoogleForm linkAtual={linkGoogle} />
 
       <div className="space-y-2">
         {atendimentos.map((a) => (
@@ -39,6 +46,7 @@ export default async function PedirAvaliacaoPage() {
             barbeiroNome={a.barbeiro!.nome}
             servicos={a.servicos.map((s) => s.nomeSnapshot)}
             minutosAtras={Math.floor((agora.getTime() - a.concluidoEm!.getTime()) / 60000)}
+            linkGoogle={linkGoogle}
           />
         ))}
         {atendimentos.length === 0 && (

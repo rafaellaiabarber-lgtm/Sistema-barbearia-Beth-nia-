@@ -9,16 +9,20 @@ export function ClienteAvaliacaoRow({
   barbeiroNome,
   servicos,
   minutosAtras,
+  linkGoogle,
 }: {
   nome: string;
   telefone: string;
   barbeiroNome: string;
   servicos: string[];
   minutosAtras: number;
+  linkGoogle: string | null;
 }) {
   const primeiroNome = nome.split(" ")[0];
   const mensagem = encodeURIComponent(
-    `Oi, ${primeiroNome}! Aqui é da Barbearia Bethânia. Como foi o atendimento de hoje (${servicos.join(" + ")}) com o ${barbeiroNome}? A sua opinião é muito importante pra gente! 💈🙏`
+    `Oi, ${primeiroNome}! Aqui é da Barbearia Bethânia. Como foi o atendimento de hoje (${servicos.join(" + ")}) com o ${barbeiroNome}? A sua opinião é muito importante pra gente!${
+      linkGoogle ? ` Se puder, deixa sua avaliação aqui: ${linkGoogle}` : ""
+    } 💈🙏`
   );
 
   const tempoTexto =
