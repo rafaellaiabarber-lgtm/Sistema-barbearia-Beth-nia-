@@ -15,9 +15,11 @@ import { calcularProgressoMeta } from "@/lib/metas-server";
 import { fraseDoDia } from "@/lib/frases";
 import { identificarJanelaBaixaOcupacao, gerarDicasPessoais } from "@/lib/gerente-virtual";
 import { limitesJornada } from "@/lib/jornada";
+import { buscarAtendimentosParaAvaliacao } from "@/lib/avaliacao";
 import { AutoRefresh } from "./auto-refresh";
 import { AtendendoAgora } from "./atendendo-agora";
 import { Valor } from "../../valor";
+import { ClienteAvaliacaoRow } from "../../cliente-avaliacao-row";
 
 function tempoEspera(desde: Date) {
   const minutos = Math.max(0, Math.floor((Date.now() - desde.getTime()) / 60000));
@@ -177,6 +179,14 @@ export default async function FilaPage({
   let minhasMetas: MinhaMeta[] = [];
   let pausadoHoje = false;
   let dicasPessoais: string[] = [];
+  let clientesParaAvaliacao: {
+    id: string;
+    nome: string;
+    telefone: string;
+    servicos: string[];
+    minutosAtras: number;
+  }[] = [];
+  let linkGoogleAvaliacao: string | null = null;
   const campanhasAtivas = session.barbeiroId ? await buscarCampanhasAtivasComProgresso(session.barbeiroId) : [];
   const itensFaltandoCampanha = campanhasAtivas.flatMap((c) => c.itens.filter((i) => !itemCompleto(i)));
   const potencialCampanhaCentavos = valorPotencialCentavos(itensFaltandoCampanha);
@@ -184,30 +194,41 @@ export default async function FilaPage({
   if (session.barbeiroId) {
     const intervaloSelecionado =
       personalizado ?? (periodoFila === "ontem" ? intervaloOntem(agora) : calcularIntervalo(periodoFila, agora));
-    const [barbeiro, atendimentosPeriodo, vendasProdutoPeriodo, metasBarbeiro] = await Promise.all([
-      prisma.barbeiro.findUnique({ where: { id: session.barbeiroId }, include: { jornadas: true } }),
-      prisma.atendimento.findMany({
-        where: {
-          barbeiroId: session.barbeiroId,
-          status: "CONCLUIDO",
-          concluidoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
-        },
-        include: { servicos: true, cliente: true },
-        orderBy: { concluidoEm: "desc" },
-      }),
-      prisma.vendaProduto.findMany({
-        where: {
-          barbeiroId: session.barbeiroId,
-          criadoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
-        },
-        include: { produto: true },
-      }),
-      prisma.meta.findMany({
-        where: { barbeiroId: session.barbeiroId, ativa: true },
-        include: { niveis: true, servico: true, produto: true },
-        orderBy: { criadoEm: "asc" },
-      }),
-    ]);
+    const [barbeiro, atendimentosPeriodo, vendasProdutoPeriodo, metasBarbeiro, atendimentosParaAvaliacao, configuracaoAvaliacao] =
+      await Promise.all([
+        prisma.barbeiro.findUnique({ where: { id: session.barbeiroId }, include: { jornadas: true } }),
+        prisma.atendimento.findMany({
+          where: {
+            barbeiroId: session.barbeiroId,
+            status: "CONCLUIDO",
+            concluidoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
+          },
+          include: { servicos: true, cliente: true },
+          orderBy: { concluidoEm: "desc" },
+        }),
+        prisma.vendaProduto.findMany({
+          where: {
+            barbeiroId: session.barbeiroId,
+            criadoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
+          },
+          include: { produto: true },
+        }),
+        prisma.meta.findMany({
+          where: { barbeiroId: session.barbeiroId, ativa: true },
+          include: { niveis: true, servico: true, produto: true },
+          orderBy: { criadoEm: "asc" },
+        }),
+        buscarAtendimentosParaAvaliacao(session.barbeiroId),
+        prisma.configuracaoAvaliacao.findUnique({ where: { id: "singleton" } }),
+      ]);
+    linkGoogleAvaliacao = configuracaoAvaliacao?.linkGoogle ?? null;
+    clientesParaAvaliacao = atendimentosParaAvaliacao.map((a) => ({
+      id: a.id,
+      nome: a.cliente.nome,
+      telefone: a.cliente.telefone!,
+      servicos: a.servicos.map((s) => s.nomeSnapshot),
+      minutosAtras: Math.floor((agora.getTime() - a.concluidoEm!.getTime()) / 60000),
+    }));
     const comissaoCentavos =
       atendimentosPeriodo.reduce((soma, a) => soma + comissaoServicos(a.servicos, barbeiro?.comissaoPercentual ?? 0), 0) +
       comissaoProdutos(vendasProdutoPeriodo);
@@ -493,6 +514,28 @@ export default async function FilaPage({
                 ))}
               </div>
             </div>
+          )}
+
+          {clientesParaAvaliacao.length > 0 && (
+            <section className="mb-8">
+              <h2 className="text-lg font-semibold mb-1">Pedir avaliação aos seus clientes</h2>
+              <p className="text-neutral-400 dark:text-neutral-500 text-sm mb-3">
+                Terminaram o atendimento com você faz um tempinho — boa hora de pedir a opinião deles.
+              </p>
+              <div className="space-y-2">
+                {clientesParaAvaliacao.map((c) => (
+                  <ClienteAvaliacaoRow
+                    key={c.id}
+                    nome={c.nome}
+                    telefone={c.telefone}
+                    barbeiroNome={session.nome}
+                    servicos={c.servicos}
+                    minutosAtras={c.minutosAtras}
+                    linkGoogle={linkGoogleAvaliacao}
+                  />
+                ))}
+              </div>
+            </section>
           )}
 
           {session.barbeiroId && (
