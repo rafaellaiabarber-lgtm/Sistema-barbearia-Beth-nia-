@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Trophy } from "lucide-react";
+import { Trophy, Heart } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo, type Periodo } from "@/lib/periodo";
@@ -20,7 +20,7 @@ export default async function BarbeirosPage({
   const agora = new Date();
   const intervaloSelecionado = calcularIntervalo(periodo, agora);
 
-  const [barbeiros, atendimentosPeriodo] = await Promise.all([
+  const [barbeiros, atendimentosPeriodo, preferenciasPeriodo] = await Promise.all([
     prisma.barbeiro.findMany({
       orderBy: [{ ativo: "desc" }, { nome: "asc" }],
       include: { usuario: true, jornadas: true },
@@ -32,6 +32,13 @@ export default async function BarbeirosPage({
         barbeiroId: { not: null },
       },
       include: { servicos: true },
+    }),
+    prisma.atendimento.findMany({
+      where: {
+        barbeiroPreferidoId: { not: null },
+        criadoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
+      },
+      select: { barbeiroPreferidoId: true },
     }),
   ]);
 
@@ -79,6 +86,17 @@ export default async function BarbeirosPage({
 
   const ranking = [...ativos].sort((a, b) => b.faturamentoCentavos - a.faturamentoCentavos);
 
+  const preferenciasPorBarbeiro = new Map<string, number>();
+  for (const a of preferenciasPeriodo) {
+    if (!a.barbeiroPreferidoId) continue;
+    preferenciasPorBarbeiro.set(a.barbeiroPreferidoId, (preferenciasPorBarbeiro.get(a.barbeiroPreferidoId) ?? 0) + 1);
+  }
+  const totalPreferencias = preferenciasPeriodo.length;
+  const rankingPreferencia = barbeiros
+    .map((b) => ({ nome: b.nome, qtd: preferenciasPorBarbeiro.get(b.id) ?? 0 }))
+    .filter((b) => b.qtd > 0)
+    .sort((a, b) => b.qtd - a.qtd);
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Barbeiros</h1>
@@ -122,6 +140,35 @@ export default async function BarbeirosPage({
                     {m.qtdAtendimentos} atend. · ticket médio <Valor>{formatarReais(m.ticketMedioCentavos)}</Valor>
                   </span>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {rankingPreferencia.length > 0 && (
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm mb-6">
+          <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 mb-1 flex items-center gap-2">
+            <Heart className="w-4 h-4 text-orange-500" />
+            Preferência dos clientes ({LABEL_PERIODO[periodo]})
+          </h2>
+          <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-3">
+            Quantas vezes cada barbeiro foi escolhido no totem, de {totalPreferencias} escolha(s) no período.
+          </p>
+          <div className="space-y-2">
+            {rankingPreferencia.map((r, i) => (
+              <div key={r.nome} className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`font-bold w-6 text-center ${i === 0 ? "text-amber-500" : "text-orange-600 dark:text-orange-400"}`}
+                  >
+                    {i + 1}º
+                  </span>
+                  <span className="font-medium">{r.nome}</span>
+                </div>
+                <span className="font-semibold text-orange-600 dark:text-orange-400">
+                  {r.qtd}x · {Math.round((r.qtd / totalPreferencias) * 100)}%
+                </span>
               </div>
             ))}
           </div>
