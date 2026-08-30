@@ -395,6 +395,12 @@ model ConfiguracaoTotem {
   atualizadoEm DateTime @updatedAt
 }
 
+model ConfiguracaoAvaliacao {
+  id           String   @id @default("singleton")
+  linkGoogle   String?
+  atualizadoEm DateTime @updatedAt
+}
+
 model ConfiguracaoFinanceira {
   id                            String   @id @default("singleton")
   taxaCartaoPercentualX100      Int?
