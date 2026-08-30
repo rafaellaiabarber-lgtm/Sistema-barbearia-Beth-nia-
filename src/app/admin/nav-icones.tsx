@@ -29,6 +29,7 @@ import {
   Disc3,
   SlidersHorizontal,
   RotateCcw,
+  MessageCircle,
   type LucideIcon,
 } from "lucide-react";
 
@@ -63,4 +64,5 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   roleta: Disc3,
   simuladorAssinatura: SlidersHorizontal,
   taxaRetorno: RotateCcw,
+  pedirAvaliacao: MessageCircle,
 };
