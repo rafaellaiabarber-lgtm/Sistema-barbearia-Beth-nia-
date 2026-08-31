@@ -24,14 +24,22 @@ export default async function DonoPage() {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-6">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-start justify-between gap-4 mb-1">
+        <div className="flex items-start justify-between gap-4 mb-1 flex-wrap">
           <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Barbearias cadastradas</h1>
-          <Link
-            href="/dono/pagina-de-vendas"
-            className="shrink-0 text-sm font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400"
-          >
-            Editar página de vendas →
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/dono/planos"
+              className="shrink-0 text-sm font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400"
+            >
+              Planos de assinatura →
+            </Link>
+            <Link
+              href="/dono/pagina-de-vendas"
+              className="shrink-0 text-sm font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400"
+            >
+              Editar página de vendas →
+            </Link>
+          </div>
         </div>
         <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-6">
           Painel do dono da plataforma — ative, desative ou renove o acesso de qualquer barbearia cadastrada pelo

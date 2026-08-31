@@ -17,6 +17,7 @@ const SLUGS_RESERVADOS = new Set([
   "despesas",
   "indicacoes",
   "planos",
+  "assinar",
   "ranking",
   "treinamento",
   "www",
@@ -32,6 +33,7 @@ export type CadastroState = { erro?: string };
 
 export async function cadastrarBarbearia(_prevState: CadastroState, formData: FormData): Promise<CadastroState> {
   const nomeBarbearia = String(formData.get("nomeBarbearia") ?? "").trim();
+  const cnpj = String(formData.get("cnpj") ?? "").trim();
   const slug = String(formData.get("slug") ?? "").trim().toLowerCase();
   const nomeResponsavel = String(formData.get("nomeResponsavel") ?? "").trim();
   const login = String(formData.get("login") ?? "").trim();
@@ -71,7 +73,7 @@ export async function cadastrarBarbearia(_prevState: CadastroState, formData: Fo
 
   await prisma.$transaction(async (tx) => {
     const barbearia = await tx.barbearia.create({
-      data: { slug, nome: nomeBarbearia, validaAte: proximaDataDeVencimento() },
+      data: { slug, nome: nomeBarbearia, cnpj: cnpj || null, validaAte: proximaDataDeVencimento() },
     });
     await tx.usuario.create({
       data: { barbeariaId: barbearia.id, nome: nomeResponsavel, login, senhaHash, role: "ADMIN" },
