@@ -1,7 +1,17 @@
 import QRCode from "qrcode";
 
-export async function BarbeiroQr({ barbeiroId, nome, baseUrl }: { barbeiroId: string; nome: string; baseUrl: string }) {
-  const url = `${baseUrl}/roleta/${barbeiroId}`;
+export async function BarbeiroQr({
+  barbeiroId,
+  nome,
+  baseUrl,
+  barbeariaSlug,
+}: {
+  barbeiroId: string;
+  nome: string;
+  baseUrl: string;
+  barbeariaSlug: string;
+}) {
+  const url = `${baseUrl}/${barbeariaSlug}/roleta/${barbeiroId}`;
   const dataUrl = await QRCode.toDataURL(url, { margin: 1, width: 160 });
 
   return (

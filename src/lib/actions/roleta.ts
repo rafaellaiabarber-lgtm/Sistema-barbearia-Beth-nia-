@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
-import { obterBarbeariaPadrao } from "@/lib/tenant";
+import { setCurrentBarbearia } from "@/lib/tenant-context";
 import { normalizarTelefone } from "@/lib/format";
 import { textoPremioRoleta } from "@/lib/roleta";
 
@@ -100,24 +100,21 @@ export async function girarRoleta(
   if (!telefone) return { erro: "Informe seu telefone." };
   if (!nome) return { erro: "Informe seu nome." };
 
-  const barbearia = await obterBarbeariaPadrao();
-  if (!barbearia) return { erro: "Link inválido." };
-
-  const barbeiro = await prisma.barbeiro.findFirst({
-    where: { id: barbeiroId, ativo: true, barbeariaId: barbearia.id },
-  });
-  if (!barbeiro) return { erro: "Link inválido." };
+  const barbeiro = await prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true } });
+  if (!barbeiro || !barbeiro.barbeariaId) return { erro: "Link inválido." };
+  const barbeariaId = barbeiro.barbeariaId;
+  setCurrentBarbearia(barbeariaId);
 
   const cliente = await prisma.cliente.upsert({
-    where: { telefone },
+    where: { barbeariaId_telefone: { barbeariaId, telefone } },
     update: { nome },
-    create: { barbeariaId: barbearia.id, nome, telefone },
+    create: { barbeariaId, nome, telefone },
   });
 
   const giroRecente = await prisma.giroRoleta.findFirst({
     where: {
       clienteId: cliente.id,
-      barbeariaId: barbearia.id,
+      barbeariaId,
       criadoEm: { gte: new Date(Date.now() - HORAS_ENTRE_GIROS * 60 * 60 * 1000) },
     },
   });
@@ -125,13 +122,13 @@ export async function girarRoleta(
     return { erro: `Você já girou a roleta nas últimas ${HORAS_ENTRE_GIROS} horas. Volte outra hora!` };
   }
 
-  const ofertas = await prisma.ofertaRoleta.findMany({ where: { ativo: true, barbeariaId: barbearia.id } });
+  const ofertas = await prisma.ofertaRoleta.findMany({ where: { ativo: true, barbeariaId } });
   if (ofertas.length === 0) return { erro: "Nenhum prêmio disponível no momento." };
 
   const sorteada = ofertas[Math.floor(Math.random() * ofertas.length)];
 
   await prisma.giroRoleta.create({
-    data: { barbeariaId: barbearia.id, barbeiroId, clienteId: cliente.id, ofertaId: sorteada.id },
+    data: { barbeariaId, barbeiroId, clienteId: cliente.id, ofertaId: sorteada.id },
   });
 
   revalidatePath("/admin/roleta");

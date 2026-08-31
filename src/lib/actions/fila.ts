@@ -3,13 +3,16 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
-import { obterBarbeariaPadrao } from "@/lib/tenant";
+import { setCurrentBarbearia } from "@/lib/tenant-context";
 import { normalizarTelefone } from "@/lib/format";
 import { diaCobertoHoje, formatarDiasSemana } from "@/lib/assinaturas";
 
 export async function buscarNomePorTelefone(telefone: string): Promise<string | null> {
   if (!telefone) return null;
-  const cliente = await prisma.cliente.findUnique({ where: { telefone: normalizarTelefone(telefone) } });
+  const session = await requireSession(["ADMIN"]);
+  const cliente = await prisma.cliente.findFirst({
+    where: { telefone: normalizarTelefone(telefone), barbeariaId: session.barbeariaId },
+  });
   return cliente?.nome ?? null;
 }
 
@@ -20,10 +23,10 @@ export type ClienteInfo = {
   planoDiasTexto: string | null;
 };
 
-export async function buscarClienteInfoPorTelefone(telefone: string): Promise<ClienteInfo> {
+export async function buscarClienteInfoPorTelefone(telefone: string, barbeariaId: string): Promise<ClienteInfo> {
   if (!telefone) return { nome: null, planoAtivo: null, planoCobertoHoje: true, planoDiasTexto: null };
-  const cliente = await prisma.cliente.findUnique({
-    where: { telefone: normalizarTelefone(telefone) },
+  const cliente = await prisma.cliente.findFirst({
+    where: { telefone: normalizarTelefone(telefone), barbeariaId },
     include: { assinaturas: { where: { status: "ATIVA" }, include: { plano: true }, take: 1 } },
   });
   const plano = cliente?.assinaturas[0]?.plano;
@@ -52,19 +55,21 @@ export async function entrarNaFila(
   const barbeiroPreferidoId = String(formData.get("barbeiroPreferidoId") ?? "").trim() || null;
   const acompanhanteNome = String(formData.get("acompanhanteNome") ?? "").trim();
   const acompanhanteTelefone = normalizarTelefone(String(formData.get("acompanhanteTelefone") ?? ""));
+  const barbeariaSlug = String(formData.get("barbeariaSlug") ?? "").trim();
 
   if (!telefone) return { erro: "Informe seu telefone." };
   if (!nome) return { erro: "Informe seu nome." };
 
-  const barbearia = await obterBarbeariaPadrao();
-  if (!barbearia) return { erro: "Barbearia não encontrada." };
+  const barbearia = barbeariaSlug ? await prisma.barbearia.findUnique({ where: { slug: barbeariaSlug } }) : null;
+  if (!barbearia || !barbearia.ativa) return { erro: "Barbearia não encontrada." };
+  setCurrentBarbearia(barbearia.id);
 
   const [barbeiro, cliente] = await Promise.all([
     barbeiroPreferidoId
       ? prisma.barbeiro.findFirst({ where: { id: barbeiroPreferidoId, ativo: true, barbeariaId: barbearia.id } })
       : Promise.resolve(null),
     prisma.cliente.upsert({
-      where: { telefone },
+      where: { barbeariaId_telefone: { barbeariaId: barbearia.id, telefone } },
       update: { nome },
       create: { barbeariaId: barbearia.id, nome, telefone },
     }),
@@ -85,7 +90,7 @@ export async function entrarNaFila(
     acompanhanteNome
       ? acompanhanteTelefone
         ? prisma.cliente.upsert({
-            where: { telefone: acompanhanteTelefone },
+            where: { barbeariaId_telefone: { barbeariaId: barbearia.id, telefone: acompanhanteTelefone } },
             update: { nome: acompanhanteNome },
             create: { barbeariaId: barbearia.id, nome: acompanhanteNome, telefone: acompanhanteTelefone },
           })

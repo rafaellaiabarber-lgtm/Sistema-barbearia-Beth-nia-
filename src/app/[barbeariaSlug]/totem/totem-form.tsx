@@ -9,7 +9,15 @@ const estadoInicial: EntrarFilaState = {};
 
 type Etapa = "telefone" | "avisoPlano" | "nome" | "barbeiro" | "acompanhante";
 
-export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoUrl: string | null }) {
+export function TotemForm({
+  barbearia,
+  barbeiros,
+  logoUrl,
+}: {
+  barbearia: { id: string; slug: string; nome: string };
+  barbeiros: Barbeiro[];
+  logoUrl: string | null;
+}) {
   const [estado, formAction, pendente] = useActionState(entrarNaFila, estadoInicial);
   const [etapa, setEtapa] = useState<Etapa>("telefone");
   const [telefone, setTelefone] = useState("");
@@ -23,13 +31,15 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
   const [acompanhanteNome, setAcompanhanteNome] = useState("");
   const [acompanhanteTelefone, setAcompanhanteTelefone] = useState("");
 
+  const totemHref = `/${barbearia.slug}/totem`;
+
   useEffect(() => {
     if (!estado.sucesso) return;
     const timer = setTimeout(() => {
-      window.location.href = "/totem";
+      window.location.href = totemHref;
     }, 2000);
     return () => clearTimeout(timer);
-  }, [estado.sucesso]);
+  }, [estado.sucesso, totemHref]);
 
   if (estado.sucesso) {
     return (
@@ -50,7 +60,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
           É só aguardar, o profissional já vai te chamar.
         </p>
         <a
-          href="/totem"
+          href={totemHref}
           className="inline-block rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-lg px-6 py-3 transition-colors"
         >
           Concluir
@@ -67,9 +77,9 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
     >
       {logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={logoUrl} alt="Barbearia Bethânia" className="h-16 mx-auto mb-2 object-contain" />
+        <img src={logoUrl} alt={barbearia.nome} className="h-16 mx-auto mb-2 object-contain" />
       ) : (
-        <h1 className="text-3xl font-black text-white text-center mb-1">Barbearia Bethânia</h1>
+        <h1 className="text-3xl font-black text-white text-center mb-1">{barbearia.nome}</h1>
       )}
       <p className="text-neutral-300 text-center mb-8">Toque para entrar na fila</p>
 
@@ -90,7 +100,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
               }
               setErroLocal("");
               setBuscandoNome(true);
-              const info = await buscarClienteInfoPorTelefone(telefone);
+              const info = await buscarClienteInfoPorTelefone(telefone, barbearia.id);
               setBuscandoNome(false);
               if (info.nome) {
                 setNome(info.nome);
@@ -268,6 +278,7 @@ export function TotemForm({ barbeiros, logoUrl }: { barbeiros: Barbeiro[]; logoU
         <form action={formAction}>
           <input type="hidden" name="telefone" value={telefone} />
           <input type="hidden" name="nome" value={nome} />
+          <input type="hidden" name="barbeariaSlug" value={barbearia.slug} />
           {barbeiroPreferidoId && (
             <input type="hidden" name="barbeiroPreferidoId" value={barbeiroPreferidoId} />
           )}
