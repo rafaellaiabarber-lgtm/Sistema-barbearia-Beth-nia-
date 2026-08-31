@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-export const MINUTOS_MINIMO_AVALIACAO = 45;
+export const MINUTOS_MINIMO_AVALIACAO = 5;
 export const HORAS_MAXIMO_AVALIACAO = 12;
 
 export function buscarAtendimentosParaAvaliacao(barbeariaId: string, barbeiroId?: string) {
