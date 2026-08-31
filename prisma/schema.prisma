@@ -257,11 +257,13 @@ model Cliente {
   barbeariaId  String?
   barbearia    Barbearia?    @relation(fields: [barbeariaId], references: [id])
   nome         String
-  telefone     String?       @unique
+  telefone     String?
   criadoEm     DateTime      @default(now())
   atendimentos Atendimento[]
   assinaturas  Assinatura[]
   girosRoleta  GiroRoleta[]
+
+  @@unique([barbeariaId, telefone])
 }
 
 model Servico {

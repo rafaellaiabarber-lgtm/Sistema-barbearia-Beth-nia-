@@ -53,7 +53,7 @@ export default async function RoletaAdminPage() {
       <h2 className="text-lg font-semibold mb-3">QR Code por barbeiro</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {barbeiros.map((b) => (
-          <BarbeiroQr key={b.id} barbeiroId={b.id} nome={b.nome} baseUrl={baseUrl} />
+          <BarbeiroQr key={b.id} barbeiroId={b.id} nome={b.nome} baseUrl={baseUrl} barbeariaSlug={session.barbeariaSlug} />
         ))}
         {barbeiros.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum barbeiro ativo.</p>}
       </div>

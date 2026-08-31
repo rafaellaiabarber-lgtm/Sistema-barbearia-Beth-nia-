@@ -17,7 +17,7 @@ export async function criarCliente(_prevState: ClienteState, formData: FormData)
   if (!nome) return { erro: "Informe o nome do cliente." };
 
   if (telefone) {
-    const existente = await prisma.cliente.findUnique({ where: { telefone } });
+    const existente = await prisma.cliente.findFirst({ where: { telefone, barbeariaId: session.barbeariaId } });
     if (existente) return { erro: "Já existe um cliente cadastrado com esse telefone." };
   }
 

@@ -43,7 +43,7 @@ export async function lancarAtendimentoManual(
   if (servicos.length === 0) return { erro: "Serviços inválidos." };
 
   const cliente = await prisma.cliente.upsert({
-    where: { telefone },
+    where: { barbeariaId_telefone: { barbeariaId: session.barbeariaId, telefone } },
     update: { nome },
     create: { barbeariaId: session.barbeariaId, nome, telefone },
   });

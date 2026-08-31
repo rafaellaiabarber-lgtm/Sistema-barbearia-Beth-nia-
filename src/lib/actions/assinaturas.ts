@@ -38,7 +38,7 @@ export async function criarAssinatura(
   if (!plano) return { erro: "Plano inválido." };
 
   const cliente = await prisma.cliente.upsert({
-    where: { telefone },
+    where: { barbeariaId_telefone: { barbeariaId: session.barbeariaId, telefone } },
     update: { nome },
     create: { barbeariaId: session.barbeariaId, nome, telefone },
   });
