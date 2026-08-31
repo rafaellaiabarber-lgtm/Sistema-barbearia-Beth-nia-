@@ -81,19 +81,63 @@ enum PeriodicidadeFeedback {
   AVULSO
 }
 
+// Cada barbearia é um tenant isolado do sistema. barbeariaId nas outras tabelas
+// ainda é opcional nesta etapa (schema + backfill) — vira obrigatório só depois
+// que todo o código já estiver escopando corretamente por barbearia.
+model Barbearia {
+  id       String   @id @default(cuid())
+  slug     String   @unique
+  nome     String
+  ativa    Boolean  @default(true)
+  criadoEm DateTime @default(now())
+
+  usuarios              Usuario[]
+  barbeiros             Barbeiro[]
+  jornadas              JornadaTrabalho[]
+  indicacoes            Indicacao[]
+  despesasBarbeiro      DespesaBarbeiro[]
+  metas                 Meta[]
+  niveisMeta            NivelMeta[]
+  clientes              Cliente[]
+  servicos              Servico[]
+  produtos              Produto[]
+  campanhasVenda        CampanhaVenda[]
+  itensCampanhaVenda    ItemCampanhaVenda[]
+  vendasProduto         VendaProduto[]
+  atendimentos          Atendimento[]
+  movimentosCaixa       MovimentoCaixa[]
+  pagamentosComissao    PagamentoComissao[]
+  atendimentoServicos   AtendimentoServico[]
+  planos                Plano[]
+  assinaturas           Assinatura[]
+  pagamentosAssinatura  PagamentoAssinatura[]
+  distribuicoesPote     DistribuicaoPote[]
+  itensDistribuicaoPote ItemDistribuicaoPote[]
+  contasFinanceiras     ContaFinanceira[]
+  materiaisTreinamento  MaterialTreinamento[]
+  temasFeedback         TemaFeedback[]
+  feedbacks             Feedback[]
+  ofertasRoleta         OfertaRoleta[]
+  girosRoleta           GiroRoleta[]
+}
+
 model Usuario {
-  id         String    @id @default(cuid())
-  nome       String
-  login      String    @unique
-  senhaHash  String
-  role       Role
-  barbeiroId String?   @unique
-  barbeiro   Barbeiro? @relation(fields: [barbeiroId], references: [id])
-  criadoEm   DateTime  @default(now())
+  id          String     @id @default(cuid())
+  barbeariaId String?
+  barbearia   Barbearia? @relation(fields: [barbeariaId], references: [id])
+  nome        String
+  login       String     @unique
+  senhaHash   String
+  role        Role
+  barbeiroId  String?    @unique
+  barbeiro    Barbeiro?  @relation(fields: [barbeiroId], references: [id])
+  criadoEm    DateTime   @default(now())
 }
 
 model Barbeiro {
   id                      String                 @id @default(cuid())
+  barbeariaId             String?
+  barbearia               Barbearia?             @relation(fields: [barbeariaId], references: [id])
   nome                    String
   telefone                String?
   fotoUrl                 String?
@@ -120,8 +164,10 @@ model Barbeiro {
 }
 
 model JornadaTrabalho {
-  id           String   @id @default(cuid())
-  barbeiro     Barbeiro @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
+  id           String     @id @default(cuid())
+  barbeariaId  String?
+  barbearia    Barbearia? @relation(fields: [barbeariaId], references: [id])
+  barbeiro     Barbeiro   @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
   barbeiroId   String
   diaSemana    Int
   horaInicio   String
@@ -133,28 +179,32 @@ model JornadaTrabalho {
 }
 
 model Indicacao {
-  id           String    @id @default(cuid())
-  barbeiro     Barbeiro  @relation(fields: [barbeiroId], references: [id])
+  id           String     @id @default(cuid())
+  barbeariaId  String?
+  barbearia    Barbearia? @relation(fields: [barbeariaId], references: [id])
+  barbeiro     Barbeiro   @relation(fields: [barbeiroId], references: [id])
   barbeiroId   String
   nome         String
   telefone     String
-  contatada    Boolean   @default(false)
+  contatada    Boolean    @default(false)
   contatadaEm  DateTime?
-  convertida   Boolean   @default(false)
+  convertida   Boolean    @default(false)
   convertidaEm DateTime?
-  criadoEm     DateTime  @default(now())
+  criadoEm     DateTime   @default(now())
 }
 
 // Controle pessoal de despesas do barbeiro (não afeta comissão nem nenhum
 // relatório do admin — cada barbeiro só vê as suas).
 model DespesaBarbeiro {
-  id            String   @id @default(cuid())
-  barbeiro      Barbeiro @relation(fields: [barbeiroId], references: [id])
+  id            String     @id @default(cuid())
+  barbeariaId   String?
+  barbearia     Barbearia? @relation(fields: [barbeariaId], references: [id])
+  barbeiro      Barbeiro   @relation(fields: [barbeiroId], references: [id])
   barbeiroId    String
   descricao     String
   valorCentavos Int
   data          DateTime
-  criadoEm      DateTime @default(now())
+  criadoEm      DateTime   @default(now())
 }
 
 // Sem @@unique de (barbeiroId, tipo): agora um barbeiro pode ter várias metas do
@@ -162,28 +212,32 @@ model DespesaBarbeiro {
 // "Faturamento" só de um serviço). Edição identifica a meta pelo id, não pela
 // combinação (barbeiroId, tipo).
 model Meta {
-  id         String      @id @default(cuid())
-  barbeiro   Barbeiro    @relation(fields: [barbeiroId], references: [id])
-  barbeiroId String
-  tipo       TipoMeta
+  id          String      @id @default(cuid())
+  barbeariaId String?
+  barbearia   Barbearia?  @relation(fields: [barbeariaId], references: [id])
+  barbeiro    Barbeiro    @relation(fields: [barbeiroId], references: [id])
+  barbeiroId  String
+  tipo        TipoMeta
   // Se null, o período considerado é sempre o mês atual.
-  dataInicio DateTime?
-  dataFim    DateTime?
+  dataInicio  DateTime?
+  dataFim     DateTime?
   // Escopo opcional: restringe a meta a um serviço específico (tipos baseados em
   // atendimento) ou a um produto específico (tipo VENDAS_PRODUTO).
-  servico    Servico?    @relation(fields: [servicoId], references: [id])
-  servicoId  String?
-  produto    Produto?    @relation(fields: [produtoId], references: [id])
-  produtoId  String?
-  ativa      Boolean     @default(true)
-  criadoEm   DateTime    @default(now())
-  niveis     NivelMeta[]
+  servico     Servico?    @relation(fields: [servicoId], references: [id])
+  servicoId   String?
+  produto     Produto?    @relation(fields: [produtoId], references: [id])
+  produtoId   String?
+  ativa       Boolean     @default(true)
+  criadoEm    DateTime    @default(now())
+  niveis      NivelMeta[]
 }
 
 // valorAlvo está em centavos para FATURAMENTO/TICKET_MEDIO, e em unidades inteiras para ATENDIMENTOS/CLIENTES_NOVOS.
 model NivelMeta {
-  id                  String @id @default(cuid())
-  meta                Meta   @relation(fields: [metaId], references: [id], onDelete: Cascade)
+  id                  String     @id @default(cuid())
+  barbeariaId         String?
+  barbearia           Barbearia? @relation(fields: [barbeariaId], references: [id])
+  meta                Meta       @relation(fields: [metaId], references: [id], onDelete: Cascade)
   metaId              String
   ordem               Int
   nome                String
@@ -195,6 +249,8 @@ model NivelMeta {
 
 model Cliente {
   id           String        @id @default(cuid())
+  barbeariaId  String?
+  barbearia    Barbearia?    @relation(fields: [barbeariaId], references: [id])
   nome         String
   telefone     String?       @unique
   criadoEm     DateTime      @default(now())
@@ -205,6 +261,8 @@ model Cliente {
 
 model Servico {
   id                  String               @id @default(cuid())
+  barbeariaId         String?
+  barbearia           Barbearia?           @relation(fields: [barbeariaId], references: [id])
   nome                String
   precoCentavos       Int
   custoCentavos       Int                  @default(0)
@@ -221,6 +279,8 @@ model Servico {
 
 model Produto {
   id                 String              @id @default(cuid())
+  barbeariaId        String?
+  barbearia          Barbearia?          @relation(fields: [barbeariaId], references: [id])
   nome               String
   precoCentavos      Int
   custoCentavos      Int                 @default(0)
@@ -233,17 +293,21 @@ model Produto {
 }
 
 model CampanhaVenda {
-  id         String              @id @default(cuid())
-  barbeiro   Barbeiro            @relation(fields: [barbeiroId], references: [id])
-  barbeiroId String
-  titulo     String?
-  ativa      Boolean             @default(true)
-  criadoEm   DateTime            @default(now())
-  itens      ItemCampanhaVenda[]
+  id          String              @id @default(cuid())
+  barbeariaId String?
+  barbearia   Barbearia?          @relation(fields: [barbeariaId], references: [id])
+  barbeiro    Barbeiro            @relation(fields: [barbeiroId], references: [id])
+  barbeiroId  String
+  titulo      String?
+  ativa       Boolean             @default(true)
+  criadoEm    DateTime            @default(now())
+  itens       ItemCampanhaVenda[]
 }
 
 model ItemCampanhaVenda {
   id             String        @id @default(cuid())
+  barbeariaId    String?
+  barbearia      Barbearia?    @relation(fields: [barbeariaId], references: [id])
   campanha       CampanhaVenda @relation(fields: [campanhaId], references: [id], onDelete: Cascade)
   campanhaId     String
   produto        Produto?      @relation(fields: [produtoId], references: [id])
@@ -255,6 +319,8 @@ model ItemCampanhaVenda {
 
 model VendaProduto {
   id                    String          @id @default(cuid())
+  barbeariaId           String?
+  barbearia             Barbearia?      @relation(fields: [barbeariaId], references: [id])
   produto               Produto         @relation(fields: [produtoId], references: [id])
   produtoId             String
   barbeiro              Barbeiro?       @relation(fields: [barbeiroId], references: [id])
@@ -269,6 +335,8 @@ model VendaProduto {
 
 model Atendimento {
   id                   String               @id @default(cuid())
+  barbeariaId          String?
+  barbearia            Barbearia?           @relation(fields: [barbeariaId], references: [id])
   cliente              Cliente              @relation(fields: [clienteId], references: [id])
   clienteId            String
   barbeiro             Barbeiro?            @relation("BarbeiroAtendeu", fields: [barbeiroId], references: [id])
@@ -288,6 +356,8 @@ model Atendimento {
 
 model MovimentoCaixa {
   id             String             @id @default(cuid())
+  barbeariaId    String?
+  barbearia      Barbearia?         @relation(fields: [barbeariaId], references: [id])
   tipo           TipoMovimentoCaixa
   descricao      String
   valorCentavos  Int
@@ -298,6 +368,8 @@ model MovimentoCaixa {
 
 model PagamentoComissao {
   id            String          @id @default(cuid())
+  barbeariaId   String?
+  barbearia     Barbearia?      @relation(fields: [barbeariaId], references: [id])
   barbeiro      Barbeiro        @relation(fields: [barbeiroId], references: [id])
   barbeiroId    String
   periodo       PeriodoComissao
@@ -309,16 +381,18 @@ model PagamentoComissao {
 }
 
 model AtendimentoServico {
-  id                 String      @id @default(cuid())
-  atendimento        Atendimento @relation(fields: [atendimentoId], references: [id], onDelete: Cascade)
-  atendimentoId      String
-  servico            Servico     @relation(fields: [servicoId], references: [id])
-  servicoId          String
-  nomeSnapshot       String
-  precoCentavos      Int
-  custoCentavos      Int         @default(0)
-  comissaoPercentual Int?
-  fichas             Int         @default(0)
+  id                    String      @id @default(cuid())
+  barbeariaId           String?
+  barbearia             Barbearia?  @relation(fields: [barbeariaId], references: [id])
+  atendimento           Atendimento @relation(fields: [atendimentoId], references: [id], onDelete: Cascade)
+  atendimentoId         String
+  servico               Servico     @relation(fields: [servicoId], references: [id])
+  servicoId             String
+  nomeSnapshot          String
+  precoCentavos         Int
+  custoCentavos         Int         @default(0)
+  comissaoPercentual    Int?
+  fichas                Int         @default(0)
   // Preço do serviço usado como base pra calcular a comissão do barbeiro. Igual a precoCentavos na
   // maioria dos casos, mas continua com o valor cheio mesmo quando o atendimento é coberto pela
   // assinatura (precoCentavos fica zerado nesse caso, pra não contar como faturamento de novo).
@@ -328,6 +402,8 @@ model AtendimentoServico {
 
 model Plano {
   id                      String       @id @default(cuid())
+  barbeariaId             String?
+  barbearia               Barbearia?   @relation(fields: [barbeariaId], references: [id])
   nome                    String
   precoCentavos           Int
   servicosIncluidosPorMes Int
@@ -342,6 +418,8 @@ model Plano {
 
 model Assinatura {
   id            String                @id @default(cuid())
+  barbeariaId   String?
+  barbearia     Barbearia?            @relation(fields: [barbeariaId], references: [id])
   cliente       Cliente               @relation(fields: [clienteId], references: [id])
   clienteId     String
   plano         Plano                 @relation(fields: [planoId], references: [id])
@@ -357,6 +435,8 @@ model Assinatura {
 
 model PagamentoAssinatura {
   id            String     @id @default(cuid())
+  barbeariaId   String?
+  barbearia     Barbearia? @relation(fields: [barbeariaId], references: [id])
   assinatura    Assinatura @relation(fields: [assinaturaId], references: [id])
   assinaturaId  String
   competencia   String
@@ -368,6 +448,8 @@ model PagamentoAssinatura {
 
 model DistribuicaoPote {
   id                String                 @id @default(cuid())
+  barbeariaId       String?
+  barbearia         Barbearia?             @relation(fields: [barbeariaId], references: [id])
   competencia       String                 @unique
   totalPoteCentavos Int
   totalFichas       Int
@@ -377,6 +459,8 @@ model DistribuicaoPote {
 
 model ItemDistribuicaoPote {
   id             String           @id @default(cuid())
+  barbeariaId    String?
+  barbearia      Barbearia?       @relation(fields: [barbeariaId], references: [id])
   distribuicao   DistribuicaoPote @relation(fields: [distribuicaoId], references: [id], onDelete: Cascade)
   distribuicaoId String
   barbeiro       Barbeiro         @relation(fields: [barbeiroId], references: [id])
@@ -427,6 +511,8 @@ model ConfiguracaoRanking {
 
 model ContaFinanceira {
   id            String            @id @default(cuid())
+  barbeariaId   String?
+  barbearia     Barbearia?        @relation(fields: [barbeariaId], references: [id])
   tipo          TipoConta
   descricao     String
   valorCentavos Int
@@ -440,6 +526,8 @@ model ContaFinanceira {
 
 model MaterialTreinamento {
   id           String                  @id @default(cuid())
+  barbeariaId  String?
+  barbearia    Barbearia?              @relation(fields: [barbeariaId], references: [id])
   titulo       String
   tipo         TipoMaterialTreinamento
   conteudo     String
@@ -449,15 +537,19 @@ model MaterialTreinamento {
 }
 
 model TemaFeedback {
-  id        String     @id @default(cuid())
-  nome      String
-  ativo     Boolean    @default(true)
-  criadoEm  DateTime   @default(now())
-  feedbacks Feedback[]
+  id          String     @id @default(cuid())
+  barbeariaId String?
+  barbearia   Barbearia? @relation(fields: [barbeariaId], references: [id])
+  nome        String
+  ativo       Boolean    @default(true)
+  criadoEm    DateTime   @default(now())
+  feedbacks   Feedback[]
 }
 
 model Feedback {
   id               String                @id @default(cuid())
+  barbeariaId      String?
+  barbearia        Barbearia?            @relation(fields: [barbeariaId], references: [id])
   barbeiro         Barbeiro              @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
   barbeiroId       String
   tema             TemaFeedback?         @relation(fields: [temaId], references: [id])
@@ -471,6 +563,8 @@ model Feedback {
 
 model OfertaRoleta {
   id                 String       @id @default(cuid())
+  barbeariaId        String?
+  barbearia          Barbearia?   @relation(fields: [barbeariaId], references: [id])
   nome               String
   descontoPercentual Int?
   ativo              Boolean      @default(true)
@@ -481,6 +575,8 @@ model OfertaRoleta {
 
 model GiroRoleta {
   id          String       @id @default(cuid())
+  barbeariaId String?
+  barbearia   Barbearia?   @relation(fields: [barbeariaId], references: [id])
   barbeiro    Barbeiro     @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
   barbeiroId  String
   cliente     Cliente      @relation(fields: [clienteId], references: [id])
