@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireDonoPlataforma } from "@/lib/tenant";
 import { alternarAtivaBarbearia } from "@/lib/actions/dono";
@@ -17,7 +18,15 @@ export default async function DonoPage() {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white mb-1">Barbearias cadastradas</h1>
+        <div className="flex items-start justify-between gap-4 mb-1">
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Barbearias cadastradas</h1>
+          <Link
+            href="/dono/pagina-de-vendas"
+            className="shrink-0 text-sm font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400"
+          >
+            Editar página de vendas →
+          </Link>
+        </div>
         <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-6">
           Painel do dono da plataforma — ative ou desative o acesso de qualquer barbearia cadastrada pelo cadastro público.
         </p>

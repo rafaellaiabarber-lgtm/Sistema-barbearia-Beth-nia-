@@ -478,6 +478,17 @@ model ItemDistribuicaoPote {
 
 // Cada barbearia tem no máximo uma linha de cada configuração — barbeariaId é a
 // própria chave primária.
+// Config única, da plataforma inteira (não por barbearia) — usada pela
+// página de vendas em "/" pra quem ainda não tem conta.
+model ConfiguracaoPlataforma {
+  id              String   @id @default("plataforma")
+  fotoHeroUrl     String?
+  fotoGaleria1Url String?
+  fotoGaleria2Url String?
+  fotoGaleria3Url String?
+  atualizadoEm    DateTime @updatedAt
+}
+
 model ConfiguracaoTotem {
   barbeariaId  String    @id
   barbearia    Barbearia @relation(fields: [barbeariaId], references: [id])
