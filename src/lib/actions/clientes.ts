@@ -8,7 +8,7 @@ import { normalizarTelefone } from "@/lib/format";
 export type ClienteState = { erro?: string; sucesso?: boolean };
 
 export async function criarCliente(_prevState: ClienteState, formData: FormData): Promise<ClienteState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   const telefoneRaw = String(formData.get("telefone") ?? "").trim();
@@ -21,7 +21,7 @@ export async function criarCliente(_prevState: ClienteState, formData: FormData)
     if (existente) return { erro: "Já existe um cliente cadastrado com esse telefone." };
   }
 
-  await prisma.cliente.create({ data: { nome, telefone } });
+  await prisma.cliente.create({ data: { barbeariaId: session.barbeariaId, nome, telefone } });
 
   revalidatePath("/admin/clientes");
   return { sucesso: true };

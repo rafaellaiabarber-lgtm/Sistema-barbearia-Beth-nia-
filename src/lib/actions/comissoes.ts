@@ -11,7 +11,7 @@ export async function marcarComissaoPaga(
   chave: string,
   valorCentavos: number
 ) {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   await prisma.pagamentoComissao.upsert({
     where: {
@@ -23,6 +23,7 @@ export async function marcarComissaoPaga(
     },
     update: { valorCentavos },
     create: {
+      barbeariaId: session.barbeariaId,
       barbeiroId,
       periodo: periodo.toUpperCase() as "HOJE" | "SEMANA" | "MES",
       chave,
@@ -34,10 +35,15 @@ export async function marcarComissaoPaga(
 }
 
 export async function desmarcarComissaoPaga(barbeiroId: string, periodo: PeriodoComissao, chave: string) {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   await prisma.pagamentoComissao.deleteMany({
-    where: { barbeiroId, periodo: periodo.toUpperCase() as "HOJE" | "SEMANA" | "MES", chave },
+    where: {
+      barbeariaId: session.barbeariaId,
+      barbeiroId,
+      periodo: periodo.toUpperCase() as "HOJE" | "SEMANA" | "MES",
+      chave,
+    },
   });
 
   revalidatePath("/admin/comissoes");

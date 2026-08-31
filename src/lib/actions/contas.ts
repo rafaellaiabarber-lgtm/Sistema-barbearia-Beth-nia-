@@ -19,7 +19,7 @@ export async function criarConta(
   _prevState: ContaState,
   formData: FormData
 ): Promise<ContaState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const descricao = String(formData.get("descricao") ?? "").trim();
   const valor = String(formData.get("valor") ?? "");
@@ -40,7 +40,7 @@ export async function criarConta(
     tipo === "PAGAR" && categoriasValidas.includes(categoriaRaw) ? (categoriaRaw as CategoriaDespesa) : null;
 
   await prisma.contaFinanceira.create({
-    data: { tipo, descricao, valorCentavos, vencimento, categoria },
+    data: { barbeariaId: session.barbeariaId, tipo, descricao, valorCentavos, vencimento, categoria },
   });
 
   revalidar();
@@ -48,7 +48,7 @@ export async function criarConta(
 }
 
 export async function marcarContaPaga(id: string, _prevState: ContaState, formData: FormData): Promise<ContaState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const formaPagamentoRaw = String(formData.get("formaPagamento") ?? "");
   if (formaPagamentoRaw !== "DINHEIRO" && formaPagamentoRaw !== "PIX" && formaPagamentoRaw !== "CARTAO") {
@@ -61,6 +61,7 @@ export async function marcarContaPaga(id: string, _prevState: ContaState, formDa
 
   const movimento = await prisma.movimentoCaixa.create({
     data: {
+      barbeariaId: session.barbeariaId,
       tipo: conta.tipo === "PAGAR" ? "SAIDA" : "ENTRADA",
       descricao: conta.descricao,
       valorCentavos: conta.valorCentavos,

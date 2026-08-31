@@ -20,7 +20,13 @@ export async function criarDespesaBarbeiro(_prevState: DespesaBarbeiroState, for
   if (!dataStr) return { erro: "Informe a data." };
 
   await prisma.despesaBarbeiro.create({
-    data: { barbeiroId: session.barbeiroId, descricao, valorCentavos, data: new Date(`${dataStr}T12:00:00`) },
+    data: {
+      barbeariaId: session.barbeariaId,
+      barbeiroId: session.barbeiroId,
+      descricao,
+      valorCentavos,
+      data: new Date(`${dataStr}T12:00:00`),
+    },
   });
 
   revalidatePath("/despesas");
@@ -30,6 +36,8 @@ export async function criarDespesaBarbeiro(_prevState: DespesaBarbeiroState, for
 export async function excluirDespesaBarbeiro(id: string) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
   if (!session.barbeiroId) return;
-  await prisma.despesaBarbeiro.deleteMany({ where: { id, barbeiroId: session.barbeiroId } });
+  await prisma.despesaBarbeiro.deleteMany({
+    where: { id, barbeiroId: session.barbeiroId, barbeariaId: session.barbeariaId },
+  });
   revalidatePath("/despesas");
 }

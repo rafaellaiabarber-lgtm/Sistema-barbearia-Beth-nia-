@@ -9,12 +9,12 @@ const PERIODICIDADES = ["SEMANAL", "MENSAL", "AVULSO"] as const;
 export type TemaState = { erro?: string };
 
 export async function criarTemaFeedback(_prevState: TemaState, formData: FormData): Promise<TemaState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   if (!nome) return { erro: "Informe o nome do tema." };
 
-  await prisma.temaFeedback.create({ data: { nome } });
+  await prisma.temaFeedback.create({ data: { barbeariaId: session.barbeariaId, nome } });
 
   revalidatePath("/admin/feedback");
   return {};
@@ -29,7 +29,7 @@ export async function alternarAtivoTema(id: string, ativo: boolean) {
 export type FeedbackState = { erro?: string; sucesso?: boolean };
 
 export async function criarFeedback(_prevState: FeedbackState, formData: FormData): Promise<FeedbackState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const barbeiroId = String(formData.get("barbeiroId") ?? "").trim();
   const temaId = String(formData.get("temaId") ?? "").trim();
@@ -54,6 +54,7 @@ export async function criarFeedback(_prevState: FeedbackState, formData: FormDat
 
   await prisma.feedback.create({
     data: {
+      barbeariaId: session.barbeariaId,
       barbeiroId,
       temaId,
       temaNomeSnapshot: tema.nome,
