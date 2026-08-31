@@ -2,6 +2,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE, verificarTokenSessao, type SessionPayload } from "@/lib/auth";
+import { setCurrentBarbearia } from "@/lib/tenant-context";
 
 export async function getSession(): Promise<SessionPayload | null> {
   const cookieStore = await cookies();
@@ -18,5 +19,6 @@ export async function requireSession(rolesPermitidas?: Array<"ADMIN" | "BARBEIRO
   if (rolesPermitidas && !rolesPermitidas.includes(session.role)) {
     redirect("/login");
   }
+  setCurrentBarbearia(session.barbeariaId);
   return session;
 }
