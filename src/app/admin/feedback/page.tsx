@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { TemasFeedback } from "./temas-feedback";
 import { NovoFeedbackForm } from "./novo-feedback-form";
 import { FeedbackRow } from "./feedback-row";
@@ -16,13 +17,17 @@ export default async function FeedbackPage({
 }: {
   searchParams: Promise<{ barbeiroId?: string }>;
 }) {
+  const session = await requireSession(["ADMIN"]);
   const { barbeiroId } = await searchParams;
 
   const [barbeiros, temas, feedbacks] = await Promise.all([
-    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    prisma.temaFeedback.findMany({ orderBy: [{ ativo: "desc" }, { nome: "asc" } ] }),
+    prisma.barbeiro.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.temaFeedback.findMany({
+      where: { barbeariaId: session.barbeariaId },
+      orderBy: [{ ativo: "desc" }, { nome: "asc" }],
+    }),
     prisma.feedback.findMany({
-      where: barbeiroId ? { barbeiroId } : {},
+      where: { barbeariaId: session.barbeariaId, ...(barbeiroId ? { barbeiroId } : {}) },
       include: { barbeiro: true },
       orderBy: { criadoEm: "desc" },
     }),

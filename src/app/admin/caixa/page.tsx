@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { formatarReais, LABEL_FORMA_PAGAMENTO, LABEL_CATEGORIA_DESPESA } from "@/lib/format";
 import { excluirMovimentoCaixa } from "@/lib/actions/caixa";
 import { NovoMovimentoForm } from "./novo-movimento-form";
@@ -24,21 +25,22 @@ type Lancamento = {
 };
 
 export default async function CaixaPage() {
+  const session = await requireSession(["ADMIN"]);
   const inicio = inicioDoDia();
 
   const [atendimentosHoje, movimentosHoje, barbeiros, servicos, produtos] = await Promise.all([
     prisma.atendimento.findMany({
-      where: { status: "CONCLUIDO", concluidoEm: { gte: inicio } },
+      where: { status: "CONCLUIDO", concluidoEm: { gte: inicio }, barbeariaId: session.barbeariaId },
       include: { cliente: true, barbeiro: true },
       orderBy: { concluidoEm: "asc" },
     }),
     prisma.movimentoCaixa.findMany({
-      where: { criadoEm: { gte: inicio } },
+      where: { criadoEm: { gte: inicio }, barbeariaId: session.barbeariaId },
       orderBy: { criadoEm: "asc" },
     }),
-    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    prisma.servico.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    prisma.produto.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.servico.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.produto.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
   ]);
 
   const lancamentos: Lancamento[] = [

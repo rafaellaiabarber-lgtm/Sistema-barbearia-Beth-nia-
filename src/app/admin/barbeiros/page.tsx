@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Trophy, Heart } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo, type Periodo } from "@/lib/periodo";
 import { NovoBarbeiroForm } from "./novo-barbeiro-form";
@@ -15,6 +16,7 @@ export default async function BarbeirosPage({
 }: {
   searchParams: Promise<{ periodo?: string }>;
 }) {
+  const session = await requireSession(["ADMIN"]);
   const { periodo: periodoParam } = await searchParams;
   const periodo: Periodo = periodoParam === "hoje" || periodoParam === "semana" ? periodoParam : "mes";
   const agora = new Date();
@@ -22,11 +24,13 @@ export default async function BarbeirosPage({
 
   const [barbeiros, atendimentosPeriodo, preferenciasPeriodo] = await Promise.all([
     prisma.barbeiro.findMany({
+      where: { barbeariaId: session.barbeariaId },
       orderBy: [{ ativo: "desc" }, { nome: "asc" }],
       include: { usuario: true, jornadas: true },
     }),
     prisma.atendimento.findMany({
       where: {
+        barbeariaId: session.barbeariaId,
         status: "CONCLUIDO",
         concluidoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
         barbeiroId: { not: null },
@@ -35,6 +39,7 @@ export default async function BarbeirosPage({
     }),
     prisma.atendimento.findMany({
       where: {
+        barbeariaId: session.barbeariaId,
         barbeiroPreferidoId: { not: null },
         criadoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
       },
