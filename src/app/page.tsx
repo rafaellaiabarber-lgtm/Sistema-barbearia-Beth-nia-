@@ -94,10 +94,10 @@ export default async function HomePage() {
             roleta de prêmios e muito mais — tudo em um só lugar.
           </p>
           <Link
-            href="/cadastro"
+            href="/assinar"
             className="inline-block rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-lg px-8 py-4 transition-colors"
           >
-            Criar minha conta
+            Quero assinar
           </Link>
         </div>
       </section>
@@ -135,10 +135,10 @@ export default async function HomePage() {
             Crie sua conta, cadastre seus barbeiros e serviços, e já comece a usar o totem e a gestão completa.
           </p>
           <Link
-            href="/cadastro"
+            href="/assinar"
             className="inline-block rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-lg px-8 py-4 transition-colors"
           >
-            Criar minha conta
+            Quero assinar
           </Link>
         </div>
       </section>

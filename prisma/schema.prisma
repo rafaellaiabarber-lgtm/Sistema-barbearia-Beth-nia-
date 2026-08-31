@@ -86,6 +86,7 @@ model Barbearia {
   id        String    @id @default(cuid())
   slug      String    @unique
   nome      String
+  cnpj      String?
   ativa     Boolean   @default(true)
   // Data de vencimento do acesso (cadastro pago fora do sistema). Nula pra
   // barbearias sem vencimento (a própria barbearia do dono da plataforma).
@@ -491,6 +492,21 @@ model ConfiguracaoPlataforma {
   fotoGaleria2Url String?
   fotoGaleria3Url String?
   atualizadoEm    DateTime @updatedAt
+}
+
+// Planos de assinatura da PLATAFORMA (o que o dono cobra de cada barbearia
+// pra usar o sistema) — não confundir com o modelo Plano, que é a assinatura
+// que cada barbearia oferece pros próprios clientes.
+model PlanoPlataforma {
+  id            String   @id @default(cuid())
+  nome          String
+  descricao     String?
+  precoCentavos Int
+  periodo       String
+  linkPagamento String
+  ativo         Boolean  @default(true)
+  ordem         Int      @default(0)
+  criadoEm      DateTime @default(now())
 }
 
 model ConfiguracaoTotem {
