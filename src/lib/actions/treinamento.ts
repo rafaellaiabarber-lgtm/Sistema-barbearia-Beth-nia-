@@ -45,7 +45,7 @@ async function extrairConteudo(
 }
 
 export async function criarMaterial(_prevState: MaterialState, formData: FormData): Promise<MaterialState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const titulo = String(formData.get("titulo") ?? "").trim();
   const tipo = String(formData.get("tipo") ?? "");
@@ -56,11 +56,14 @@ export async function criarMaterial(_prevState: MaterialState, formData: FormDat
   if ("erro" in resultado) return resultado;
 
   try {
-    const ultimo = await prisma.materialTreinamento.findFirst({ orderBy: { ordem: "desc" } });
+    const ultimo = await prisma.materialTreinamento.findFirst({
+      where: { barbeariaId: session.barbeariaId },
+      orderBy: { ordem: "desc" },
+    });
     const ordem = (ultimo?.ordem ?? -1) + 1;
 
     await prisma.materialTreinamento.create({
-      data: { titulo, tipo: tipo as TipoMaterial, conteudo: resultado.conteudo, ordem },
+      data: { barbeariaId: session.barbeariaId, titulo, tipo: tipo as TipoMaterial, conteudo: resultado.conteudo, ordem },
     });
   } catch {
     return { erro: "Não foi possível salvar. Fale com o suporte técnico — pode faltar rodar uma atualização no banco." };
@@ -116,9 +119,12 @@ export async function excluirMaterial(id: string) {
 }
 
 export async function moverMaterial(id: string, direcao: "cima" | "baixo") {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
-  const materiais = await prisma.materialTreinamento.findMany({ orderBy: { ordem: "asc" } });
+  const materiais = await prisma.materialTreinamento.findMany({
+    where: { barbeariaId: session.barbeariaId },
+    orderBy: { ordem: "asc" },
+  });
   const index = materiais.findIndex((m) => m.id === id);
   if (index === -1) return;
 

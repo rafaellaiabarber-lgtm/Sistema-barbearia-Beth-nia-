@@ -15,7 +15,7 @@ function revalidarPaginas() {
 }
 
 export async function criarPlano(_prevState: PlanoState, formData: FormData): Promise<PlanoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   const preco = String(formData.get("preco") ?? "");
@@ -29,7 +29,14 @@ export async function criarPlano(_prevState: PlanoState, formData: FormData): Pr
   if (!Number.isFinite(cota) || cota <= 0) return { erro: "Informe uma cota de serviços válida." };
 
   await prisma.plano.create({
-    data: { nome, precoCentavos, servicosIncluidosPorMes: Math.round(cota), diasSemana, linkExterno },
+    data: {
+      barbeariaId: session.barbeariaId,
+      nome,
+      precoCentavos,
+      servicosIncluidosPorMes: Math.round(cota),
+      diasSemana,
+      linkExterno,
+    },
   });
 
   revalidarPaginas();

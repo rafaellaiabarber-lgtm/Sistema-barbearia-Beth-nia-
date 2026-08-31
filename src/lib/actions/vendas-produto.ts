@@ -22,7 +22,7 @@ export async function registrarVendaProduto(
   _prevState: VendaProdutoState,
   formData: FormData
 ): Promise<VendaProdutoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const produtoId = String(formData.get("produtoId") ?? "").trim();
   const barbeiroId = String(formData.get("barbeiroId") ?? "").trim();
@@ -37,8 +37,8 @@ export async function registrarVendaProduto(
   }
 
   const [produto, barbeiro] = await Promise.all([
-    prisma.produto.findFirst({ where: { id: produtoId, ativo: true } }),
-    prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true } }),
+    prisma.produto.findFirst({ where: { id: produtoId, ativo: true, barbeariaId: session.barbeariaId } }),
+    prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true, barbeariaId: session.barbeariaId } }),
   ]);
   if (!produto) return { erro: "Produto inválido." };
   if (!barbeiro) return { erro: "Barbeiro inválido." };
@@ -48,6 +48,7 @@ export async function registrarVendaProduto(
   await prisma.$transaction(async (tx) => {
     await tx.vendaProduto.create({
       data: {
+        barbeariaId: session.barbeariaId,
         produtoId: produto.id,
         barbeiroId: barbeiro.id,
         quantidade,
@@ -59,6 +60,7 @@ export async function registrarVendaProduto(
     });
     await tx.movimentoCaixa.create({
       data: {
+        barbeariaId: session.barbeariaId,
         tipo: "ENTRADA",
         descricao: `Venda de produto — ${produto.nome} x${quantidade} (${barbeiro.nome})`,
         valorCentavos: totalCentavos,

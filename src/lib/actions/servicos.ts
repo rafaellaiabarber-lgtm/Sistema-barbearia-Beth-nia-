@@ -8,7 +8,7 @@ import { reaisParaCentavos } from "@/lib/format";
 export type ServicoState = { erro?: string; sucesso?: boolean };
 
 export async function criarServico(_prevState: ServicoState, formData: FormData): Promise<ServicoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   const preco = String(formData.get("preco") ?? "");
@@ -32,7 +32,14 @@ export async function criarServico(_prevState: ServicoState, formData: FormData)
   }
 
   await prisma.servico.create({
-    data: { nome, precoCentavos, custoCentavos, duracaoMinutos: duracao || 30, comissaoPercentual },
+    data: {
+      barbeariaId: session.barbeariaId,
+      nome,
+      precoCentavos,
+      custoCentavos,
+      duracaoMinutos: duracao || 30,
+      comissaoPercentual,
+    },
   });
 
   revalidatePath("/admin/servicos");

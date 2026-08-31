@@ -25,7 +25,7 @@ function revalidar() {
 }
 
 export async function salvarMeta(_prevState: MetaState, formData: FormData): Promise<MetaState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const metaId = String(formData.get("metaId") ?? "").trim();
 
@@ -77,7 +77,7 @@ export async function salvarMeta(_prevState: MetaState, formData: FormData): Pro
     }
   }
 
-  const dadosMeta = { barbeiroId, tipo, dataInicio, dataFim, servicoId, produtoId };
+  const dadosMeta = { barbeariaId: session.barbeariaId, barbeiroId, tipo, dataInicio, dataFim, servicoId, produtoId };
 
   await prisma.$transaction(async (tx) => {
     const meta = metaId
@@ -85,7 +85,7 @@ export async function salvarMeta(_prevState: MetaState, formData: FormData): Pro
       : await tx.meta.create({ data: dadosMeta });
     await tx.nivelMeta.deleteMany({ where: { metaId: meta.id } });
     await tx.nivelMeta.createMany({
-      data: niveis.map((n) => ({ ...n, metaId: meta.id })),
+      data: niveis.map((n) => ({ ...n, metaId: meta.id, barbeariaId: session.barbeariaId })),
     });
   });
 

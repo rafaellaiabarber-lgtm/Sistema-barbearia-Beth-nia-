@@ -8,7 +8,7 @@ import { reaisParaCentavos } from "@/lib/format";
 export type ProdutoState = { erro?: string; sucesso?: boolean };
 
 export async function criarProduto(_prevState: ProdutoState, formData: FormData): Promise<ProdutoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   const preco = String(formData.get("preco") ?? "");
@@ -30,7 +30,9 @@ export async function criarProduto(_prevState: ProdutoState, formData: FormData)
     }
   }
 
-  await prisma.produto.create({ data: { nome, precoCentavos, custoCentavos, comissaoPercentual } });
+  await prisma.produto.create({
+    data: { barbeariaId: session.barbeariaId, nome, precoCentavos, custoCentavos, comissaoPercentual },
+  });
 
   revalidatePath("/admin/produtos");
   revalidatePath("/admin/caixa");
