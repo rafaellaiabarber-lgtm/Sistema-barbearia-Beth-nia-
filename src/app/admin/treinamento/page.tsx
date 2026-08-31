@@ -1,9 +1,14 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { NovoMaterialForm } from "./novo-material-form";
 import { MaterialRow } from "./material-row";
 
 export default async function TreinamentoAdminPage() {
-  const materiais = await prisma.materialTreinamento.findMany({ orderBy: { ordem: "asc" } });
+  const session = await requireSession(["ADMIN"]);
+  const materiais = await prisma.materialTreinamento.findMany({
+    where: { barbeariaId: session.barbeariaId },
+    orderBy: { ordem: "asc" },
+  });
 
   return (
     <div>

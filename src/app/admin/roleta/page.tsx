@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { marcarGiroResgatado } from "@/lib/actions/roleta";
 import { textoPremioRoleta } from "@/lib/roleta";
 import { NovaOfertaForm } from "./nova-oferta-form";
@@ -9,10 +10,15 @@ import { BarbeiroQr } from "./barbeiro-qr";
 export const dynamic = "force-dynamic";
 
 export default async function RoletaAdminPage() {
+  const session = await requireSession(["ADMIN"]);
   const [ofertas, barbeiros, giros] = await Promise.all([
-    prisma.ofertaRoleta.findMany({ orderBy: [{ ativo: "desc" }, { ordem: "asc" }] }),
-    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.ofertaRoleta.findMany({
+      where: { barbeariaId: session.barbeariaId },
+      orderBy: [{ ativo: "desc" }, { ordem: "asc" }],
+    }),
+    prisma.barbeiro.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
     prisma.giroRoleta.findMany({
+      where: { barbeariaId: session.barbeariaId },
       include: { cliente: true, barbeiro: true, oferta: true },
       orderBy: { criadoEm: "desc" },
       take: 50,

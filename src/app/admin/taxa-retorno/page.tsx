@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { ClienteInativoRow } from "../gerente-virtual/cliente-inativo-row";
 
 const PRESETS = [20, 30, 40, 60];
@@ -11,6 +12,7 @@ export default async function TaxaRetornoPage({
 }: {
   searchParams: Promise<{ dias?: string }>;
 }) {
+  const session = await requireSession(["ADMIN"]);
   const { dias: diasParam } = await searchParams;
   const dias = Math.max(1, Number.parseInt(diasParam ?? "30", 10) || 30);
 
@@ -19,7 +21,7 @@ export default async function TaxaRetornoPage({
   limite.setDate(limite.getDate() - dias);
 
   const clientesComAtendimento = await prisma.cliente.findMany({
-    where: { atendimentos: { some: { status: "CONCLUIDO" } } },
+    where: { barbeariaId: session.barbeariaId, atendimentos: { some: { status: "CONCLUIDO" } } },
     include: { atendimentos: { where: { status: "CONCLUIDO" }, select: { concluidoEm: true } } },
   });
 

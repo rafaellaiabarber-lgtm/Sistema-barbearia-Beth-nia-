@@ -1,11 +1,19 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { NovoServicoForm } from "./novo-servico-form";
 import { ServicoRow } from "./servico-row";
 
 export default async function ServicosPage() {
+  const session = await requireSession(["ADMIN"]);
   const [servicos, barbeiros] = await Promise.all([
-    prisma.servico.findMany({ orderBy: [{ ativo: "desc" }, { nome: "asc" }] }),
-    prisma.barbeiro.findMany({ where: { ativo: true }, select: { comissaoPercentual: true } }),
+    prisma.servico.findMany({
+      where: { barbeariaId: session.barbeariaId },
+      orderBy: [{ ativo: "desc" }, { nome: "asc" }],
+    }),
+    prisma.barbeiro.findMany({
+      where: { ativo: true, barbeariaId: session.barbeariaId },
+      select: { comissaoPercentual: true },
+    }),
   ]);
   const comissoesPadrao = barbeiros.map((b) => b.comissaoPercentual);
 
