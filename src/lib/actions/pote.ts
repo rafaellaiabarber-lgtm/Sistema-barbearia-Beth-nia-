@@ -11,23 +11,31 @@ export async function distribuirPote(
   competencia: string,
   _prevState: DistribuirPoteState
 ): Promise<DistribuirPoteState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
-  const existente = await prisma.distribuicaoPote.findUnique({ where: { competencia } });
+  const existente = await prisma.distribuicaoPote.findUnique({
+    where: { barbeariaId_competencia: { barbeariaId: session.barbeariaId, competencia } },
+  });
   if (existente) return { erro: "Essa competência já foi distribuída." };
 
-  const { totalPoteCentavos, totalFichas, itens } = await calcularPote(competencia);
+  const { totalPoteCentavos, totalFichas, itens } = await calcularPote(session.barbeariaId, competencia);
 
   if (totalPoteCentavos <= 0) return { erro: "Não há pagamentos de assinatura registrados nessa competência." };
   if (totalFichas <= 0) return { erro: "Nenhum atendimento com serviço de ficha registrado nessa competência." };
 
   await prisma.distribuicaoPote.create({
     data: {
+      barbeariaId: session.barbeariaId,
       competencia,
       totalPoteCentavos,
       totalFichas,
       itens: {
-        create: itens.map((i) => ({ barbeiroId: i.barbeiroId, fichas: i.fichas, valorCentavos: i.valorCentavos })),
+        create: itens.map((i) => ({
+          barbeariaId: session.barbeariaId,
+          barbeiroId: i.barbeiroId,
+          fichas: i.fichas,
+          valorCentavos: i.valorCentavos,
+        })),
       },
     },
   });

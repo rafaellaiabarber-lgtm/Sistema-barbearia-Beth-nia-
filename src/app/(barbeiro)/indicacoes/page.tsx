@@ -16,13 +16,14 @@ export default async function IndicacoesPage({
   const statusFiltro = status === "contatadas" || status === "pendentes" ? status : "todas";
 
   const barbeiros = souAdmin
-    ? await prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } })
+    ? await prisma.barbeiro.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } })
     : [];
 
   const barbeiroFiltro = souAdmin ? barbeiroIdParam || undefined : (session.barbeiroId ?? "__nenhum__");
 
   const indicacoes = await prisma.indicacao.findMany({
     where: {
+      barbeariaId: session.barbeariaId,
       barbeiroId: barbeiroFiltro,
       ...(statusFiltro === "contatadas" ? { contatada: true } : {}),
       ...(statusFiltro === "pendentes" ? { contatada: false } : {}),

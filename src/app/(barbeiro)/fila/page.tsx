@@ -115,18 +115,18 @@ export default async function FilaPage({
 
   const [aguardando, emAtendimento, barbeirosAtivos, servicosAtivos, produtosAtivos] = await Promise.all([
     prisma.atendimento.findMany({
-      where: { status: "AGUARDANDO" },
+      where: { status: "AGUARDANDO", barbeariaId: session.barbeariaId },
       orderBy: { criadoEm: "asc" },
       include: { cliente: true, barbeiroPreferido: true },
     }),
     prisma.atendimento.findMany({
-      where: { status: "EM_ATENDIMENTO" },
+      where: { status: "EM_ATENDIMENTO", barbeariaId: session.barbeariaId },
       orderBy: { chamadoEm: "asc" },
       include: { cliente: true, servicos: true, barbeiro: true },
     }),
-    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    prisma.servico.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    prisma.produto.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.servico.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.produto.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
   ]);
 
   const meuAtendimento = session.barbeiroId
@@ -136,7 +136,7 @@ export default async function FilaPage({
   const clienteIdsNaFila = [...new Set([...aguardando, ...emAtendimento].map((a) => a.clienteId))];
   const assinaturasAtivas = clienteIdsNaFila.length
     ? await prisma.assinatura.findMany({
-        where: { clienteId: { in: clienteIdsNaFila }, status: "ATIVA" },
+        where: { clienteId: { in: clienteIdsNaFila }, status: "ATIVA", barbeariaId: session.barbeariaId },
         include: { plano: true },
       })
     : [];
@@ -149,7 +149,7 @@ export default async function FilaPage({
 
   const premiosPendentes = clienteIdsNaFila.length
     ? await prisma.giroRoleta.findMany({
-        where: { clienteId: { in: clienteIdsNaFila }, resgatadoEm: null },
+        where: { clienteId: { in: clienteIdsNaFila }, resgatadoEm: null, barbeariaId: session.barbeariaId },
         include: { oferta: true },
         orderBy: { criadoEm: "asc" },
       })
@@ -187,7 +187,9 @@ export default async function FilaPage({
     minutosAtras: number;
   }[] = [];
   let linkGoogleAvaliacao: string | null = null;
-  const campanhasAtivas = session.barbeiroId ? await buscarCampanhasAtivasComProgresso(session.barbeiroId) : [];
+  const campanhasAtivas = session.barbeiroId
+    ? await buscarCampanhasAtivasComProgresso(session.barbeariaId, session.barbeiroId)
+    : [];
   const itensFaltandoCampanha = campanhasAtivas.flatMap((c) => c.itens.filter((i) => !itemCompleto(i)));
   const potencialCampanhaCentavos = valorPotencialCentavos(itensFaltandoCampanha);
 
@@ -200,6 +202,7 @@ export default async function FilaPage({
         prisma.atendimento.findMany({
           where: {
             barbeiroId: session.barbeiroId,
+            barbeariaId: session.barbeariaId,
             status: "CONCLUIDO",
             concluidoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
           },
@@ -209,16 +212,17 @@ export default async function FilaPage({
         prisma.vendaProduto.findMany({
           where: {
             barbeiroId: session.barbeiroId,
+            barbeariaId: session.barbeariaId,
             criadoEm: { gte: intervaloSelecionado.inicio, lte: intervaloSelecionado.fim },
           },
           include: { produto: true },
         }),
         prisma.meta.findMany({
-          where: { barbeiroId: session.barbeiroId, ativa: true },
+          where: { barbeiroId: session.barbeiroId, barbeariaId: session.barbeariaId, ativa: true },
           include: { niveis: true, servico: true, produto: true },
           orderBy: { criadoEm: "asc" },
         }),
-        buscarAtendimentosParaAvaliacao(session.barbeiroId),
+        buscarAtendimentosParaAvaliacao(session.barbeariaId, session.barbeiroId),
         prisma.configuracaoAvaliacao.findUnique({ where: { barbeariaId: session.barbeariaId } }),
       ]);
     linkGoogleAvaliacao = configuracaoAvaliacao?.linkGoogle ?? null;
@@ -255,13 +259,20 @@ export default async function FilaPage({
     const mesAtualIntervalo = calcularIntervalo("mes", agora);
     const [clientesAtendidosPorMim, atendimentosMesBarbeiro] = await Promise.all([
       prisma.cliente.findMany({
-        where: { atendimentos: { some: { status: "CONCLUIDO", barbeiroId: session.barbeiroId } } },
+        where: {
+          barbeariaId: session.barbeariaId,
+          atendimentos: { some: { status: "CONCLUIDO", barbeiroId: session.barbeiroId } },
+        },
         include: {
           atendimentos: { where: { status: "CONCLUIDO", barbeiroId: session.barbeiroId }, select: { concluidoEm: true } },
         },
       }),
       prisma.atendimento.findMany({
-        where: { barbeiroId: session.barbeiroId, criadoEm: { gte: mesAtualIntervalo.inicio, lte: mesAtualIntervalo.fim } },
+        where: {
+          barbeiroId: session.barbeiroId,
+          barbeariaId: session.barbeariaId,
+          criadoEm: { gte: mesAtualIntervalo.inicio, lte: mesAtualIntervalo.fim },
+        },
         select: { criadoEm: true },
       }),
     ]);

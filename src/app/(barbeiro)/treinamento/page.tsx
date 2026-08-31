@@ -3,9 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { urlEmbedVideo } from "@/lib/treinamento";
 
 export default async function TreinamentoPage() {
-  await requireSession(["ADMIN", "BARBEIRO"]);
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
 
-  const materiais = await prisma.materialTreinamento.findMany({ orderBy: { ordem: "asc" } });
+  const materiais = await prisma.materialTreinamento.findMany({
+    where: { barbeariaId: session.barbeariaId },
+    orderBy: { ordem: "asc" },
+  });
 
   return (
     <div className="p-6">

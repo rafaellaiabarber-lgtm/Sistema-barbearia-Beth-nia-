@@ -11,11 +11,13 @@ import { CampanhasVenda } from "./campanhas-venda";
 async function buscarContagens(
   inicio: Date,
   fim: Date,
-  barbeiros: { id: string; nome: string }[]
+  barbeiros: { id: string; nome: string }[],
+  barbeariaId: string
 ): Promise<ContagemBarbeiro[]> {
   const [servicosExtras, vendas, assinaturas, indicacoes] = await Promise.all([
     prisma.atendimentoServico.findMany({
       where: {
+        barbeariaId,
         servico: { pontuaRanking: true },
         atendimento: { status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim }, barbeiroId: { not: null } },
       },
@@ -23,17 +25,17 @@ async function buscarContagens(
     }),
     prisma.vendaProduto.groupBy({
       by: ["barbeiroId"],
-      where: { criadoEm: { gte: inicio, lte: fim }, barbeiroId: { not: null } },
+      where: { barbeariaId, criadoEm: { gte: inicio, lte: fim }, barbeiroId: { not: null } },
       _count: { _all: true },
     }),
     prisma.assinatura.groupBy({
       by: ["barbeiroId"],
-      where: { criadoEm: { gte: inicio, lte: fim }, barbeiroId: { not: null } },
+      where: { barbeariaId, criadoEm: { gte: inicio, lte: fim }, barbeiroId: { not: null } },
       _count: { _all: true },
     }),
     prisma.indicacao.groupBy({
       by: ["barbeiroId"],
-      where: { convertida: true, convertidaEm: { gte: inicio, lte: fim } },
+      where: { barbeariaId, convertida: true, convertidaEm: { gte: inicio, lte: fim } },
       _count: { _all: true },
     }),
   ]);
@@ -71,9 +73,9 @@ export default async function RankingPage({
   const personalizado = dataInicio ? calcularIntervalo("personalizado", agora, { dataInicio, dataFim }) : null;
 
   const [barbeirosAtivos, configuracao, campanhasAtivas] = await Promise.all([
-    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
     prisma.configuracaoRanking.findUnique({ where: { barbeariaId: session.barbeariaId } }),
-    buscarTodasCampanhasAtivasComProgresso(),
+    buscarTodasCampanhasAtivasComProgresso(session.barbeariaId),
   ]);
 
   const pontos: PontosPorAcao = {
@@ -84,9 +86,11 @@ export default async function RankingPage({
   };
 
   const [contagensSemana, contagensMes, contagensPersonalizado] = await Promise.all([
-    buscarContagens(semana.inicio, semana.fim, barbeirosAtivos),
-    buscarContagens(mes.inicio, mes.fim, barbeirosAtivos),
-    personalizado ? buscarContagens(personalizado.inicio, personalizado.fim, barbeirosAtivos) : null,
+    buscarContagens(semana.inicio, semana.fim, barbeirosAtivos, session.barbeariaId),
+    buscarContagens(mes.inicio, mes.fim, barbeirosAtivos, session.barbeariaId),
+    personalizado
+      ? buscarContagens(personalizado.inicio, personalizado.fim, barbeirosAtivos, session.barbeariaId)
+      : null,
   ]);
 
   const rankingSemanal = montarRanking(contagensSemana, pontos);

@@ -9,7 +9,10 @@ export function limitesCompetencia(competencia: string) {
 
 export type ItemPote = { barbeiroId: string; nome: string; fichas: number; valorCentavos: number };
 
-export async function calcularPote(competencia: string): Promise<{
+export async function calcularPote(
+  barbeariaId: string,
+  competencia: string
+): Promise<{
   totalPoteCentavos: number;
   totalFichas: number;
   itens: ItemPote[];
@@ -17,12 +20,12 @@ export async function calcularPote(competencia: string): Promise<{
   const { inicio, fim } = limitesCompetencia(competencia);
 
   const [pagamentos, atendimentos, barbeiros] = await Promise.all([
-    prisma.pagamentoAssinatura.findMany({ where: { competencia } }),
+    prisma.pagamentoAssinatura.findMany({ where: { competencia, barbeariaId } }),
     prisma.atendimento.findMany({
-      where: { status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim } },
+      where: { status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim }, barbeariaId },
       include: { servicos: { include: { servico: true } } },
     }),
-    prisma.barbeiro.findMany(),
+    prisma.barbeiro.findMany({ where: { barbeariaId } }),
   ]);
 
   const totalPoteCentavos = pagamentos.reduce((s, p) => s + p.valorCentavos, 0);

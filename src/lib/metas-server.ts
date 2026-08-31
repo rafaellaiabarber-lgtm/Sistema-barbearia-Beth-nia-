@@ -6,6 +6,7 @@ import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 
 export type MetaComNiveis = {
   id: string;
+  barbeariaId: string | null;
   barbeiroId: string;
   tipo: string;
   ativa: boolean;
@@ -25,6 +26,7 @@ export async function calcularProgressoMeta(meta: MetaComNiveis, comissaoPadraoB
   if (meta.tipo === "VENDAS_PRODUTO") {
     const resultado = await prisma.vendaProduto.aggregate({
       where: {
+        barbeariaId: meta.barbeariaId,
         barbeiroId: meta.barbeiroId,
         criadoEm: { gte: periodo.inicio, lte: periodo.fim },
         ...(meta.produtoId ? { produtoId: meta.produtoId } : {}),
@@ -47,6 +49,7 @@ export async function calcularProgressoMeta(meta: MetaComNiveis, comissaoPadraoB
     // dentro dos atendimentos, não o total do atendimento (que pode incluir outros serviços).
     const itens = await prisma.atendimentoServico.findMany({
       where: {
+        barbeariaId: meta.barbeariaId,
         servicoId: meta.servicoId,
         atendimento: {
           status: "CONCLUIDO",
@@ -70,6 +73,7 @@ export async function calcularProgressoMeta(meta: MetaComNiveis, comissaoPadraoB
   } else {
     const atendimentos = await prisma.atendimento.findMany({
       where: {
+        barbeariaId: meta.barbeariaId,
         status: "CONCLUIDO",
         barbeiroId: meta.barbeiroId,
         concluidoEm: { gte: periodo.inicio, lte: periodo.fim },
@@ -88,7 +92,7 @@ export async function calcularProgressoMeta(meta: MetaComNiveis, comissaoPadraoB
     if (meta.tipo === "FATURAMENTO") {
       // A comissão do barbeiro também inclui as vendas de produto, não só os serviços.
       const vendasProduto = await prisma.vendaProduto.findMany({
-        where: { barbeiroId: meta.barbeiroId, criadoEm: { gte: periodo.inicio, lte: periodo.fim } },
+        where: { barbeariaId: meta.barbeariaId, barbeiroId: meta.barbeiroId, criadoEm: { gte: periodo.inicio, lte: periodo.fim } },
       });
       progresso.comissaoCentavos += comissaoProdutos(vendasProduto);
     }
