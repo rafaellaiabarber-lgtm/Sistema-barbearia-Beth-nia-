@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo } from "@/lib/periodo";
 import { competenciaAtual, estaInadimplente } from "@/lib/assinaturas";
@@ -13,11 +14,13 @@ function formatarPercentual(valor: number | null) {
 }
 
 export default async function PlanosPage() {
+  const session = await requireSession(["ADMIN"]);
   const agora = new Date();
   const mes = calcularIntervalo("mes", agora);
   const competencia = competenciaAtual(agora);
 
   const planos = await prisma.plano.findMany({
+    where: { barbeariaId: session.barbeariaId },
     orderBy: [{ ativo: "desc" }, { nome: "asc" }],
     include: {
       assinaturas: {
@@ -36,6 +39,7 @@ export default async function PlanosPage() {
   const atendimentosAssinantesMes = clienteIdsAtivos.length
     ? await prisma.atendimento.findMany({
         where: {
+          barbeariaId: session.barbeariaId,
           status: "CONCLUIDO",
           concluidoEm: { gte: mes.inicio, lte: mes.fim },
           clienteId: { in: clienteIdsAtivos },

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo, validarPeriodo } from "@/lib/periodo";
 import { FiltroRelatorio } from "../filtro-relatorio";
@@ -24,6 +25,7 @@ export default async function FluxoCaixaPage({
     barbeiroId?: string;
   }>;
 }) {
+  const session = await requireSession(["ADMIN"]);
   const { periodo: periodoParam, dataInicio, dataFim, barbeiroId } = await searchParams;
   const periodo: Periodo = validarPeriodo(periodoParam, "mes");
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
@@ -31,14 +33,17 @@ export default async function FluxoCaixaPage({
   const [atendimentos, movimentos, servicos, barbeiros] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
+        barbeariaId: session.barbeariaId,
         status: "CONCLUIDO",
         concluidoEm: { gte: inicio, lte: fim },
         ...(barbeiroId ? { barbeiroId } : {}),
       },
     }),
-    prisma.movimentoCaixa.findMany({ where: { criadoEm: { gte: inicio, lte: fim } } }),
-    prisma.servico.findMany({ orderBy: { nome: "asc" } }),
-    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.movimentoCaixa.findMany({
+      where: { criadoEm: { gte: inicio, lte: fim }, barbeariaId: session.barbeariaId },
+    }),
+    prisma.servico.findMany({ where: { barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
   ]);
 
   const porDia = new Map<string, { entradas: number; saidas: number }>();

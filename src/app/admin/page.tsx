@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ShoppingCart, BarChart3, ThumbsUp, ThumbsDown } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo, intervaloAnterior } from "@/lib/periodo";
 import { lucroServicos } from "@/lib/comissao";
@@ -14,6 +15,7 @@ function chaveDia(d: Date) {
 }
 
 export default async function AdminHomePage() {
+  const session = await requireSession(["ADMIN"]);
   const agora = new Date();
   const hoje = calcularIntervalo("hoje", agora);
   const semana = calcularIntervalo("semana", agora);
@@ -40,33 +42,42 @@ export default async function AdminHomePage() {
     atendimentosGrafico,
   ] = await Promise.all([
     prisma.atendimento.findMany({
-      where: { status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim } },
+      where: { barbeariaId: session.barbeariaId, status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim } },
       include: { barbeiro: true, cliente: true, servicos: true },
     }),
     prisma.atendimento.findMany({
       where: {
+        barbeariaId: session.barbeariaId,
         status: "CONCLUIDO",
         concluidoEm: { gte: mesAnteriorIntervalo.inicio, lte: mesAnteriorIntervalo.fim },
       },
       include: { barbeiro: true, servicos: true },
     }),
-    prisma.atendimento.count({ where: { status: "AGUARDANDO" } }),
-    prisma.atendimento.count({ where: { status: "EM_ATENDIMENTO" } }),
+    prisma.atendimento.count({ where: { barbeariaId: session.barbeariaId, status: "AGUARDANDO" } }),
+    prisma.atendimento.count({ where: { barbeariaId: session.barbeariaId, status: "EM_ATENDIMENTO" } }),
     prisma.atendimento.aggregate({
-      where: { status: "CONCLUIDO", concluidoEm: { gte: diaAnterior.inicio, lte: diaAnterior.fim } },
+      where: {
+        barbeariaId: session.barbeariaId,
+        status: "CONCLUIDO",
+        concluidoEm: { gte: diaAnterior.inicio, lte: diaAnterior.fim },
+      },
       _sum: { precoTotalCentavos: true },
     }),
     prisma.atendimento.aggregate({
-      where: { status: "CONCLUIDO", concluidoEm: { gte: semanaAnterior.inicio, lte: semanaAnterior.fim } },
+      where: {
+        barbeariaId: session.barbeariaId,
+        status: "CONCLUIDO",
+        concluidoEm: { gte: semanaAnterior.inicio, lte: semanaAnterior.fim },
+      },
       _sum: { precoTotalCentavos: true },
     }),
-    prisma.assinatura.count({ where: { status: "ATIVA" } }),
+    prisma.assinatura.count({ where: { barbeariaId: session.barbeariaId, status: "ATIVA" } }),
     prisma.assinatura.findMany({
-      where: { status: "ATIVA" },
+      where: { barbeariaId: session.barbeariaId, status: "ATIVA" },
       include: { pagamentos: { where: { competencia: competenciaAtual(agora) } } },
     }),
     prisma.atendimento.findMany({
-      where: { status: "CONCLUIDO", concluidoEm: { gte: inicioGrafico, lte: agora } },
+      where: { barbeariaId: session.barbeariaId, status: "CONCLUIDO", concluidoEm: { gte: inicioGrafico, lte: agora } },
       select: { concluidoEm: true, precoTotalCentavos: true },
     }),
   ]);

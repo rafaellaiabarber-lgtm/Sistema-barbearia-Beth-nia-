@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { validarPeriodo, calcularIntervalo } from "@/lib/periodo";
 import { Simulador } from "./simulador";
 
@@ -9,17 +10,21 @@ export default async function SimuladorAssinaturaPage({
 }: {
   searchParams: Promise<{ periodo?: string; dataInicio?: string; dataFim?: string; servicoId?: string }>;
 }) {
+  const session = await requireSession(["ADMIN"]);
   const sp = await searchParams;
   const periodo = validarPeriodo(sp.periodo, "semana");
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio: sp.dataInicio, dataFim: sp.dataFim });
 
   const [servicos, barbeiros] = await Promise.all([
     prisma.servico.findMany({
-      where: { ativo: true },
+      where: { ativo: true, barbeariaId: session.barbeariaId },
       orderBy: { nome: "asc" },
       select: { id: true, nome: true, custoCentavos: true, comissaoPercentual: true },
     }),
-    prisma.barbeiro.findMany({ where: { ativo: true }, select: { comissaoPercentual: true } }),
+    prisma.barbeiro.findMany({
+      where: { ativo: true, barbeariaId: session.barbeariaId },
+      select: { comissaoPercentual: true },
+    }),
   ]);
 
   const servicoId = sp.servicoId && servicos.some((s) => s.id === sp.servicoId) ? sp.servicoId : (servicos[0]?.id ?? "");
@@ -36,6 +41,7 @@ export default async function SimuladorAssinaturaPage({
   if (servico) {
     const itens = await prisma.atendimentoServico.findMany({
       where: {
+        barbeariaId: session.barbeariaId,
         servicoId: servico.id,
         atendimento: { status: "CONCLUIDO", cobertoPorAssinatura: false, concluidoEm: { gte: inicio, lte: fim } },
       },
@@ -57,7 +63,11 @@ export default async function SimuladorAssinaturaPage({
     // A maioria dos clientes avulsos não volta a cada 30 dias certinhos — pra saber o ritmo real de retorno
     // (e não um número redondo chutado), olha pro histórico completo do serviço, não só pro período escolhido acima.
     const historico = await prisma.atendimentoServico.findMany({
-      where: { servicoId: servico.id, atendimento: { status: "CONCLUIDO", cobertoPorAssinatura: false } },
+      where: {
+        barbeariaId: session.barbeariaId,
+        servicoId: servico.id,
+        atendimento: { status: "CONCLUIDO", cobertoPorAssinatura: false },
+      },
       select: { atendimento: { select: { clienteId: true, concluidoEm: true } } },
     });
 

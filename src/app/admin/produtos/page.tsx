@@ -1,9 +1,14 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { NovoProdutoForm } from "./novo-produto-form";
 import { ProdutoRow } from "./produto-row";
 
 export default async function ProdutosPage() {
-  const produtos = await prisma.produto.findMany({ orderBy: [{ ativo: "desc" }, { nome: "asc" }] });
+  const session = await requireSession(["ADMIN"]);
+  const produtos = await prisma.produto.findMany({
+    where: { barbeariaId: session.barbeariaId },
+    orderBy: [{ ativo: "desc" }, { nome: "asc" }],
+  });
 
   return (
     <div>
