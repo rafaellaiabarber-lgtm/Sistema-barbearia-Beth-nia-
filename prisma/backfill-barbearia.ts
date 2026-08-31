@@ -41,6 +41,10 @@ async function main() {
     { nome: "feedback", cliente: prisma.feedback },
     { nome: "ofertaRoleta", cliente: prisma.ofertaRoleta },
     { nome: "giroRoleta", cliente: prisma.giroRoleta },
+    { nome: "configuracaoTotem", cliente: prisma.configuracaoTotem },
+    { nome: "configuracaoAvaliacao", cliente: prisma.configuracaoAvaliacao },
+    { nome: "configuracaoFinanceira", cliente: prisma.configuracaoFinanceira },
+    { nome: "configuracaoRanking", cliente: prisma.configuracaoRanking },
   ] as const;
 
   for (const { nome, cliente } of modelos) {
