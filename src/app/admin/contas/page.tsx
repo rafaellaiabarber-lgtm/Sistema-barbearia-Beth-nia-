@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { formatarReais } from "@/lib/format";
 import { NovaContaForm } from "./nova-conta-form";
 import { ContaRow } from "./conta-row";
@@ -11,11 +12,18 @@ function inicioDoDia() {
 }
 
 export default async function ContasPage() {
+  const session = await requireSession(["ADMIN"]);
   const hoje = inicioDoDia();
 
   const [aPagar, aReceber] = await Promise.all([
-    prisma.contaFinanceira.findMany({ where: { tipo: "PAGAR" }, orderBy: { vencimento: "asc" } }),
-    prisma.contaFinanceira.findMany({ where: { tipo: "RECEBER" }, orderBy: { vencimento: "asc" } }),
+    prisma.contaFinanceira.findMany({
+      where: { tipo: "PAGAR", barbeariaId: session.barbeariaId },
+      orderBy: { vencimento: "asc" },
+    }),
+    prisma.contaFinanceira.findMany({
+      where: { tipo: "RECEBER", barbeariaId: session.barbeariaId },
+      orderBy: { vencimento: "asc" },
+    }),
   ]);
 
   function separar(contas: typeof aPagar) {

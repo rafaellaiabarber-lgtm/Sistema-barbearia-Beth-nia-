@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { competenciaAtual, estaInadimplente, prestesAVencer } from "@/lib/assinaturas";
 import { NovaAssinaturaForm } from "./nova-assinatura-form";
 import { ListaAssinaturas } from "./lista-assinaturas";
@@ -12,12 +13,14 @@ export default async function AssinaturasPage({
 }: {
   searchParams: Promise<{ telefone?: string; nome?: string }>;
 }) {
+  const session = await requireSession(["ADMIN"]);
   const sp = await searchParams;
   const competencia = competenciaAtual();
   const hoje = paraCampoData(new Date());
 
   const [assinaturas, planosAtivos, barbeirosAtivos] = await Promise.all([
     prisma.assinatura.findMany({
+      where: { barbeariaId: session.barbeariaId },
       include: {
         cliente: true,
         plano: true,
@@ -26,8 +29,8 @@ export default async function AssinaturasPage({
       },
       orderBy: [{ cliente: { nome: "asc" } }],
     }),
-    prisma.plano.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.plano.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
   ]);
 
   const ativas = assinaturas.filter((a) => a.status === "ATIVA");

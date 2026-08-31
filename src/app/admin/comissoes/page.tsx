@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo, chavePeriodo, validarPeriodo } from "@/lib/periodo";
 import { marcarComissaoPaga, desmarcarComissaoPaga } from "@/lib/actions/comissoes";
@@ -19,6 +20,7 @@ export default async function ComissoesPage({
     barbeiroId?: string;
   }>;
 }) {
+  const session = await requireSession(["ADMIN"]);
   const { periodo: periodoParam, dataInicio, dataFim, servicoId, barbeiroId } = await searchParams;
   const periodo: Periodo = validarPeriodo(periodoParam, "hoje");
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
@@ -28,6 +30,7 @@ export default async function ComissoesPage({
   const [atendimentos, servicos, barbeiros, vendasProduto] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
+        barbeariaId: session.barbeariaId,
         status: "CONCLUIDO",
         concluidoEm: { gte: inicio, lte: fim },
         ...(barbeiroId ? { barbeiroId } : {}),
@@ -36,10 +39,10 @@ export default async function ComissoesPage({
       include: { barbeiro: true, servicos: true },
       orderBy: { concluidoEm: "desc" },
     }),
-    prisma.servico.findMany({ orderBy: { nome: "asc" } }),
-    prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
+    prisma.servico.findMany({ where: { barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ where: { barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
     prisma.vendaProduto.findMany({
-      where: { criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
+      where: { barbeariaId: session.barbeariaId, criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
     }),
   ]);
 
@@ -78,6 +81,7 @@ export default async function ComissoesPage({
   const pagamentos = podeMarcarPago
     ? await prisma.pagamentoComissao.findMany({
         where: {
+          barbeariaId: session.barbeariaId,
           periodo: periodo.toUpperCase() as "HOJE" | "SEMANA" | "MES",
           chave,
           barbeiroId: { in: [...porBarbeiro.keys()] },

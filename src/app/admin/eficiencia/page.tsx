@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { type Periodo, calcularIntervalo, validarPeriodo } from "@/lib/periodo";
 import { FiltroRelatorio } from "../filtro-relatorio";
 import { GraficoBarras } from "../grafico-barras";
@@ -29,6 +30,7 @@ export default async function EficienciaPage({
     barbeiroId?: string;
   }>;
 }) {
+  const session = await requireSession(["ADMIN"]);
   const { periodo: periodoParam, dataInicio, dataFim, barbeiroId } = await searchParams;
   const periodo: Periodo = validarPeriodo(periodoParam, "mes");
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
@@ -36,6 +38,7 @@ export default async function EficienciaPage({
   const [atendimentos, barbeiros, atendimentosPeriodoTodos] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
+        barbeariaId: session.barbeariaId,
         status: "CONCLUIDO",
         concluidoEm: { gte: inicio, lte: fim },
         chamadoEm: { not: null },
@@ -43,9 +46,13 @@ export default async function EficienciaPage({
       },
       include: { barbeiro: true },
     }),
-    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" }, include: { jornadas: true } }),
+    prisma.barbeiro.findMany({
+      where: { ativo: true, barbeariaId: session.barbeariaId },
+      orderBy: { nome: "asc" },
+      include: { jornadas: true },
+    }),
     prisma.atendimento.findMany({
-      where: { criadoEm: { gte: inicio, lte: fim } },
+      where: { criadoEm: { gte: inicio, lte: fim }, barbeariaId: session.barbeariaId },
       select: { criadoEm: true },
     }),
   ]);

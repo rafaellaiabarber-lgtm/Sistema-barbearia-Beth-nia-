@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { ListaClientes } from "./lista-clientes";
 
 export default async function ClientesPage() {
+  const session = await requireSession(["ADMIN"]);
   const clientes = await prisma.cliente.findMany({
+    where: { barbeariaId: session.barbeariaId },
     orderBy: { criadoEm: "desc" },
     include: {
       atendimentos: {
