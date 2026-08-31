@@ -19,7 +19,7 @@ export async function lancarAtendimentoManual(
   _prevState: LancarAtendimentoState,
   formData: FormData
 ): Promise<LancarAtendimentoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   const telefone = normalizarTelefone(String(formData.get("telefone") ?? ""));
@@ -36,8 +36,8 @@ export async function lancarAtendimentoManual(
   }
 
   const [barbeiro, servicos] = await Promise.all([
-    prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true } }),
-    prisma.servico.findMany({ where: { id: { in: servicoIds } } }),
+    prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true, barbeariaId: session.barbeariaId } }),
+    prisma.servico.findMany({ where: { id: { in: servicoIds }, barbeariaId: session.barbeariaId } }),
   ]);
   if (!barbeiro) return { erro: "Barbeiro inválido." };
   if (servicos.length === 0) return { erro: "Serviços inválidos." };
@@ -45,7 +45,7 @@ export async function lancarAtendimentoManual(
   const cliente = await prisma.cliente.upsert({
     where: { telefone },
     update: { nome },
-    create: { nome, telefone },
+    create: { barbeariaId: session.barbeariaId, nome, telefone },
   });
 
   const precoTotalCentavos = servicos.reduce((soma, s) => soma + s.precoCentavos, 0);
@@ -53,6 +53,7 @@ export async function lancarAtendimentoManual(
 
   await prisma.atendimento.create({
     data: {
+      barbeariaId: session.barbeariaId,
       clienteId: cliente.id,
       barbeiroId: barbeiro.id,
       status: "CONCLUIDO",
@@ -62,6 +63,7 @@ export async function lancarAtendimentoManual(
       formaPagamento,
       servicos: {
         create: servicos.map((s) => ({
+          barbeariaId: session.barbeariaId,
           servicoId: s.id,
           nomeSnapshot: s.nome,
           precoCentavos: s.precoCentavos,
@@ -78,8 +80,10 @@ export async function lancarAtendimentoManual(
 }
 
 export async function excluirAtendimento(atendimentoId: string) {
-  await requireSession(["ADMIN"]);
-  await prisma.atendimento.deleteMany({ where: { id: atendimentoId, status: "CONCLUIDO" } });
+  const session = await requireSession(["ADMIN"]);
+  await prisma.atendimento.deleteMany({
+    where: { id: atendimentoId, status: "CONCLUIDO", barbeariaId: session.barbeariaId },
+  });
   revalidarRelatorios();
 }
 
@@ -89,7 +93,7 @@ export async function editarHorarioAtendimento(
   _prevState: EditarHorarioState,
   formData: FormData
 ): Promise<EditarHorarioState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const atendimentoId = String(formData.get("atendimentoId") ?? "");
   const chamadoEmStr = String(formData.get("chamadoEm") ?? "");
@@ -102,7 +106,7 @@ export async function editarHorarioAtendimento(
   if (chamadoEm.getTime() > concluidoEm.getTime()) return { erro: "O início não pode ser depois do término." };
 
   const atualizado = await prisma.atendimento.updateMany({
-    where: { id: atendimentoId, status: "CONCLUIDO" },
+    where: { id: atendimentoId, status: "CONCLUIDO", barbeariaId: session.barbeariaId },
     data: { chamadoEm, concluidoEm },
   });
   if (atualizado.count === 0) return { erro: "Atendimento não encontrado." };
@@ -118,10 +122,14 @@ export type CorrigirComissaoCobertosState = { sucesso?: boolean; corrigidos?: nu
 // zerada). Usa o preço atual do serviço como base — é a melhor aproximação disponível, já que
 // o valor original não foi salvo nesses atendimentos.
 export async function corrigirComissaoAtendimentosCobertos(): Promise<CorrigirComissaoCobertosState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const pendentes = await prisma.atendimentoServico.findMany({
-    where: { precoComissaoCentavos: null, atendimento: { cobertoPorAssinatura: true } },
+    where: {
+      barbeariaId: session.barbeariaId,
+      precoComissaoCentavos: null,
+      atendimento: { cobertoPorAssinatura: true },
+    },
     include: { servico: true },
   });
 
@@ -148,7 +156,7 @@ export async function editarComissaoServico(
   _prevState: EditarComissaoServicoState,
   formData: FormData
 ): Promise<EditarComissaoServicoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const valorStr = String(formData.get("valor") ?? "").replace(",", ".");
   const valorCentavos = Math.round(Number(valorStr) * 100);
@@ -157,7 +165,7 @@ export async function editarComissaoServico(
   }
 
   const atualizado = await prisma.atendimentoServico.updateMany({
-    where: { id: atendimentoServicoId },
+    where: { id: atendimentoServicoId, barbeariaId: session.barbeariaId },
     data: { precoComissaoCentavos: valorCentavos },
   });
   if (atualizado.count === 0) return { erro: "Serviço não encontrado." };
@@ -171,12 +179,16 @@ export async function editarComissaoServico(
 export type SugestaoCliente = { nome: string; telefone: string };
 
 export async function buscarClientesPorNome(query: string): Promise<SugestaoCliente[]> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
   const termo = query.trim();
   if (termo.length < 2) return [];
 
   const clientes = await prisma.cliente.findMany({
-    where: { nome: { contains: termo, mode: "insensitive" }, telefone: { not: null } },
+    where: {
+      barbeariaId: session.barbeariaId,
+      nome: { contains: termo, mode: "insensitive" },
+      telefone: { not: null },
+    },
     orderBy: { nome: "asc" },
     take: 5,
   });
