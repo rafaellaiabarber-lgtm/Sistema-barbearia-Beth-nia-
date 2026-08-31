@@ -4,11 +4,18 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
+  const barbearia = await prisma.barbearia.upsert({
+    where: { slug: "bethania" },
+    update: {},
+    create: { slug: "bethania", nome: "Barbearia Bethânia" },
+  });
+
   const senhaAdmin = await bcrypt.hash("admin123", 10);
   await prisma.usuario.upsert({
     where: { login: "admin" },
     update: {},
     create: {
+      barbeariaId: barbearia.id,
       nome: "Administrador",
       login: "admin",
       senhaHash: senhaAdmin,
@@ -21,6 +28,7 @@ async function main() {
     update: {},
     create: {
       id: "seed-barbeiro-1",
+      barbeariaId: barbearia.id,
       nome: "Carlos",
       telefone: "11999990001",
       comissaoPercentual: 50,
@@ -32,6 +40,7 @@ async function main() {
     update: {},
     create: {
       id: "seed-barbeiro-2",
+      barbeariaId: barbearia.id,
       nome: "Marcos",
       telefone: "11999990002",
       comissaoPercentual: 50,
@@ -43,6 +52,7 @@ async function main() {
     where: { login: "carlos" },
     update: {},
     create: {
+      barbeariaId: barbearia.id,
       nome: "Carlos",
       login: "carlos",
       senhaHash: senhaBarbeiro,
@@ -54,6 +64,7 @@ async function main() {
     where: { login: "marcos" },
     update: {},
     create: {
+      barbeariaId: barbearia.id,
       nome: "Marcos",
       login: "marcos",
       senhaHash: senhaBarbeiro,
@@ -70,9 +81,9 @@ async function main() {
   ];
 
   for (const s of servicos) {
-    const existente = await prisma.servico.findFirst({ where: { nome: s.nome } });
+    const existente = await prisma.servico.findFirst({ where: { nome: s.nome, barbeariaId: barbearia.id } });
     if (!existente) {
-      await prisma.servico.create({ data: s });
+      await prisma.servico.create({ data: { ...s, barbeariaId: barbearia.id } });
     }
   }
 

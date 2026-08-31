@@ -6,7 +6,7 @@ import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 
 export type MetaComNiveis = {
   id: string;
-  barbeariaId: string | null;
+  barbeariaId: string;
   barbeiroId: string;
   tipo: string;
   ativa: boolean;

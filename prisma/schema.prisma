@@ -81,9 +81,7 @@ enum PeriodicidadeFeedback {
   AVULSO
 }
 
-// Cada barbearia é um tenant isolado do sistema. barbeariaId nas outras tabelas
-// ainda é opcional nesta etapa (schema + backfill) — vira obrigatório só depois
-// que todo o código já estiver escopando corretamente por barbearia.
+// Cada barbearia é um tenant isolado do sistema.
 model Barbearia {
   id       String   @id @default(cuid())
   slug     String   @unique
@@ -127,22 +125,22 @@ model Barbearia {
 }
 
 model Usuario {
-  id          String     @id @default(cuid())
-  barbeariaId String?
-  barbearia   Barbearia? @relation(fields: [barbeariaId], references: [id])
+  id          String    @id @default(cuid())
+  barbeariaId String
+  barbearia   Barbearia @relation(fields: [barbeariaId], references: [id])
   nome        String
-  login       String     @unique
+  login       String    @unique
   senhaHash   String
   role        Role
-  barbeiroId  String?    @unique
-  barbeiro    Barbeiro?  @relation(fields: [barbeiroId], references: [id])
-  criadoEm    DateTime   @default(now())
+  barbeiroId  String?   @unique
+  barbeiro    Barbeiro? @relation(fields: [barbeiroId], references: [id])
+  criadoEm    DateTime  @default(now())
 }
 
 model Barbeiro {
   id                      String                 @id @default(cuid())
-  barbeariaId             String?
-  barbearia               Barbearia?             @relation(fields: [barbeariaId], references: [id])
+  barbeariaId             String
+  barbearia               Barbearia              @relation(fields: [barbeariaId], references: [id])
   nome                    String
   telefone                String?
   fotoUrl                 String?
@@ -169,10 +167,10 @@ model Barbeiro {
 }
 
 model JornadaTrabalho {
-  id           String     @id @default(cuid())
-  barbeariaId  String?
-  barbearia    Barbearia? @relation(fields: [barbeariaId], references: [id])
-  barbeiro     Barbeiro   @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  barbeariaId  String
+  barbearia    Barbearia @relation(fields: [barbeariaId], references: [id])
+  barbeiro     Barbeiro  @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
   barbeiroId   String
   diaSemana    Int
   horaInicio   String
@@ -184,32 +182,32 @@ model JornadaTrabalho {
 }
 
 model Indicacao {
-  id           String     @id @default(cuid())
-  barbeariaId  String?
-  barbearia    Barbearia? @relation(fields: [barbeariaId], references: [id])
-  barbeiro     Barbeiro   @relation(fields: [barbeiroId], references: [id])
+  id           String    @id @default(cuid())
+  barbeariaId  String
+  barbearia    Barbearia @relation(fields: [barbeariaId], references: [id])
+  barbeiro     Barbeiro  @relation(fields: [barbeiroId], references: [id])
   barbeiroId   String
   nome         String
   telefone     String
-  contatada    Boolean    @default(false)
+  contatada    Boolean   @default(false)
   contatadaEm  DateTime?
-  convertida   Boolean    @default(false)
+  convertida   Boolean   @default(false)
   convertidaEm DateTime?
-  criadoEm     DateTime   @default(now())
+  criadoEm     DateTime  @default(now())
 }
 
 // Controle pessoal de despesas do barbeiro (não afeta comissão nem nenhum
 // relatório do admin — cada barbeiro só vê as suas).
 model DespesaBarbeiro {
-  id            String     @id @default(cuid())
-  barbeariaId   String?
-  barbearia     Barbearia? @relation(fields: [barbeariaId], references: [id])
-  barbeiro      Barbeiro   @relation(fields: [barbeiroId], references: [id])
+  id            String    @id @default(cuid())
+  barbeariaId   String
+  barbearia     Barbearia @relation(fields: [barbeariaId], references: [id])
+  barbeiro      Barbeiro  @relation(fields: [barbeiroId], references: [id])
   barbeiroId    String
   descricao     String
   valorCentavos Int
   data          DateTime
-  criadoEm      DateTime   @default(now())
+  criadoEm      DateTime  @default(now())
 }
 
 // Sem @@unique de (barbeiroId, tipo): agora um barbeiro pode ter várias metas do
@@ -218,8 +216,8 @@ model DespesaBarbeiro {
 // combinação (barbeiroId, tipo).
 model Meta {
   id          String      @id @default(cuid())
-  barbeariaId String?
-  barbearia   Barbearia?  @relation(fields: [barbeariaId], references: [id])
+  barbeariaId String
+  barbearia   Barbearia   @relation(fields: [barbeariaId], references: [id])
   barbeiro    Barbeiro    @relation(fields: [barbeiroId], references: [id])
   barbeiroId  String
   tipo        TipoMeta
@@ -239,10 +237,10 @@ model Meta {
 
 // valorAlvo está em centavos para FATURAMENTO/TICKET_MEDIO, e em unidades inteiras para ATENDIMENTOS/CLIENTES_NOVOS.
 model NivelMeta {
-  id                  String     @id @default(cuid())
-  barbeariaId         String?
-  barbearia           Barbearia? @relation(fields: [barbeariaId], references: [id])
-  meta                Meta       @relation(fields: [metaId], references: [id], onDelete: Cascade)
+  id                  String    @id @default(cuid())
+  barbeariaId         String
+  barbearia           Barbearia @relation(fields: [barbeariaId], references: [id])
+  meta                Meta      @relation(fields: [metaId], references: [id], onDelete: Cascade)
   metaId              String
   ordem               Int
   nome                String
@@ -254,8 +252,8 @@ model NivelMeta {
 
 model Cliente {
   id           String        @id @default(cuid())
-  barbeariaId  String?
-  barbearia    Barbearia?    @relation(fields: [barbeariaId], references: [id])
+  barbeariaId  String
+  barbearia    Barbearia     @relation(fields: [barbeariaId], references: [id])
   nome         String
   telefone     String?
   criadoEm     DateTime      @default(now())
@@ -268,8 +266,8 @@ model Cliente {
 
 model Servico {
   id                  String               @id @default(cuid())
-  barbeariaId         String?
-  barbearia           Barbearia?           @relation(fields: [barbeariaId], references: [id])
+  barbeariaId         String
+  barbearia           Barbearia            @relation(fields: [barbeariaId], references: [id])
   nome                String
   precoCentavos       Int
   custoCentavos       Int                  @default(0)
@@ -286,8 +284,8 @@ model Servico {
 
 model Produto {
   id                 String              @id @default(cuid())
-  barbeariaId        String?
-  barbearia          Barbearia?          @relation(fields: [barbeariaId], references: [id])
+  barbeariaId        String
+  barbearia          Barbearia           @relation(fields: [barbeariaId], references: [id])
   nome               String
   precoCentavos      Int
   custoCentavos      Int                 @default(0)
@@ -301,8 +299,8 @@ model Produto {
 
 model CampanhaVenda {
   id          String              @id @default(cuid())
-  barbeariaId String?
-  barbearia   Barbearia?          @relation(fields: [barbeariaId], references: [id])
+  barbeariaId String
+  barbearia   Barbearia           @relation(fields: [barbeariaId], references: [id])
   barbeiro    Barbeiro            @relation(fields: [barbeiroId], references: [id])
   barbeiroId  String
   titulo      String?
@@ -313,8 +311,8 @@ model CampanhaVenda {
 
 model ItemCampanhaVenda {
   id             String        @id @default(cuid())
-  barbeariaId    String?
-  barbearia      Barbearia?    @relation(fields: [barbeariaId], references: [id])
+  barbeariaId    String
+  barbearia      Barbearia     @relation(fields: [barbeariaId], references: [id])
   campanha       CampanhaVenda @relation(fields: [campanhaId], references: [id], onDelete: Cascade)
   campanhaId     String
   produto        Produto?      @relation(fields: [produtoId], references: [id])
@@ -326,8 +324,8 @@ model ItemCampanhaVenda {
 
 model VendaProduto {
   id                    String          @id @default(cuid())
-  barbeariaId           String?
-  barbearia             Barbearia?      @relation(fields: [barbeariaId], references: [id])
+  barbeariaId           String
+  barbearia             Barbearia       @relation(fields: [barbeariaId], references: [id])
   produto               Produto         @relation(fields: [produtoId], references: [id])
   produtoId             String
   barbeiro              Barbeiro?       @relation(fields: [barbeiroId], references: [id])
@@ -342,8 +340,8 @@ model VendaProduto {
 
 model Atendimento {
   id                   String               @id @default(cuid())
-  barbeariaId          String?
-  barbearia            Barbearia?           @relation(fields: [barbeariaId], references: [id])
+  barbeariaId          String
+  barbearia            Barbearia            @relation(fields: [barbeariaId], references: [id])
   cliente              Cliente              @relation(fields: [clienteId], references: [id])
   clienteId            String
   barbeiro             Barbeiro?            @relation("BarbeiroAtendeu", fields: [barbeiroId], references: [id])
@@ -363,8 +361,8 @@ model Atendimento {
 
 model MovimentoCaixa {
   id             String             @id @default(cuid())
-  barbeariaId    String?
-  barbearia      Barbearia?         @relation(fields: [barbeariaId], references: [id])
+  barbeariaId    String
+  barbearia      Barbearia          @relation(fields: [barbeariaId], references: [id])
   tipo           TipoMovimentoCaixa
   descricao      String
   valorCentavos  Int
@@ -375,8 +373,8 @@ model MovimentoCaixa {
 
 model PagamentoComissao {
   id            String          @id @default(cuid())
-  barbeariaId   String?
-  barbearia     Barbearia?      @relation(fields: [barbeariaId], references: [id])
+  barbeariaId   String
+  barbearia     Barbearia       @relation(fields: [barbeariaId], references: [id])
   barbeiro      Barbeiro        @relation(fields: [barbeiroId], references: [id])
   barbeiroId    String
   periodo       PeriodoComissao
@@ -389,8 +387,8 @@ model PagamentoComissao {
 
 model AtendimentoServico {
   id                    String      @id @default(cuid())
-  barbeariaId           String?
-  barbearia             Barbearia?  @relation(fields: [barbeariaId], references: [id])
+  barbeariaId           String
+  barbearia             Barbearia   @relation(fields: [barbeariaId], references: [id])
   atendimento           Atendimento @relation(fields: [atendimentoId], references: [id], onDelete: Cascade)
   atendimentoId         String
   servico               Servico     @relation(fields: [servicoId], references: [id])
@@ -409,8 +407,8 @@ model AtendimentoServico {
 
 model Plano {
   id                      String       @id @default(cuid())
-  barbeariaId             String?
-  barbearia               Barbearia?   @relation(fields: [barbeariaId], references: [id])
+  barbeariaId             String
+  barbearia               Barbearia    @relation(fields: [barbeariaId], references: [id])
   nome                    String
   precoCentavos           Int
   servicosIncluidosPorMes Int
@@ -425,8 +423,8 @@ model Plano {
 
 model Assinatura {
   id            String                @id @default(cuid())
-  barbeariaId   String?
-  barbearia     Barbearia?            @relation(fields: [barbeariaId], references: [id])
+  barbeariaId   String
+  barbearia     Barbearia             @relation(fields: [barbeariaId], references: [id])
   cliente       Cliente               @relation(fields: [clienteId], references: [id])
   clienteId     String
   plano         Plano                 @relation(fields: [planoId], references: [id])
@@ -442,8 +440,8 @@ model Assinatura {
 
 model PagamentoAssinatura {
   id            String     @id @default(cuid())
-  barbeariaId   String?
-  barbearia     Barbearia? @relation(fields: [barbeariaId], references: [id])
+  barbeariaId   String
+  barbearia     Barbearia  @relation(fields: [barbeariaId], references: [id])
   assinatura    Assinatura @relation(fields: [assinaturaId], references: [id])
   assinaturaId  String
   competencia   String
@@ -455,8 +453,8 @@ model PagamentoAssinatura {
 
 model DistribuicaoPote {
   id                String                 @id @default(cuid())
-  barbeariaId       String?
-  barbearia         Barbearia?             @relation(fields: [barbeariaId], references: [id])
+  barbeariaId       String
+  barbearia         Barbearia              @relation(fields: [barbeariaId], references: [id])
   competencia       String
   totalPoteCentavos Int
   totalFichas       Int
@@ -468,8 +466,8 @@ model DistribuicaoPote {
 
 model ItemDistribuicaoPote {
   id             String           @id @default(cuid())
-  barbeariaId    String?
-  barbearia      Barbearia?       @relation(fields: [barbeariaId], references: [id])
+  barbeariaId    String
+  barbearia      Barbearia        @relation(fields: [barbeariaId], references: [id])
   distribuicao   DistribuicaoPote @relation(fields: [distribuicaoId], references: [id], onDelete: Cascade)
   distribuicaoId String
   barbeiro       Barbeiro         @relation(fields: [barbeiroId], references: [id])
@@ -526,8 +524,8 @@ model ConfiguracaoRanking {
 
 model ContaFinanceira {
   id            String            @id @default(cuid())
-  barbeariaId   String?
-  barbearia     Barbearia?        @relation(fields: [barbeariaId], references: [id])
+  barbeariaId   String
+  barbearia     Barbearia         @relation(fields: [barbeariaId], references: [id])
   tipo          TipoConta
   descricao     String
   valorCentavos Int
@@ -541,8 +539,8 @@ model ContaFinanceira {
 
 model MaterialTreinamento {
   id           String                  @id @default(cuid())
-  barbeariaId  String?
-  barbearia    Barbearia?              @relation(fields: [barbeariaId], references: [id])
+  barbeariaId  String
+  barbearia    Barbearia               @relation(fields: [barbeariaId], references: [id])
   titulo       String
   tipo         TipoMaterialTreinamento
   conteudo     String
@@ -553,8 +551,8 @@ model MaterialTreinamento {
 
 model TemaFeedback {
   id          String     @id @default(cuid())
-  barbeariaId String?
-  barbearia   Barbearia? @relation(fields: [barbeariaId], references: [id])
+  barbeariaId String
+  barbearia   Barbearia  @relation(fields: [barbeariaId], references: [id])
   nome        String
   ativo       Boolean    @default(true)
   criadoEm    DateTime   @default(now())
@@ -563,8 +561,8 @@ model TemaFeedback {
 
 model Feedback {
   id               String                @id @default(cuid())
-  barbeariaId      String?
-  barbearia        Barbearia?            @relation(fields: [barbeariaId], references: [id])
+  barbeariaId      String
+  barbearia        Barbearia             @relation(fields: [barbeariaId], references: [id])
   barbeiro         Barbeiro              @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
   barbeiroId       String
   tema             TemaFeedback?         @relation(fields: [temaId], references: [id])
@@ -578,8 +576,8 @@ model Feedback {
 
 model OfertaRoleta {
   id                 String       @id @default(cuid())
-  barbeariaId        String?
-  barbearia          Barbearia?   @relation(fields: [barbeariaId], references: [id])
+  barbeariaId        String
+  barbearia          Barbearia    @relation(fields: [barbeariaId], references: [id])
   nome               String
   descontoPercentual Int?
   ativo              Boolean      @default(true)
@@ -590,8 +588,8 @@ model OfertaRoleta {
 
 model GiroRoleta {
   id          String       @id @default(cuid())
-  barbeariaId String?
-  barbearia   Barbearia?   @relation(fields: [barbeariaId], references: [id])
+  barbeariaId String
+  barbearia   Barbearia    @relation(fields: [barbeariaId], references: [id])
   barbeiro    Barbeiro     @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
   barbeiroId  String
   cliente     Cliente      @relation(fields: [clienteId], references: [id])
