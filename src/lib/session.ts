@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE, verificarTokenSessao, type SessionPayload } from "@/lib/auth";
 import { setCurrentBarbearia } from "@/lib/tenant-context";
+import { prisma } from "@/lib/prisma";
 
 export async function getSession(): Promise<SessionPayload | null> {
   const cookieStore = await cookies();
@@ -17,6 +18,13 @@ export async function requireSession(rolesPermitidas?: Array<"ADMIN" | "BARBEIRO
     redirect("/login");
   }
   if (rolesPermitidas && !rolesPermitidas.includes(session.role)) {
+    redirect("/login");
+  }
+  const barbearia = await prisma.barbearia.findUnique({
+    where: { id: session.barbeariaId },
+    select: { ativa: true },
+  });
+  if (!barbearia || !barbearia.ativa) {
     redirect("/login");
   }
   setCurrentBarbearia(session.barbeariaId);

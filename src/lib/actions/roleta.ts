@@ -100,8 +100,11 @@ export async function girarRoleta(
   if (!telefone) return { erro: "Informe seu telefone." };
   if (!nome) return { erro: "Informe seu nome." };
 
-  const barbeiro = await prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true } });
-  if (!barbeiro || !barbeiro.barbeariaId) return { erro: "Link inválido." };
+  const barbeiro = await prisma.barbeiro.findFirst({
+    where: { id: barbeiroId, ativo: true },
+    include: { barbearia: true },
+  });
+  if (!barbeiro || !barbeiro.barbearia || !barbeiro.barbearia.ativa) return { erro: "Link inválido." };
   const barbeariaId = barbeiro.barbeariaId;
   setCurrentBarbearia(barbeariaId);
 

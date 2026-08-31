@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { logout } from "@/lib/actions/auth";
 import { obterConfiguracaoTotem } from "@/lib/actions/totem";
+import { prisma } from "@/lib/prisma";
 import { ThemeToggle } from "../theme-toggle";
 import { ValoresToggle } from "../valores-toggle";
 import { BarbeiroSidebarNav } from "./sidebar-nav";
@@ -10,7 +11,10 @@ import { barbeiroNavLinks } from "./nav-links";
 
 export default async function FilaLayout({ children }: { children: React.ReactNode }) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
-  const configuracao = await obterConfiguracaoTotem(session.barbeariaId);
+  const [configuracao, minhaBarbearia] = await Promise.all([
+    obterConfiguracaoTotem(session.barbeariaId),
+    prisma.barbearia.findUnique({ where: { id: session.barbeariaId }, select: { nome: true } }),
+  ]);
   const logoUrl = configuracao?.logoMenuUrl ?? configuracao?.logoUrl ?? null;
 
   return (
@@ -18,6 +22,7 @@ export default async function FilaLayout({ children }: { children: React.ReactNo
       <BarbeiroMobileNav
         links={barbeiroNavLinks}
         nome={session.nome}
+        nomeBarbearia={minhaBarbearia?.nome ?? "Barbearia"}
         mostrarPainelAdmin={session.role === "ADMIN"}
         logoUrl={logoUrl}
       />
@@ -30,7 +35,7 @@ export default async function FilaLayout({ children }: { children: React.ReactNo
               <img src={logoUrl} alt="" className="h-10 w-auto max-w-10 rounded-md object-contain shrink-0" />
             )}
             <div className="min-w-0">
-              <p className="font-bold text-lg text-white">Barbearia Bethânia</p>
+              <p className="font-bold text-lg text-white truncate">{minhaBarbearia?.nome ?? "Barbearia"}</p>
               <p className="text-orange-400 text-sm">Olá, {session.nome}</p>
             </div>
           </div>

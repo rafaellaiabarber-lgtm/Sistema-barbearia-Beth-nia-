@@ -30,6 +30,7 @@ import {
   SlidersHorizontal,
   RotateCcw,
   MessageCircle,
+  Building2,
   type LucideIcon,
 } from "lucide-react";
 
@@ -65,4 +66,5 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   simuladorAssinatura: SlidersHorizontal,
   taxaRetorno: RotateCcw,
   pedirAvaliacao: MessageCircle,
+  plataforma: Building2,
 };

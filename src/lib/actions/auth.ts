@@ -28,6 +28,9 @@ export async function login(_prevState: LoginState, formData: FormData): Promise
   if (!usuario.barbearia) {
     return { erro: "Conta sem barbearia vinculada. Fale com o suporte." };
   }
+  if (!usuario.barbearia.ativa) {
+    return { erro: "Essa conta está desativada. Fale com o suporte." };
+  }
 
   const token = await criarTokenSessao({
     usuarioId: usuario.id,
