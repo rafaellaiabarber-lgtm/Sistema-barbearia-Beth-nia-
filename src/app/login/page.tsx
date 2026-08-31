@@ -22,9 +22,12 @@ export default async function LoginPage() {
 
         <LoginForm />
 
-        <div className="mt-6 text-center">
-          <Link href="/totem" className="text-sm text-neutral-500 hover:text-orange-600 dark:hover:text-orange-400">
+        <div className="mt-6 text-center space-y-2">
+          <Link href="/totem" className="block text-sm text-neutral-500 hover:text-orange-600 dark:hover:text-orange-400">
             Sou cliente, quero entrar na fila →
+          </Link>
+          <Link href="/cadastro" className="block text-sm text-neutral-500 hover:text-orange-600 dark:hover:text-orange-400">
+            Ainda não tem conta? Cadastre sua barbearia →
           </Link>
         </div>
       </div>
