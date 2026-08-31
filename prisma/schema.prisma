@@ -83,11 +83,15 @@ enum PeriodicidadeFeedback {
 
 // Cada barbearia é um tenant isolado do sistema.
 model Barbearia {
-  id       String   @id @default(cuid())
-  slug     String   @unique
-  nome     String
-  ativa    Boolean  @default(true)
-  criadoEm DateTime @default(now())
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  nome      String
+  ativa     Boolean   @default(true)
+  // Data de vencimento do acesso (cadastro pago fora do sistema). Nula pra
+  // barbearias sem vencimento (a própria barbearia do dono da plataforma).
+  // Passada essa data, o acesso é desativado automaticamente.
+  validaAte DateTime?
+  criadoEm  DateTime  @default(now())
 
   usuarios              Usuario[]
   barbeiros             Barbeiro[]

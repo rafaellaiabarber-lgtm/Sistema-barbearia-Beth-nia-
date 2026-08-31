@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { setCurrentBarbearia } from "@/lib/tenant-context";
 import { requireSession } from "@/lib/session";
+import { barbeariaEstaAtiva } from "@/lib/barbearia-status";
 
 // Resolve a barbearia mais antiga cadastrada (a Bethânia). Usada só pelos
 // redirects de compatibilidade das URLs antigas sem slug (/totem, /roleta/{id})
@@ -13,10 +14,10 @@ export async function obterBarbeariaPadrao() {
 }
 
 // Resolve a barbearia a partir do slug na URL (rotas públicas com [barbeariaSlug]).
-// 404 se o slug não existir ou a barbearia estiver desativada.
+// 404 se o slug não existir, estiver desativada ou tiver vencido.
 export async function requireBarbeariaBySlug(slug: string) {
   const barbearia = await prisma.barbearia.findUnique({ where: { slug } });
-  if (!barbearia || !barbearia.ativa) notFound();
+  if (!barbearia || !(await barbeariaEstaAtiva(barbearia))) notFound();
   setCurrentBarbearia(barbearia.id);
   return barbearia;
 }

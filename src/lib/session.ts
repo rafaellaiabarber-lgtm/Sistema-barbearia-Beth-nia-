@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { SESSION_COOKIE, verificarTokenSessao, type SessionPayload } from "@/lib/auth";
 import { setCurrentBarbearia } from "@/lib/tenant-context";
 import { prisma } from "@/lib/prisma";
+import { barbeariaEstaAtiva } from "@/lib/barbearia-status";
 
 export async function getSession(): Promise<SessionPayload | null> {
   const cookieStore = await cookies();
@@ -22,9 +23,9 @@ export async function requireSession(rolesPermitidas?: Array<"ADMIN" | "BARBEIRO
   }
   const barbearia = await prisma.barbearia.findUnique({
     where: { id: session.barbeariaId },
-    select: { ativa: true },
+    select: { id: true, ativa: true, validaAte: true },
   });
-  if (!barbearia || !barbearia.ativa) {
+  if (!barbearia || !(await barbeariaEstaAtiva(barbearia))) {
     redirect("/login");
   }
   setCurrentBarbearia(session.barbeariaId);
