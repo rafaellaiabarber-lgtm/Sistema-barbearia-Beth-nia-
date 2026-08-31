@@ -24,10 +24,14 @@ export async function criarIndicacao(_prevState: IndicacaoState, formData: FormD
   if (digitos.length < 10) return { erro: "Informe um telefone válido, com DDD." };
   if (!barbeiroId) return { erro: "Escolha o barbeiro responsável." };
 
-  const barbeiro = await prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true } });
+  const barbeiro = await prisma.barbeiro.findFirst({
+    where: { id: barbeiroId, ativo: true, barbeariaId: session.barbeariaId },
+  });
   if (!barbeiro) return { erro: "Barbeiro inválido." };
 
-  await prisma.indicacao.create({ data: { barbeiroId, nome, telefone: digitos } });
+  await prisma.indicacao.create({
+    data: { barbeariaId: session.barbeariaId, barbeiroId, nome, telefone: digitos },
+  });
 
   revalidar();
   return {};
@@ -35,7 +39,10 @@ export async function criarIndicacao(_prevState: IndicacaoState, formData: FormD
 
 export async function alternarContatada(indicacaoId: string, contatada: boolean) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
-  const escopo = session.role === "ADMIN" ? {} : { barbeiroId: session.barbeiroId ?? "__nenhum__" };
+  const escopo = {
+    barbeariaId: session.barbeariaId,
+    ...(session.role === "ADMIN" ? {} : { barbeiroId: session.barbeiroId ?? "__nenhum__" }),
+  };
   await prisma.indicacao.updateMany({
     where: { id: indicacaoId, ...escopo },
     data: { contatada, contatadaEm: contatada ? new Date() : null },
@@ -45,7 +52,10 @@ export async function alternarContatada(indicacaoId: string, contatada: boolean)
 
 export async function alternarConvertida(indicacaoId: string, convertida: boolean) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
-  const escopo = session.role === "ADMIN" ? {} : { barbeiroId: session.barbeiroId ?? "__nenhum__" };
+  const escopo = {
+    barbeariaId: session.barbeariaId,
+    ...(session.role === "ADMIN" ? {} : { barbeiroId: session.barbeiroId ?? "__nenhum__" }),
+  };
   await prisma.indicacao.updateMany({
     where: { id: indicacaoId, ...escopo },
     data: { convertida, convertidaEm: convertida ? new Date() : null },
@@ -55,7 +65,10 @@ export async function alternarConvertida(indicacaoId: string, convertida: boolea
 
 export async function excluirIndicacao(indicacaoId: string) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
-  const escopo = session.role === "ADMIN" ? {} : { barbeiroId: session.barbeiroId ?? "__nenhum__" };
+  const escopo = {
+    barbeariaId: session.barbeariaId,
+    ...(session.role === "ADMIN" ? {} : { barbeiroId: session.barbeiroId ?? "__nenhum__" }),
+  };
   await prisma.indicacao.deleteMany({ where: { id: indicacaoId, ...escopo } });
   revalidar();
 }

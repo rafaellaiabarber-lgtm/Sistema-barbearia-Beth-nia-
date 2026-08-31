@@ -13,7 +13,7 @@ export async function salvarJornada(
   _prevState: JornadaState,
   formData: FormData
 ): Promise<JornadaState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const linhas: {
     diaSemana: number;
@@ -56,10 +56,11 @@ export async function salvarJornada(
   }
 
   await prisma.$transaction([
-    prisma.jornadaTrabalho.deleteMany({ where: { barbeiroId } }),
+    prisma.jornadaTrabalho.deleteMany({ where: { barbeiroId, barbeariaId: session.barbeariaId } }),
     ...linhas.map((l) =>
       prisma.jornadaTrabalho.create({
         data: {
+          barbeariaId: session.barbeariaId,
           barbeiroId,
           diaSemana: l.diaSemana,
           horaInicio: l.horaInicio,

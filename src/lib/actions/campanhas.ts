@@ -13,7 +13,7 @@ function revalidar() {
 }
 
 export async function criarCampanha(_prevState: CampanhaState, formData: FormData): Promise<CampanhaState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const barbeiroId = String(formData.get("barbeiroId") ?? "").trim();
   const titulo = String(formData.get("titulo") ?? "").trim();
@@ -38,14 +38,17 @@ export async function criarCampanha(_prevState: CampanhaState, formData: FormDat
     else return { erro: `Item ${i + 1} inválido.` };
   }
 
-  const barbeiro = await prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true } });
+  const barbeiro = await prisma.barbeiro.findFirst({
+    where: { id: barbeiroId, ativo: true, barbeariaId: session.barbeariaId },
+  });
   if (!barbeiro) return { erro: "Barbeiro inválido." };
 
   await prisma.campanhaVenda.create({
     data: {
+      barbeariaId: session.barbeariaId,
       barbeiroId,
       titulo: titulo || null,
-      itens: { create: itens },
+      itens: { create: itens.map((item) => ({ ...item, barbeariaId: session.barbeariaId })) },
     },
   });
 

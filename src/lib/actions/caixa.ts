@@ -12,7 +12,7 @@ export async function criarMovimentoCaixa(
   _prevState: MovimentoCaixaState,
   formData: FormData
 ): Promise<MovimentoCaixaState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const tipo = String(formData.get("tipo") ?? "");
   const descricao = String(formData.get("descricao") ?? "").trim();
@@ -37,7 +37,7 @@ export async function criarMovimentoCaixa(
   const categoria = tipo === "SAIDA" ? (categoriaRaw as CategoriaDespesa) : null;
 
   await prisma.movimentoCaixa.create({
-    data: { tipo, descricao, valorCentavos, formaPagamento, categoria },
+    data: { barbeariaId: session.barbeariaId, tipo, descricao, valorCentavos, formaPagamento, categoria },
   });
 
   revalidatePath("/admin/caixa");
