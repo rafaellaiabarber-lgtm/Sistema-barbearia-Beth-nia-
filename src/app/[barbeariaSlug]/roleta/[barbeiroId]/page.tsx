@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { setCurrentBarbearia } from "@/lib/tenant-context";
+import { barbeariaEstaAtiva } from "@/lib/barbearia-status";
 import { RoletaWheel } from "./roleta-wheel";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +13,7 @@ export default async function RoletaPage({ params }: { params: Promise<{ barbeir
     include: { barbearia: true },
   });
 
-  if (!barbeiro || !barbeiro.barbearia || !barbeiro.barbearia.ativa) {
+  if (!barbeiro || !barbeiro.barbearia || !(await barbeariaEstaAtiva(barbeiro.barbearia))) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <p className="text-white text-center">Essa roleta não está disponível no momento.</p>

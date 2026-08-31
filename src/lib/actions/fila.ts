@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { setCurrentBarbearia } from "@/lib/tenant-context";
+import { barbeariaEstaAtiva } from "@/lib/barbearia-status";
 import { normalizarTelefone } from "@/lib/format";
 import { diaCobertoHoje, formatarDiasSemana } from "@/lib/assinaturas";
 
@@ -61,7 +62,7 @@ export async function entrarNaFila(
   if (!nome) return { erro: "Informe seu nome." };
 
   const barbearia = barbeariaSlug ? await prisma.barbearia.findUnique({ where: { slug: barbeariaSlug } }) : null;
-  if (!barbearia || !barbearia.ativa) return { erro: "Barbearia não encontrada." };
+  if (!barbearia || !(await barbeariaEstaAtiva(barbearia))) return { erro: "Barbearia não encontrada." };
   setCurrentBarbearia(barbearia.id);
 
   const [barbeiro, cliente] = await Promise.all([

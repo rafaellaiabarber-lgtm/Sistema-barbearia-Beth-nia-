@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { criarTokenSessao, verificarSenha, SESSION_COOKIE, SESSION_DURATION_SECONDS } from "@/lib/auth";
+import { barbeariaEstaAtiva } from "@/lib/barbearia-status";
 
 export type LoginState = { erro?: string };
 
@@ -28,7 +29,7 @@ export async function login(_prevState: LoginState, formData: FormData): Promise
   if (!usuario.barbearia) {
     return { erro: "Conta sem barbearia vinculada. Fale com o suporte." };
   }
-  if (!usuario.barbearia.ativa) {
+  if (!(await barbeariaEstaAtiva(usuario.barbearia))) {
     return { erro: "Essa conta está desativada. Fale com o suporte." };
   }
 

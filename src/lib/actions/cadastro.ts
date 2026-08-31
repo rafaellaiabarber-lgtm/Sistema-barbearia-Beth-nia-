@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { hashSenha } from "@/lib/auth";
+import { proximaDataDeVencimento } from "@/lib/barbearia-status";
 
 // Rotas reais do Next.js que um slug de barbearia não pode ocupar.
 const SLUGS_RESERVADOS = new Set([
@@ -69,7 +70,9 @@ export async function cadastrarBarbearia(_prevState: CadastroState, formData: Fo
   const senhaHash = await hashSenha(senha);
 
   await prisma.$transaction(async (tx) => {
-    const barbearia = await tx.barbearia.create({ data: { slug, nome: nomeBarbearia } });
+    const barbearia = await tx.barbearia.create({
+      data: { slug, nome: nomeBarbearia, validaAte: proximaDataDeVencimento() },
+    });
     await tx.usuario.create({
       data: { barbeariaId: barbearia.id, nome: nomeResponsavel, login, senhaHash, role: "ADMIN" },
     });

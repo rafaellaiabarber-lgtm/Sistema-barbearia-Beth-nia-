@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { setCurrentBarbearia } from "@/lib/tenant-context";
+import { barbeariaEstaAtiva } from "@/lib/barbearia-status";
 import { normalizarTelefone } from "@/lib/format";
 import { textoPremioRoleta } from "@/lib/roleta";
 
@@ -104,7 +105,7 @@ export async function girarRoleta(
     where: { id: barbeiroId, ativo: true },
     include: { barbearia: true },
   });
-  if (!barbeiro || !barbeiro.barbearia || !barbeiro.barbearia.ativa) return { erro: "Link inválido." };
+  if (!barbeiro || !barbeiro.barbearia || !(await barbeariaEstaAtiva(barbeiro.barbearia))) return { erro: "Link inválido." };
   const barbeariaId = barbeiro.barbeariaId;
   setCurrentBarbearia(barbeariaId);
 
