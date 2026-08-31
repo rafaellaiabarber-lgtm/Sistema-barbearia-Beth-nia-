@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
+import { obterBarbeariaPadrao } from "@/lib/tenant";
 import { normalizarTelefone } from "@/lib/format";
 import { textoPremioRoleta } from "@/lib/roleta";
 
@@ -12,7 +13,7 @@ const HORAS_ENTRE_GIROS = 24;
 export type OfertaState = { erro?: string };
 
 export async function criarOferta(_prevState: OfertaState, formData: FormData): Promise<OfertaState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   if (!nome) return { erro: "Informe o nome do prêmio." };
@@ -26,14 +27,22 @@ export async function criarOferta(_prevState: OfertaState, formData: FormData): 
     }
   }
 
-  const ativos = await prisma.ofertaRoleta.count({ where: { ativo: true } });
+  const ativos = await prisma.ofertaRoleta.count({ where: { ativo: true, barbeariaId: session.barbeariaId } });
   if (ativos >= MAX_OFERTAS_ATIVAS) {
     return { erro: `A roleta aceita no máximo ${MAX_OFERTAS_ATIVAS} prêmios ativos. Desative algum antes de adicionar outro.` };
   }
 
-  const ultima = await prisma.ofertaRoleta.findFirst({ orderBy: { ordem: "desc" } });
+  const ultima = await prisma.ofertaRoleta.findFirst({
+    where: { barbeariaId: session.barbeariaId },
+    orderBy: { ordem: "desc" },
+  });
   await prisma.ofertaRoleta.create({
-    data: { nome, descontoPercentual, ordem: (ultima?.ordem ?? -1) + 1 },
+    data: {
+      barbeariaId: session.barbeariaId,
+      nome,
+      descontoPercentual,
+      ordem: (ultima?.ordem ?? -1) + 1,
+    },
   });
 
   revalidatePath("/admin/roleta");
@@ -41,31 +50,34 @@ export async function criarOferta(_prevState: OfertaState, formData: FormData): 
 }
 
 export async function alternarAtivoOferta(id: string, ativo: boolean) {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   if (ativo) {
-    const ativos = await prisma.ofertaRoleta.count({ where: { ativo: true } });
+    const ativos = await prisma.ofertaRoleta.count({ where: { ativo: true, barbeariaId: session.barbeariaId } });
     if (ativos >= MAX_OFERTAS_ATIVAS) return;
   }
 
-  await prisma.ofertaRoleta.update({ where: { id }, data: { ativo } });
+  await prisma.ofertaRoleta.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { ativo } });
   revalidatePath("/admin/roleta");
 }
 
 export async function excluirOferta(id: string) {
-  await requireSession(["ADMIN"]);
-  const emUso = await prisma.giroRoleta.findFirst({ where: { ofertaId: id } });
+  const session = await requireSession(["ADMIN"]);
+  const emUso = await prisma.giroRoleta.findFirst({ where: { ofertaId: id, barbeariaId: session.barbeariaId } });
   if (emUso) {
-    await prisma.ofertaRoleta.update({ where: { id }, data: { ativo: false } });
+    await prisma.ofertaRoleta.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { ativo: false } });
   } else {
-    await prisma.ofertaRoleta.delete({ where: { id } });
+    await prisma.ofertaRoleta.deleteMany({ where: { id, barbeariaId: session.barbeariaId } });
   }
   revalidatePath("/admin/roleta");
 }
 
 export async function marcarGiroResgatado(id: string) {
-  await requireSession(["ADMIN", "BARBEIRO"]);
-  await prisma.giroRoleta.update({ where: { id }, data: { resgatadoEm: new Date() } });
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
+  await prisma.giroRoleta.updateMany({
+    where: { id, barbeariaId: session.barbeariaId },
+    data: { resgatadoEm: new Date() },
+  });
   revalidatePath("/admin/roleta");
   revalidatePath("/fila");
 }
@@ -88,18 +100,24 @@ export async function girarRoleta(
   if (!telefone) return { erro: "Informe seu telefone." };
   if (!nome) return { erro: "Informe seu nome." };
 
-  const barbeiro = await prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true } });
+  const barbearia = await obterBarbeariaPadrao();
+  if (!barbearia) return { erro: "Link inválido." };
+
+  const barbeiro = await prisma.barbeiro.findFirst({
+    where: { id: barbeiroId, ativo: true, barbeariaId: barbearia.id },
+  });
   if (!barbeiro) return { erro: "Link inválido." };
 
   const cliente = await prisma.cliente.upsert({
     where: { telefone },
     update: { nome },
-    create: { nome, telefone },
+    create: { barbeariaId: barbearia.id, nome, telefone },
   });
 
   const giroRecente = await prisma.giroRoleta.findFirst({
     where: {
       clienteId: cliente.id,
+      barbeariaId: barbearia.id,
       criadoEm: { gte: new Date(Date.now() - HORAS_ENTRE_GIROS * 60 * 60 * 1000) },
     },
   });
@@ -107,13 +125,13 @@ export async function girarRoleta(
     return { erro: `Você já girou a roleta nas últimas ${HORAS_ENTRE_GIROS} horas. Volte outra hora!` };
   }
 
-  const ofertas = await prisma.ofertaRoleta.findMany({ where: { ativo: true } });
+  const ofertas = await prisma.ofertaRoleta.findMany({ where: { ativo: true, barbeariaId: barbearia.id } });
   if (ofertas.length === 0) return { erro: "Nenhum prêmio disponível no momento." };
 
   const sorteada = ofertas[Math.floor(Math.random() * ofertas.length)];
 
   await prisma.giroRoleta.create({
-    data: { barbeiroId, clienteId: cliente.id, ofertaId: sorteada.id },
+    data: { barbeariaId: barbearia.id, barbeiroId, clienteId: cliente.id, ofertaId: sorteada.id },
   });
 
   revalidatePath("/admin/roleta");

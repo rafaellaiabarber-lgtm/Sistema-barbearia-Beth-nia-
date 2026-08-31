@@ -18,7 +18,7 @@ export async function criarAssinatura(
   _prevState: AssinaturaState,
   formData: FormData
 ): Promise<AssinaturaState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   const telefone = normalizarTelefone(String(formData.get("telefone") ?? ""));
@@ -34,22 +34,29 @@ export async function criarAssinatura(
     return { erro: "Dia de vencimento deve ser entre 1 e 31." };
   }
 
-  const plano = await prisma.plano.findFirst({ where: { id: planoId, ativo: true } });
+  const plano = await prisma.plano.findFirst({ where: { id: planoId, ativo: true, barbeariaId: session.barbeariaId } });
   if (!plano) return { erro: "Plano inválido." };
 
   const cliente = await prisma.cliente.upsert({
     where: { telefone },
     update: { nome },
-    create: { nome, telefone },
+    create: { barbeariaId: session.barbeariaId, nome, telefone },
   });
 
   const jaTemAtiva = await prisma.assinatura.findFirst({
-    where: { clienteId: cliente.id, status: "ATIVA" },
+    where: { clienteId: cliente.id, status: "ATIVA", barbeariaId: session.barbeariaId },
   });
   if (jaTemAtiva) return { erro: "Esse cliente já tem uma assinatura ativa." };
 
   const novaAssinatura = await prisma.assinatura.create({
-    data: { clienteId: cliente.id, planoId, barbeiroId, diaVencimento: Math.round(diaVencimento), status: "ATIVA" },
+    data: {
+      barbeariaId: session.barbeariaId,
+      clienteId: cliente.id,
+      planoId,
+      barbeiroId,
+      diaVencimento: Math.round(diaVencimento),
+      status: "ATIVA",
+    },
   });
 
   if (dataPagamentoStr) {
@@ -57,7 +64,13 @@ export async function criarAssinatura(
     if (!Number.isNaN(pagoEm.getTime())) {
       const comp = `${pagoEm.getFullYear()}-${String(pagoEm.getMonth() + 1).padStart(2, "0")}`;
       await prisma.pagamentoAssinatura.create({
-        data: { assinaturaId: novaAssinatura.id, competencia: comp, valorCentavos: plano.precoCentavos, pagoEm },
+        data: {
+          barbeariaId: session.barbeariaId,
+          assinaturaId: novaAssinatura.id,
+          competencia: comp,
+          valorCentavos: plano.precoCentavos,
+          pagoEm,
+        },
       });
     }
   }
@@ -67,18 +80,18 @@ export async function criarAssinatura(
 }
 
 export async function cancelarAssinatura(id: string) {
-  await requireSession(["ADMIN"]);
-  await prisma.assinatura.update({
-    where: { id },
+  const session = await requireSession(["ADMIN"]);
+  await prisma.assinatura.updateMany({
+    where: { id, barbeariaId: session.barbeariaId },
     data: { status: "CANCELADA", canceladaEm: new Date() },
   });
   revalidarPaginas();
 }
 
 export async function reativarAssinatura(id: string) {
-  await requireSession(["ADMIN"]);
-  await prisma.assinatura.update({
-    where: { id },
+  const session = await requireSession(["ADMIN"]);
+  await prisma.assinatura.updateMany({
+    where: { id, barbeariaId: session.barbeariaId },
     data: { status: "ATIVA", canceladaEm: null },
   });
   revalidarPaginas();
@@ -93,15 +106,18 @@ export async function alterarPlanoAssinatura(
   _prevState: AlterarPlanoState,
   formData: FormData
 ): Promise<AlterarPlanoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const planoId = String(formData.get("planoId") ?? "").trim();
   if (!planoId) return { erro: "Escolha um plano." };
 
-  const plano = await prisma.plano.findFirst({ where: { id: planoId, ativo: true } });
+  const plano = await prisma.plano.findFirst({ where: { id: planoId, ativo: true, barbeariaId: session.barbeariaId } });
   if (!plano) return { erro: "Plano inválido." };
 
-  await prisma.assinatura.update({ where: { id: assinaturaId }, data: { planoId } });
+  await prisma.assinatura.updateMany({
+    where: { id: assinaturaId, barbeariaId: session.barbeariaId },
+    data: { planoId },
+  });
 
   revalidarPaginas();
   return { sucesso: true };
@@ -115,14 +131,17 @@ export async function alterarVencimentoAssinatura(
   _prevState: AlterarVencimentoState,
   formData: FormData
 ): Promise<AlterarVencimentoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const diaVencimento = Number(formData.get("diaVencimento") ?? 0);
   if (!Number.isFinite(diaVencimento) || diaVencimento < 1 || diaVencimento > 31) {
     return { erro: "Dia de vencimento deve ser entre 1 e 31." };
   }
 
-  await prisma.assinatura.update({ where: { id: assinaturaId }, data: { diaVencimento: Math.round(diaVencimento) } });
+  await prisma.assinatura.updateMany({
+    where: { id: assinaturaId, barbeariaId: session.barbeariaId },
+    data: { diaVencimento: Math.round(diaVencimento) },
+  });
 
   revalidarPaginas();
   return { sucesso: true };
@@ -131,29 +150,31 @@ export async function alterarVencimentoAssinatura(
 const COMPETENCIA_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
 
 export async function marcarPagamentoAssinatura(assinaturaId: string, valorCentavos: number, competencia?: string) {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
   const comp = competencia ?? competenciaAtual();
   if (!COMPETENCIA_REGEX.test(comp)) return;
   await prisma.pagamentoAssinatura.upsert({
     where: { assinaturaId_competencia: { assinaturaId, competencia: comp } },
     update: {},
-    create: { assinaturaId, competencia: comp, valorCentavos },
+    create: { barbeariaId: session.barbeariaId, assinaturaId, competencia: comp, valorCentavos },
   });
   revalidarPaginas();
 }
 
 export async function desmarcarPagamentoAssinatura(assinaturaId: string, competencia?: string) {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
   const comp = competencia ?? competenciaAtual();
   if (!COMPETENCIA_REGEX.test(comp)) return;
-  await prisma.pagamentoAssinatura.deleteMany({ where: { assinaturaId, competencia: comp } });
+  await prisma.pagamentoAssinatura.deleteMany({
+    where: { assinaturaId, competencia: comp, barbeariaId: session.barbeariaId },
+  });
   revalidarPaginas();
 }
 
 // Deixa registrar um pagamento numa data específica (passada ou futura) — pra assinantes que já vinham pagando
 // antes de entrar no sistema, o dia real do pagamento importa, não só "hoje".
 export async function marcarPagamentoComData(formData: FormData) {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const assinaturaId = String(formData.get("assinaturaId") ?? "");
   const valorCentavos = Number(formData.get("valorCentavos") ?? 0);
@@ -167,7 +188,7 @@ export async function marcarPagamentoComData(formData: FormData) {
   await prisma.pagamentoAssinatura.upsert({
     where: { assinaturaId_competencia: { assinaturaId, competencia } },
     update: { pagoEm },
-    create: { assinaturaId, competencia, valorCentavos, pagoEm },
+    create: { barbeariaId: session.barbeariaId, assinaturaId, competencia, valorCentavos, pagoEm },
   });
   revalidarPaginas();
 }

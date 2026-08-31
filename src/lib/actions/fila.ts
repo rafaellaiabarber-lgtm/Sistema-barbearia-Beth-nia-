@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
+import { obterBarbeariaPadrao } from "@/lib/tenant";
 import { normalizarTelefone } from "@/lib/format";
 import { diaCobertoHoje, formatarDiasSemana } from "@/lib/assinaturas";
 
@@ -55,20 +56,24 @@ export async function entrarNaFila(
   if (!telefone) return { erro: "Informe seu telefone." };
   if (!nome) return { erro: "Informe seu nome." };
 
+  const barbearia = await obterBarbeariaPadrao();
+  if (!barbearia) return { erro: "Barbearia não encontrada." };
+
   const [barbeiro, cliente] = await Promise.all([
     barbeiroPreferidoId
-      ? prisma.barbeiro.findFirst({ where: { id: barbeiroPreferidoId, ativo: true } })
+      ? prisma.barbeiro.findFirst({ where: { id: barbeiroPreferidoId, ativo: true, barbeariaId: barbearia.id } })
       : Promise.resolve(null),
     prisma.cliente.upsert({
       where: { telefone },
       update: { nome },
-      create: { nome, telefone },
+      create: { barbeariaId: barbearia.id, nome, telefone },
     }),
   ]);
   if (barbeiroPreferidoId && !barbeiro) return { erro: "Barbeiro inválido." };
 
   await prisma.atendimento.create({
     data: {
+      barbeariaId: barbearia.id,
       clienteId: cliente.id,
       status: "AGUARDANDO",
       barbeiroPreferidoId,
@@ -76,15 +81,15 @@ export async function entrarNaFila(
   });
 
   const [posicao, acompanhanteCliente] = await Promise.all([
-    prisma.atendimento.count({ where: { status: "AGUARDANDO" } }),
+    prisma.atendimento.count({ where: { status: "AGUARDANDO", barbeariaId: barbearia.id } }),
     acompanhanteNome
       ? acompanhanteTelefone
         ? prisma.cliente.upsert({
             where: { telefone: acompanhanteTelefone },
             update: { nome: acompanhanteNome },
-            create: { nome: acompanhanteNome, telefone: acompanhanteTelefone },
+            create: { barbeariaId: barbearia.id, nome: acompanhanteNome, telefone: acompanhanteTelefone },
           })
-        : prisma.cliente.create({ data: { nome: acompanhanteNome, telefone: null } })
+        : prisma.cliente.create({ data: { barbeariaId: barbearia.id, nome: acompanhanteNome, telefone: null } })
       : Promise.resolve(null),
   ]);
 
@@ -92,13 +97,16 @@ export async function entrarNaFila(
   if (acompanhanteCliente) {
     await prisma.atendimento.create({
       data: {
+        barbeariaId: barbearia.id,
         clienteId: acompanhanteCliente.id,
         status: "AGUARDANDO",
         barbeiroPreferidoId,
       },
     });
 
-    acompanhantePosicao = await prisma.atendimento.count({ where: { status: "AGUARDANDO" } });
+    acompanhantePosicao = await prisma.atendimento.count({
+      where: { status: "AGUARDANDO", barbeariaId: barbearia.id },
+    });
   }
 
   revalidatePath("/fila");
@@ -117,12 +125,12 @@ export async function chamarProximo(barbeiroIdSelecionado?: string) {
   if (!barbeiroId) return;
 
   const emAndamento = await prisma.atendimento.findFirst({
-    where: { barbeiroId, status: "EM_ATENDIMENTO" },
+    where: { barbeiroId, status: "EM_ATENDIMENTO", barbeariaId: session.barbeariaId },
   });
   if (emAndamento) return;
 
   const proximo = await prisma.atendimento.findFirst({
-    where: { status: "AGUARDANDO" },
+    where: { status: "AGUARDANDO", barbeariaId: session.barbeariaId },
     orderBy: { criadoEm: "asc" },
   });
   if (!proximo) return;
@@ -141,12 +149,12 @@ export async function chamarCliente(atendimentoId: string) {
   const barbeiroId = session.barbeiroId;
 
   const emAndamento = await prisma.atendimento.findFirst({
-    where: { barbeiroId, status: "EM_ATENDIMENTO" },
+    where: { barbeiroId, status: "EM_ATENDIMENTO", barbeariaId: session.barbeariaId },
   });
   if (emAndamento) return;
 
   const atendimento = await prisma.atendimento.findFirst({
-    where: { id: atendimentoId, status: "AGUARDANDO" },
+    where: { id: atendimentoId, status: "AGUARDANDO", barbeariaId: session.barbeariaId },
   });
   if (!atendimento) return;
 
@@ -165,7 +173,7 @@ export async function concluirAtendimento(
   _prevState: ConcluirState,
   formData: FormData
 ): Promise<ConcluirState> {
-  await requireSession(["ADMIN", "BARBEIRO"]);
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
 
   const servicoIds = formData.getAll("servicoIds").map(String);
   if (servicoIds.length === 0) {
@@ -190,10 +198,15 @@ export async function concluirAtendimento(
     : null;
 
   const [servicos, atendimento, produtos] = await Promise.all([
-    prisma.servico.findMany({ where: { id: { in: servicoIds } } }),
-    prisma.atendimento.findUnique({ where: { id: atendimentoId }, include: { barbeiro: true } }),
+    prisma.servico.findMany({ where: { id: { in: servicoIds }, barbeariaId: session.barbeariaId } }),
+    prisma.atendimento.findFirst({
+      where: { id: atendimentoId, barbeariaId: session.barbeariaId },
+      include: { barbeiro: true },
+    }),
     itensProduto.length > 0
-      ? prisma.produto.findMany({ where: { id: { in: itensProduto.map((i) => i.id) }, ativo: true } })
+      ? prisma.produto.findMany({
+          where: { id: { in: itensProduto.map((i) => i.id) }, ativo: true, barbeariaId: session.barbeariaId },
+        })
       : Promise.resolve([]),
   ]);
   if (servicos.length === 0) return { erro: "Serviços inválidos." };
@@ -215,6 +228,7 @@ export async function concluirAtendimento(
         cobertoPorAssinatura,
         servicos: {
           create: servicos.map((s) => ({
+            barbeariaId: session.barbeariaId,
             servicoId: s.id,
             nomeSnapshot: s.nome,
             precoCentavos: cobertoPorAssinatura ? 0 : s.precoCentavos,
@@ -233,6 +247,7 @@ export async function concluirAtendimento(
       const totalCentavos = produto.precoCentavos * item.quantidade;
       await tx.vendaProduto.create({
         data: {
+          barbeariaId: session.barbeariaId,
           produtoId: produto.id,
           barbeiroId,
           quantidade: item.quantidade,
@@ -244,6 +259,7 @@ export async function concluirAtendimento(
       });
       await tx.movimentoCaixa.create({
         data: {
+          barbeariaId: session.barbeariaId,
           tipo: "ENTRADA",
           descricao: `Venda de produto — ${produto.nome} x${item.quantidade} (${barbeiroNome})`,
           valorCentavos: totalCentavos,
@@ -266,9 +282,9 @@ export async function concluirAtendimento(
 }
 
 export async function cancelarAtendimento(atendimentoId: string) {
-  await requireSession(["ADMIN", "BARBEIRO"]);
-  await prisma.atendimento.update({
-    where: { id: atendimentoId },
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
+  await prisma.atendimento.updateMany({
+    where: { id: atendimentoId, barbeariaId: session.barbeariaId },
     data: { status: "CANCELADO" },
   });
   revalidatePath("/fila");
@@ -294,7 +310,7 @@ export async function desfazerInicioAtendimento(atendimentoId: string) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
 
   const atendimento = await prisma.atendimento.findFirst({
-    where: { id: atendimentoId, status: "EM_ATENDIMENTO" },
+    where: { id: atendimentoId, status: "EM_ATENDIMENTO", barbeariaId: session.barbeariaId },
   });
   if (!atendimento) return;
   if (session.role === "BARBEIRO" && atendimento.barbeiroId !== session.barbeiroId) return;

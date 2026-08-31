@@ -6,10 +6,7 @@ export const dynamic = "force-dynamic";
 export default async function RoletaPage({ params }: { params: Promise<{ barbeiroId: string }> }) {
   const { barbeiroId } = await params;
 
-  const [barbeiro, ofertas] = await Promise.all([
-    prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true } }),
-    prisma.ofertaRoleta.findMany({ where: { ativo: true }, orderBy: { ordem: "asc" } }),
-  ]);
+  const barbeiro = await prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true } });
 
   if (!barbeiro) {
     return (
@@ -18,6 +15,11 @@ export default async function RoletaPage({ params }: { params: Promise<{ barbeir
       </div>
     );
   }
+
+  const ofertas = await prisma.ofertaRoleta.findMany({
+    where: { ativo: true, barbeariaId: barbeiro.barbeariaId },
+    orderBy: { ordem: "asc" },
+  });
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
