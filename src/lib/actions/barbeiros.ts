@@ -83,7 +83,7 @@ export async function atualizarBarbeiro(
   _prevState: BarbeiroState,
   formData: FormData
 ): Promise<BarbeiroState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   const telefone = String(formData.get("telefone") ?? "").trim();
@@ -114,8 +114,8 @@ export async function atualizarBarbeiro(
     });
   }
 
-  await prisma.barbeiro.update({
-    where: { id },
+  await prisma.barbeiro.updateMany({
+    where: { id, barbeariaId: session.barbeariaId },
     data: { nome, telefone: telefone || null, comissaoPercentual: comissao },
   });
 
@@ -125,26 +125,26 @@ export async function atualizarBarbeiro(
 }
 
 export async function alternarAtivoBarbeiro(id: string, ativo: boolean) {
-  await requireSession(["ADMIN"]);
-  await prisma.barbeiro.update({ where: { id }, data: { ativo } });
+  const session = await requireSession(["ADMIN"]);
+  await prisma.barbeiro.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { ativo } });
   revalidatePath("/admin/barbeiros");
   revalidatePath("/totem");
 }
 
 export async function excluirBarbeiro(id: string) {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const [temAtendimento, temPreferido, temComissao] = await Promise.all([
-    prisma.atendimento.findFirst({ where: { barbeiroId: id } }),
-    prisma.atendimento.findFirst({ where: { barbeiroPreferidoId: id } }),
-    prisma.pagamentoComissao.findFirst({ where: { barbeiroId: id } }),
+    prisma.atendimento.findFirst({ where: { barbeiroId: id, barbeariaId: session.barbeariaId } }),
+    prisma.atendimento.findFirst({ where: { barbeiroPreferidoId: id, barbeariaId: session.barbeariaId } }),
+    prisma.pagamentoComissao.findFirst({ where: { barbeiroId: id, barbeariaId: session.barbeariaId } }),
   ]);
 
   if (temAtendimento || temPreferido || temComissao) {
-    await prisma.barbeiro.update({ where: { id }, data: { ativo: false } });
+    await prisma.barbeiro.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { ativo: false } });
   } else {
-    await prisma.usuario.deleteMany({ where: { barbeiroId: id } });
-    await prisma.barbeiro.delete({ where: { id } });
+    await prisma.usuario.deleteMany({ where: { barbeiroId: id, barbeariaId: session.barbeariaId } });
+    await prisma.barbeiro.deleteMany({ where: { id, barbeariaId: session.barbeariaId } });
   }
 
   revalidatePath("/admin/barbeiros");
@@ -156,12 +156,15 @@ export async function atualizarFotoBarbeiro(
   _prevState: BarbeiroState,
   formData: FormData
 ): Promise<BarbeiroState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   try {
     const fotoUrl = await enviarFoto(barbeiroId, formData.get("foto"));
     if (!fotoUrl) return { erro: "Escolha uma imagem." };
-    await prisma.barbeiro.update({ where: { id: barbeiroId }, data: { fotoUrl } });
+    await prisma.barbeiro.updateMany({
+      where: { id: barbeiroId, barbeariaId: session.barbeariaId },
+      data: { fotoUrl },
+    });
   } catch (e) {
     return { erro: e instanceof Error ? e.message : "Falha ao enviar a foto." };
   }
