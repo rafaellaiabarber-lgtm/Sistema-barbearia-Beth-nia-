@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { competenciaAtual, formatarCompetencia } from "@/lib/assinaturas";
 import { calcularPote } from "@/lib/pote";
 import { formatarReais } from "@/lib/format";
@@ -22,30 +23,39 @@ export default async function RateioAssinaturaPage({
 }: {
   searchParams: Promise<{ competencia?: string }>;
 }) {
+  const session = await requireSession(["ADMIN"]);
   const { competencia: competenciaParam } = await searchParams;
   const competencia =
     competenciaParam && /^\d{4}-\d{2}$/.test(competenciaParam) ? competenciaParam : competenciaAtual();
 
   const [distribuicaoExistente, historico, servicos, barbeiros] = await Promise.all([
     prisma.distribuicaoPote.findUnique({
-      where: { competencia },
+      where: { barbeariaId_competencia: { barbeariaId: session.barbeariaId, competencia } },
       include: { itens: { include: { barbeiro: true }, orderBy: { valorCentavos: "desc" } } },
     }),
     prisma.distribuicaoPote.findMany({
-      where: { competencia: { not: competencia } },
+      where: { barbeariaId: session.barbeariaId, competencia: { not: competencia } },
       include: { itens: { include: { barbeiro: true }, orderBy: { valorCentavos: "desc" } } },
       orderBy: { competencia: "desc" },
       take: 6,
     }),
-    prisma.servico.findMany({ where: { ativo: true, fichas: { gt: 0 } }, orderBy: { nome: "asc" }, select: { id: true, nome: true, fichas: true } }),
-    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" }, select: { id: true, nome: true } }),
+    prisma.servico.findMany({
+      where: { ativo: true, fichas: { gt: 0 }, barbeariaId: session.barbeariaId },
+      orderBy: { nome: "asc" },
+      select: { id: true, nome: true, fichas: true },
+    }),
+    prisma.barbeiro.findMany({
+      where: { ativo: true, barbeariaId: session.barbeariaId },
+      orderBy: { nome: "asc" },
+      select: { id: true, nome: true },
+    }),
   ]);
 
-  const preview = distribuicaoExistente ? null : await calcularPote(competencia);
+  const preview = distribuicaoExistente ? null : await calcularPote(session.barbeariaId, competencia);
   const pagamentos = distribuicaoExistente
     ? []
     : await prisma.pagamentoAssinatura.findMany({
-        where: { competencia },
+        where: { competencia, barbeariaId: session.barbeariaId },
         include: { assinatura: { include: { cliente: true, plano: true } } },
         orderBy: { pagoEm: "asc" },
       });

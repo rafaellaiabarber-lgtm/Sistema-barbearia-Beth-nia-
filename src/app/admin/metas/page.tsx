@@ -1,13 +1,15 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { LABEL_TIPO_META } from "@/lib/metas";
 import { calcularProgressoMeta } from "@/lib/metas-server";
 import { NovaMetaForm } from "./nova-meta-form";
 import { MetaCard } from "./meta-card";
 
 export default async function MetasPage() {
+  const session = await requireSession(["ADMIN"]);
   const [barbeiros, servicos, produtos] = await Promise.all([
     prisma.barbeiro.findMany({
-      where: { ativo: true },
+      where: { ativo: true, barbeariaId: session.barbeariaId },
       orderBy: { nome: "asc" },
       include: {
         metas: {
@@ -16,8 +18,8 @@ export default async function MetasPage() {
         },
       },
     }),
-    prisma.servico.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    prisma.produto.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.servico.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.produto.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
   ]);
 
   const todasMetas = barbeiros.flatMap((b) => b.metas.map((m) => ({ meta: m, comissaoPadrao: b.comissaoPercentual })));

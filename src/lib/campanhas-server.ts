@@ -13,12 +13,13 @@ export function comissaoPercentualItem(
 
 export async function buscarQuantidadeAtualItem(
   item: { produtoId: string | null; servicoId: string | null },
+  barbeariaId: string,
   barbeiroId: string,
   desde: Date
 ): Promise<number> {
   if (item.produtoId) {
     const resultado = await prisma.vendaProduto.aggregate({
-      where: { produtoId: item.produtoId, barbeiroId, criadoEm: { gte: desde } },
+      where: { barbeariaId, produtoId: item.produtoId, barbeiroId, criadoEm: { gte: desde } },
       _sum: { quantidade: true },
     });
     return resultado._sum.quantidade ?? 0;
@@ -26,6 +27,7 @@ export async function buscarQuantidadeAtualItem(
   if (item.servicoId) {
     return prisma.atendimentoServico.count({
       where: {
+        barbeariaId,
         servicoId: item.servicoId,
         atendimento: { barbeiroId, status: "CONCLUIDO", concluidoEm: { gte: desde } },
       },
@@ -34,9 +36,9 @@ export async function buscarQuantidadeAtualItem(
   return 0;
 }
 
-export async function buscarCampanhasAtivasComProgresso(barbeiroId: string) {
+export async function buscarCampanhasAtivasComProgresso(barbeariaId: string, barbeiroId: string) {
   const campanhas = await prisma.campanhaVenda.findMany({
-    where: { barbeiroId, ativa: true },
+    where: { barbeariaId, barbeiroId, ativa: true },
     include: { barbeiro: true, itens: { include: { produto: true, servico: true } } },
     orderBy: { criadoEm: "asc" },
   });
@@ -48,7 +50,7 @@ export async function buscarCampanhasAtivasComProgresso(barbeiroId: string) {
           itemId: item.id,
           nome: item.produto?.nome ?? item.servico?.nome ?? "?",
           quantidadeAlvo: item.quantidadeAlvo,
-          quantidadeAtual: await buscarQuantidadeAtualItem(item, barbeiroId, c.criadoEm),
+          quantidadeAtual: await buscarQuantidadeAtualItem(item, barbeariaId, barbeiroId, c.criadoEm),
           precoCentavos: item.produto?.precoCentavos ?? item.servico?.precoCentavos ?? 0,
           comissaoPercentual: comissaoPercentualItem(item, c.barbeiro.comissaoPercentual),
         }))
@@ -58,9 +60,9 @@ export async function buscarCampanhasAtivasComProgresso(barbeiroId: string) {
   );
 }
 
-export async function buscarTodasCampanhasAtivasComProgresso() {
+export async function buscarTodasCampanhasAtivasComProgresso(barbeariaId: string) {
   const campanhas = await prisma.campanhaVenda.findMany({
-    where: { ativa: true },
+    where: { barbeariaId, ativa: true },
     include: { barbeiro: true, itens: { include: { produto: true, servico: true } } },
     orderBy: [{ barbeiro: { nome: "asc" } }, { criadoEm: "asc" }],
   });
@@ -72,7 +74,7 @@ export async function buscarTodasCampanhasAtivasComProgresso() {
           itemId: item.id,
           nome: item.produto?.nome ?? item.servico?.nome ?? "?",
           quantidadeAlvo: item.quantidadeAlvo,
-          quantidadeAtual: await buscarQuantidadeAtualItem(item, c.barbeiroId, c.criadoEm),
+          quantidadeAtual: await buscarQuantidadeAtualItem(item, barbeariaId, c.barbeiroId, c.criadoEm),
           precoCentavos: item.produto?.precoCentavos ?? item.servico?.precoCentavos ?? 0,
           comissaoPercentual: comissaoPercentualItem(item, c.barbeiro.comissaoPercentual),
         }))

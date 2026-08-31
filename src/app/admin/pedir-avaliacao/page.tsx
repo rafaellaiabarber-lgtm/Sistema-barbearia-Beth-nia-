@@ -11,7 +11,7 @@ export default async function PedirAvaliacaoPage() {
   const agora = new Date();
 
   const [atendimentos, configuracao] = await Promise.all([
-    buscarAtendimentosParaAvaliacao(),
+    buscarAtendimentosParaAvaliacao(session.barbeariaId),
     prisma.configuracaoAvaliacao.findUnique({ where: { barbeariaId: session.barbeariaId } }),
   ]);
   const linkGoogle = configuracao?.linkGoogle ?? null;

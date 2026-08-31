@@ -6,9 +6,12 @@ import { PlanoLink } from "../../admin/planos/plano-link";
 import { Valor } from "../../valor";
 
 export default async function PlanosBarbeiroPage() {
-  await requireSession(["ADMIN", "BARBEIRO"]);
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
 
-  const planos = await prisma.plano.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } });
+  const planos = await prisma.plano.findMany({
+    where: { ativo: true, barbeariaId: session.barbeariaId },
+    orderBy: { nome: "asc" },
+  });
 
   return (
     <div className="p-6">

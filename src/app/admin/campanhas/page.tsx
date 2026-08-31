@@ -1,15 +1,18 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { NovaCampanhaForm } from "./nova-campanha-form";
 import { CampanhaRow } from "./campanha-row";
 import type { ItemProgresso } from "@/lib/campanhas";
 import { buscarQuantidadeAtualItem, comissaoPercentualItem } from "@/lib/campanhas-server";
 
 export default async function CampanhasPage() {
+  const session = await requireSession(["ADMIN"]);
   const [barbeirosAtivos, produtosAtivos, servicosAtivos, campanhas] = await Promise.all([
-    prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    prisma.produto.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    prisma.servico.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.produto.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.servico.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
     prisma.campanhaVenda.findMany({
+      where: { barbeariaId: session.barbeariaId },
       include: { barbeiro: true, itens: { include: { produto: true, servico: true } } },
       orderBy: [{ ativa: "desc" }, { criadoEm: "desc" }],
     }),
@@ -22,7 +25,7 @@ export default async function CampanhasPage() {
           itemId: item.id,
           nome: item.produto?.nome ?? item.servico?.nome ?? "?",
           quantidadeAlvo: item.quantidadeAlvo,
-          quantidadeAtual: await buscarQuantidadeAtualItem(item, c.barbeiroId, c.criadoEm),
+          quantidadeAtual: await buscarQuantidadeAtualItem(item, session.barbeariaId, c.barbeiroId, c.criadoEm),
           precoCentavos: item.produto?.precoCentavos ?? item.servico?.precoCentavos ?? 0,
           comissaoPercentual: comissaoPercentualItem(item, c.barbeiro.comissaoPercentual),
         }))

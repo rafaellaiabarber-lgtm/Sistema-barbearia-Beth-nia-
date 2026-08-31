@@ -19,7 +19,7 @@ export default async function DespesasPage() {
   }
 
   const despesas = await prisma.despesaBarbeiro.findMany({
-    where: { barbeiroId: session.barbeiroId },
+    where: { barbeiroId: session.barbeiroId, barbeariaId: session.barbeariaId },
     orderBy: { data: "desc" },
   });
 

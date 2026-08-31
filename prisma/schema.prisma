@@ -455,11 +455,13 @@ model DistribuicaoPote {
   id                String                 @id @default(cuid())
   barbeariaId       String?
   barbearia         Barbearia?             @relation(fields: [barbeariaId], references: [id])
-  competencia       String                 @unique
+  competencia       String
   totalPoteCentavos Int
   totalFichas       Int
   criadoEm          DateTime               @default(now())
   itens             ItemDistribuicaoPote[]
+
+  @@unique([barbeariaId, competencia])
 }
 
 model ItemDistribuicaoPote {
