@@ -26,7 +26,7 @@ async function enviarFoto(barbeiroId: string, foto: FormDataEntryValue | null): 
 }
 
 export async function criarBarbeiro(_prevState: BarbeiroState, formData: FormData): Promise<BarbeiroState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   const telefone = String(formData.get("telefone") ?? "").trim();
@@ -43,6 +43,7 @@ export async function criarBarbeiro(_prevState: BarbeiroState, formData: FormDat
 
   const barbeiro = await prisma.barbeiro.create({
     data: {
+      barbeariaId: session.barbeariaId,
       nome,
       telefone: telefone || null,
       comissaoPercentual: comissao,
@@ -63,6 +64,7 @@ export async function criarBarbeiro(_prevState: BarbeiroState, formData: FormDat
 
   await prisma.usuario.create({
     data: {
+      barbeariaId: session.barbeariaId,
       nome,
       login,
       senhaHash: await hashSenha(senha),

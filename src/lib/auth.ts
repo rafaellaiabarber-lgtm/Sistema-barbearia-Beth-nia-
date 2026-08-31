@@ -17,6 +17,8 @@ export type SessionPayload = {
   nome: string;
   role: "ADMIN" | "BARBEIRO";
   barbeiroId: string | null;
+  barbeariaId: string;
+  barbeariaSlug: string;
 };
 
 export async function hashSenha(senha: string) {

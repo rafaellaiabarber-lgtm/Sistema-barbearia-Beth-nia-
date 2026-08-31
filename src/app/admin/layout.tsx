@@ -8,7 +8,8 @@ import { ThemeToggle } from "../theme-toggle";
 import { ValoresToggle } from "../valores-toggle";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [session, configuracao] = await Promise.all([requireSession(["ADMIN"]), obterConfiguracaoTotem()]);
+  const session = await requireSession(["ADMIN"]);
+  const configuracao = await obterConfiguracaoTotem();
   const logoUrl = configuracao?.logoMenuUrl ?? configuracao?.logoUrl ?? null;
 
   return (
