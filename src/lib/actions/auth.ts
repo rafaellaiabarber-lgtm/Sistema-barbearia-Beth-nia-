@@ -15,7 +15,7 @@ export async function login(_prevState: LoginState, formData: FormData): Promise
     return { erro: "Preencha usuário e senha." };
   }
 
-  const usuario = await prisma.usuario.findUnique({ where: { login } });
+  const usuario = await prisma.usuario.findUnique({ where: { login }, include: { barbearia: true } });
   if (!usuario) {
     return { erro: "Usuário ou senha inválidos." };
   }
@@ -25,11 +25,17 @@ export async function login(_prevState: LoginState, formData: FormData): Promise
     return { erro: "Usuário ou senha inválidos." };
   }
 
+  if (!usuario.barbearia) {
+    return { erro: "Conta sem barbearia vinculada. Fale com o suporte." };
+  }
+
   const token = await criarTokenSessao({
     usuarioId: usuario.id,
     nome: usuario.nome,
     role: usuario.role,
     barbeiroId: usuario.barbeiroId,
+    barbeariaId: usuario.barbearia.id,
+    barbeariaSlug: usuario.barbearia.slug,
   });
 
   const cookieStore = await cookies();

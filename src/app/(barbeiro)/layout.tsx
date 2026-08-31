@@ -9,10 +9,8 @@ import { BarbeiroMobileNav } from "./mobile-nav";
 import { barbeiroNavLinks } from "./nav-links";
 
 export default async function FilaLayout({ children }: { children: React.ReactNode }) {
-  const [session, configuracao] = await Promise.all([
-    requireSession(["ADMIN", "BARBEIRO"]),
-    obterConfiguracaoTotem(),
-  ]);
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
+  const configuracao = await obterConfiguracaoTotem();
   const logoUrl = configuracao?.logoMenuUrl ?? configuracao?.logoUrl ?? null;
 
   return (
