@@ -219,7 +219,7 @@ export default async function FilaPage({
           orderBy: { criadoEm: "asc" },
         }),
         buscarAtendimentosParaAvaliacao(session.barbeiroId),
-        prisma.configuracaoAvaliacao.findUnique({ where: { id: "singleton" } }),
+        prisma.configuracaoAvaliacao.findUnique({ where: { barbeariaId: session.barbeariaId } }),
       ]);
     linkGoogleAvaliacao = configuracaoAvaliacao?.linkGoogle ?? null;
     clientesParaAvaliacao = atendimentosParaAvaliacao.map((a) => ({

@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { obterConfiguracaoTotem } from "@/lib/actions/totem";
+import { obterBarbeariaPadrao } from "@/lib/tenant";
 import { LoginForm } from "./login-form";
 
 export const dynamic = "force-dynamic";
 
 export default async function LoginPage() {
-  const configuracao = await obterConfiguracaoTotem();
+  const barbearia = await obterBarbeariaPadrao();
+  const configuracao = barbearia ? await obterConfiguracaoTotem(barbearia.id) : null;
   const logoUrl = configuracao?.logoMenuUrl ?? configuracao?.logoUrl ?? null;
 
   return (

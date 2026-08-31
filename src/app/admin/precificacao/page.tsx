@@ -1,9 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { percentualX100ParaValor } from "@/lib/format";
+import { requireSession } from "@/lib/session";
 import { Calculadora } from "./calculadora";
 
 export default async function PrecificacaoPage() {
-  const configuracao = await prisma.configuracaoFinanceira.findUnique({ where: { id: "singleton" } });
+  const session = await requireSession(["ADMIN"]);
+  const configuracao = await prisma.configuracaoFinanceira.findUnique({ where: { barbeariaId: session.barbeariaId } });
   const taxaCartaoDefault =
     configuracao?.taxaCartaoPercentualX100 !== null && configuracao?.taxaCartaoPercentualX100 !== undefined
       ? percentualX100ParaValor(configuracao.taxaCartaoPercentualX100)

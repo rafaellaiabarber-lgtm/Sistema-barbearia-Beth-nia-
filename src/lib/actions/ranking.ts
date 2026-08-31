@@ -27,7 +27,7 @@ export async function atualizarConfiguracaoRanking(
   _prevState: ConfiguracaoRankingState,
   formData: FormData
 ): Promise<ConfiguracaoRankingState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const dados = {
     pontosPorAtendimento: pontosInteiro(formData, "pontosPorAtendimento"),
@@ -44,8 +44,8 @@ export async function atualizarConfiguracaoRanking(
   };
 
   await prisma.configuracaoRanking.upsert({
-    where: { id: "singleton" },
-    create: { id: "singleton", ...dados },
+    where: { barbeariaId: session.barbeariaId },
+    create: { barbeariaId: session.barbeariaId, ...dados },
     update: dados,
   });
 

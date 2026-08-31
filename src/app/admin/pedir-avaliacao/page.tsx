@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
 import { ClienteAvaliacaoRow } from "../../cliente-avaliacao-row";
 import { LinkGoogleForm } from "./link-google-form";
 import { buscarAtendimentosParaAvaliacao, MINUTOS_MINIMO_AVALIACAO, HORAS_MAXIMO_AVALIACAO } from "@/lib/avaliacao";
@@ -6,11 +7,12 @@ import { buscarAtendimentosParaAvaliacao, MINUTOS_MINIMO_AVALIACAO, HORAS_MAXIMO
 export const dynamic = "force-dynamic";
 
 export default async function PedirAvaliacaoPage() {
+  const session = await requireSession(["ADMIN"]);
   const agora = new Date();
 
   const [atendimentos, configuracao] = await Promise.all([
     buscarAtendimentosParaAvaliacao(),
-    prisma.configuracaoAvaliacao.findUnique({ where: { id: "singleton" } }),
+    prisma.configuracaoAvaliacao.findUnique({ where: { barbeariaId: session.barbeariaId } }),
   ]);
   const linkGoogle = configuracao?.linkGoogle ?? null;
 
