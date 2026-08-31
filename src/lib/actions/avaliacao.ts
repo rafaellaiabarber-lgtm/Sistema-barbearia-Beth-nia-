@@ -10,7 +10,7 @@ export async function salvarLinkAvaliacaoGoogle(
   _prevState: ConfiguracaoAvaliacaoState,
   formData: FormData
 ): Promise<ConfiguracaoAvaliacaoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const link = String(formData.get("linkGoogle") ?? "").trim();
   if (link && !/^https?:\/\//i.test(link)) {
@@ -18,8 +18,8 @@ export async function salvarLinkAvaliacaoGoogle(
   }
 
   await prisma.configuracaoAvaliacao.upsert({
-    where: { id: "singleton" },
-    create: { id: "singleton", linkGoogle: link || null },
+    where: { barbeariaId: session.barbeariaId },
+    create: { barbeariaId: session.barbeariaId, linkGoogle: link || null },
     update: { linkGoogle: link || null },
   });
 

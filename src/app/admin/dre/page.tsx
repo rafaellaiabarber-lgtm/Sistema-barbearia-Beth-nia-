@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo, validarPeriodo } from "@/lib/periodo";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
+import { requireSession } from "@/lib/session";
 import { FiltroRelatorio } from "../filtro-relatorio";
 import { Valor } from "../../valor";
 
@@ -15,6 +16,7 @@ export default async function DrePage({
     barbeiroId?: string;
   }>;
 }) {
+  const session = await requireSession(["ADMIN"]);
   const { periodo: periodoParam, dataInicio, dataFim, barbeiroId } = await searchParams;
   const periodo: Periodo = validarPeriodo(periodoParam, "mes");
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
@@ -31,7 +33,7 @@ export default async function DrePage({
     prisma.movimentoCaixa.findMany({ where: { criadoEm: { gte: inicio, lte: fim } } }),
     prisma.servico.findMany({ orderBy: { nome: "asc" } }),
     prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    prisma.configuracaoFinanceira.findUnique({ where: { id: "singleton" } }),
+    prisma.configuracaoFinanceira.findUnique({ where: { barbeariaId: session.barbeariaId } }),
     prisma.vendaProduto.findMany({
       where: { criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
     }),

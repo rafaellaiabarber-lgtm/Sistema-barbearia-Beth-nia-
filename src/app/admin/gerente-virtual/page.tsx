@@ -14,6 +14,7 @@ import {
   type ComparativoMes,
 } from "@/lib/gerente-virtual";
 import { minutosDisponiveis, limitesJornada } from "@/lib/jornada";
+import { requireSession } from "@/lib/session";
 import { MetaMensalForm } from "./meta-mensal-form";
 import { ClienteInativoRow } from "./cliente-inativo-row";
 import { Valor } from "../../valor";
@@ -49,6 +50,7 @@ export default async function GerenteVirtualPage({
 }: {
   searchParams: Promise<{ diasSumidos?: string }>;
 }) {
+  const session = await requireSession(["ADMIN"]);
   const { diasSumidos: diasSumidosParam } = await searchParams;
   const diasSumidos = Number.parseInt(diasSumidosParam ?? "45", 10) || 45;
 
@@ -60,7 +62,7 @@ export default async function GerenteVirtualPage({
     await Promise.all([
       buscarComparativo(mesAtual.inicio, mesAtual.fim),
       buscarComparativo(mesAnterior.inicio, mesAnterior.fim),
-      prisma.configuracaoFinanceira.findUnique({ where: { id: "singleton" } }),
+      prisma.configuracaoFinanceira.findUnique({ where: { barbeariaId: session.barbeariaId } }),
       prisma.cliente.findMany({
         where: { atendimentos: { some: { status: "CONCLUIDO" } } },
         include: { atendimentos: { where: { status: "CONCLUIDO" }, select: { concluidoEm: true } } },

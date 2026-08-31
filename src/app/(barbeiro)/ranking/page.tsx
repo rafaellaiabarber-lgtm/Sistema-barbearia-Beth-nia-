@@ -72,7 +72,7 @@ export default async function RankingPage({
 
   const [barbeirosAtivos, configuracao, campanhasAtivas] = await Promise.all([
     prisma.barbeiro.findMany({ where: { ativo: true }, orderBy: { nome: "asc" } }),
-    prisma.configuracaoRanking.findUnique({ where: { id: "singleton" } }),
+    prisma.configuracaoRanking.findUnique({ where: { barbeariaId: session.barbeariaId } }),
     buscarTodasCampanhasAtivasComProgresso(),
   ]);
 

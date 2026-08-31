@@ -9,7 +9,7 @@ import { ValoresToggle } from "../valores-toggle";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await requireSession(["ADMIN"]);
-  const configuracao = await obterConfiguracaoTotem();
+  const configuracao = await obterConfiguracaoTotem(session.barbeariaId);
   const logoUrl = configuracao?.logoMenuUrl ?? configuracao?.logoUrl ?? null;
 
   return (

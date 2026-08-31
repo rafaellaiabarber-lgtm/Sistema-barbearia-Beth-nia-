@@ -10,7 +10,7 @@ import { barbeiroNavLinks } from "./nav-links";
 
 export default async function FilaLayout({ children }: { children: React.ReactNode }) {
   const session = await requireSession(["ADMIN", "BARBEIRO"]);
-  const configuracao = await obterConfiguracaoTotem();
+  const configuracao = await obterConfiguracaoTotem(session.barbeariaId);
   const logoUrl = configuracao?.logoMenuUrl ?? configuracao?.logoUrl ?? null;
 
   return (

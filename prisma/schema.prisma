@@ -474,48 +474,42 @@ model ItemDistribuicaoPote {
   valorCentavos  Int
 }
 
-// Etapa intermediária da conversão pra multi-tenant: barbeariaId ainda é uma coluna
-// opcional ao lado do id "singleton" de sempre. Depois do backfill, uma etapa
-// seguinte troca a chave primária de id pra barbeariaId (sem risco de perder as
-// configurações que a Bethânia já tem salvas).
+// Cada barbearia tem no máximo uma linha de cada configuração — barbeariaId é a
+// própria chave primária.
 model ConfiguracaoTotem {
-  id           String     @id @default("singleton")
-  barbeariaId  String?    @unique
-  barbearia    Barbearia? @relation(fields: [barbeariaId], references: [id])
+  barbeariaId  String    @id
+  barbearia    Barbearia @relation(fields: [barbeariaId], references: [id])
   logoUrl      String?
   logoMenuUrl  String?
   fundoUrl     String?
   // "imagem" ou "video". Null (fundoUrl definido em versões antigas) é tratado como imagem.
   fundoTipo    String?
-  atualizadoEm DateTime   @updatedAt
+  atualizadoEm DateTime  @updatedAt
 }
 
 model ConfiguracaoAvaliacao {
-  id           String     @id @default("singleton")
-  barbeariaId  String?    @unique
-  barbearia    Barbearia? @relation(fields: [barbeariaId], references: [id])
+  barbeariaId  String    @id
+  barbearia    Barbearia @relation(fields: [barbeariaId], references: [id])
   linkGoogle   String?
-  atualizadoEm DateTime   @updatedAt
+  atualizadoEm DateTime  @updatedAt
 }
 
 model ConfiguracaoFinanceira {
-  id                            String     @id @default("singleton")
-  barbeariaId                   String?    @unique
-  barbearia                     Barbearia? @relation(fields: [barbeariaId], references: [id])
+  barbeariaId                   String    @id
+  barbearia                     Barbearia @relation(fields: [barbeariaId], references: [id])
   taxaCartaoPercentualX100      Int?
   impostoPercentualX100         Int?
   metaFaturamentoMensalCentavos Int?
-  atualizadoEm                  DateTime   @updatedAt
+  atualizadoEm                  DateTime  @updatedAt
 }
 
 model ConfiguracaoRanking {
-  id                           String     @id @default("singleton")
-  barbeariaId                  String?    @unique
-  barbearia                    Barbearia? @relation(fields: [barbeariaId], references: [id])
-  pontosPorAtendimento         Int        @default(1)
-  pontosPorVendaProduto        Int        @default(1)
-  pontosPorAssinatura          Int        @default(1)
-  pontosPorIndicacaoConvertida Int        @default(1)
+  barbeariaId                  String    @id
+  barbearia                    Barbearia @relation(fields: [barbeariaId], references: [id])
+  pontosPorAtendimento         Int       @default(1)
+  pontosPorVendaProduto        Int       @default(1)
+  pontosPorAssinatura          Int       @default(1)
+  pontosPorIndicacaoConvertida Int       @default(1)
   premio1LugarSemanal          String?
   premio2LugarSemanal          String?
   premio3LugarSemanal          String?
@@ -523,7 +517,7 @@ model ConfiguracaoRanking {
   premio2LugarMensal           String?
   premio3LugarMensal           String?
   pontuacaoMinimaPremio        Int?
-  atualizadoEm                 DateTime   @updatedAt
+  atualizadoEm                 DateTime  @updatedAt
 }
 
 model ContaFinanceira {

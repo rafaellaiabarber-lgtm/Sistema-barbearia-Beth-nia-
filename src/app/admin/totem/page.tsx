@@ -7,10 +7,12 @@ import {
   removerLogoMenu,
   removerFundoTotem,
 } from "@/lib/actions/totem";
+import { requireSession } from "@/lib/session";
 import { ImagemTotemForm } from "./imagem-totem-form";
 
 export default async function TotemConfigPage() {
-  const configuracao = await obterConfiguracaoTotem();
+  const session = await requireSession(["ADMIN"]);
+  const configuracao = await obterConfiguracaoTotem(session.barbeariaId);
 
   return (
     <div>

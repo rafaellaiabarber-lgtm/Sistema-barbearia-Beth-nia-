@@ -7,7 +7,6 @@ import { requireSession } from "@/lib/session";
 
 export type ConfiguracaoTotemState = { erro?: string; sucesso?: boolean };
 
-const CONFIGURACAO_ID = "singleton";
 const TAMANHO_MAXIMO_IMAGEM = 5 * 1024 * 1024;
 
 async function enviarImagem(pasta: string, arquivo: FormDataEntryValue | null): Promise<string | undefined> {
@@ -25,22 +24,22 @@ async function enviarImagem(pasta: string, arquivo: FormDataEntryValue | null): 
   return blob.url;
 }
 
-export async function obterConfiguracaoTotem() {
-  return prisma.configuracaoTotem.findUnique({ where: { id: CONFIGURACAO_ID } });
+export async function obterConfiguracaoTotem(barbeariaId: string) {
+  return prisma.configuracaoTotem.findUnique({ where: { barbeariaId } });
 }
 
 export async function atualizarLogoTotem(
   _prevState: ConfiguracaoTotemState,
   formData: FormData
 ): Promise<ConfiguracaoTotemState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   try {
     const logoUrl = await enviarImagem("logo", formData.get("logo"));
     if (!logoUrl) return { erro: "Escolha uma imagem." };
     await prisma.configuracaoTotem.upsert({
-      where: { id: CONFIGURACAO_ID },
-      create: { id: CONFIGURACAO_ID, logoUrl },
+      where: { barbeariaId: session.barbeariaId },
+      create: { barbeariaId: session.barbeariaId, logoUrl },
       update: { logoUrl },
     });
   } catch (e) {
@@ -56,14 +55,14 @@ export async function atualizarLogoMenu(
   _prevState: ConfiguracaoTotemState,
   formData: FormData
 ): Promise<ConfiguracaoTotemState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   try {
     const logoMenuUrl = await enviarImagem("logo-menu", formData.get("logoMenu"));
     if (!logoMenuUrl) return { erro: "Escolha uma imagem." };
     await prisma.configuracaoTotem.upsert({
-      where: { id: CONFIGURACAO_ID },
-      create: { id: CONFIGURACAO_ID, logoMenuUrl },
+      where: { barbeariaId: session.barbeariaId },
+      create: { barbeariaId: session.barbeariaId, logoMenuUrl },
       update: { logoMenuUrl },
     });
   } catch (e) {
@@ -76,10 +75,10 @@ export async function atualizarLogoMenu(
 }
 
 export async function removerLogoMenu() {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
   await prisma.configuracaoTotem.upsert({
-    where: { id: CONFIGURACAO_ID },
-    create: { id: CONFIGURACAO_ID, logoMenuUrl: null },
+    where: { barbeariaId: session.barbeariaId },
+    create: { barbeariaId: session.barbeariaId, logoMenuUrl: null },
     update: { logoMenuUrl: null },
   });
   revalidatePath("/admin/totem");
@@ -90,14 +89,14 @@ export async function atualizarFundoTotem(
   _prevState: ConfiguracaoTotemState,
   formData: FormData
 ): Promise<ConfiguracaoTotemState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   try {
     const fundoUrl = await enviarImagem("fundo", formData.get("fundo"));
     if (!fundoUrl) return { erro: "Escolha uma imagem." };
     await prisma.configuracaoTotem.upsert({
-      where: { id: CONFIGURACAO_ID },
-      create: { id: CONFIGURACAO_ID, fundoUrl },
+      where: { barbeariaId: session.barbeariaId },
+      create: { barbeariaId: session.barbeariaId, fundoUrl },
       update: { fundoUrl },
     });
   } catch (e) {
@@ -110,10 +109,10 @@ export async function atualizarFundoTotem(
 }
 
 export async function removerLogoTotem() {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
   await prisma.configuracaoTotem.upsert({
-    where: { id: CONFIGURACAO_ID },
-    create: { id: CONFIGURACAO_ID, logoUrl: null },
+    where: { barbeariaId: session.barbeariaId },
+    create: { barbeariaId: session.barbeariaId, logoUrl: null },
     update: { logoUrl: null },
   });
   revalidatePath("/admin/totem");
@@ -121,10 +120,10 @@ export async function removerLogoTotem() {
 }
 
 export async function removerFundoTotem() {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
   await prisma.configuracaoTotem.upsert({
-    where: { id: CONFIGURACAO_ID },
-    create: { id: CONFIGURACAO_ID, fundoUrl: null },
+    where: { barbeariaId: session.barbeariaId },
+    create: { barbeariaId: session.barbeariaId, fundoUrl: null },
     update: { fundoUrl: null },
   });
   revalidatePath("/admin/totem");

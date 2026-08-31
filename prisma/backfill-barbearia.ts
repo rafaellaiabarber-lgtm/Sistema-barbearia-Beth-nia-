@@ -41,10 +41,8 @@ async function main() {
     { nome: "feedback", cliente: prisma.feedback },
     { nome: "ofertaRoleta", cliente: prisma.ofertaRoleta },
     { nome: "giroRoleta", cliente: prisma.giroRoleta },
-    { nome: "configuracaoTotem", cliente: prisma.configuracaoTotem },
-    { nome: "configuracaoAvaliacao", cliente: prisma.configuracaoAvaliacao },
-    { nome: "configuracaoFinanceira", cliente: prisma.configuracaoFinanceira },
-    { nome: "configuracaoRanking", cliente: prisma.configuracaoRanking },
+    // As 4 tabelas de configuração (ConfiguracaoTotem/Avaliacao/Financeira/Ranking) não entram
+    // aqui: barbeariaId já é a chave primária delas (não é mais uma coluna opcional pra backfillar).
   ] as const;
 
   for (const { nome, cliente } of modelos) {

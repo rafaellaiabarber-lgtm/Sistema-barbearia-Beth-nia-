@@ -56,7 +56,7 @@ export async function atualizarTaxaCartao(
   _prevState: ConfiguracaoFinanceiraState,
   formData: FormData
 ): Promise<ConfiguracaoFinanceiraState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const taxa = String(formData.get("taxaCartao") ?? "").trim();
   const taxaCartaoPercentualX100 = taxa ? valorParaPercentualX100(taxa) : null;
@@ -65,8 +65,8 @@ export async function atualizarTaxaCartao(
   }
 
   await prisma.configuracaoFinanceira.upsert({
-    where: { id: "singleton" },
-    create: { id: "singleton", taxaCartaoPercentualX100 },
+    where: { barbeariaId: session.barbeariaId },
+    create: { barbeariaId: session.barbeariaId, taxaCartaoPercentualX100 },
     update: { taxaCartaoPercentualX100 },
   });
 
@@ -78,7 +78,7 @@ export async function atualizarImpostoPadrao(
   _prevState: ConfiguracaoFinanceiraState,
   formData: FormData
 ): Promise<ConfiguracaoFinanceiraState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const imposto = String(formData.get("imposto") ?? "").trim();
   const impostoPercentualX100 = imposto ? valorParaPercentualX100(imposto) : null;
@@ -87,8 +87,8 @@ export async function atualizarImpostoPadrao(
   }
 
   await prisma.configuracaoFinanceira.upsert({
-    where: { id: "singleton" },
-    create: { id: "singleton", impostoPercentualX100 },
+    where: { barbeariaId: session.barbeariaId },
+    create: { barbeariaId: session.barbeariaId, impostoPercentualX100 },
     update: { impostoPercentualX100 },
   });
 
@@ -100,7 +100,7 @@ export async function atualizarMetaFaturamentoMensal(
   _prevState: ConfiguracaoFinanceiraState,
   formData: FormData
 ): Promise<ConfiguracaoFinanceiraState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const meta = String(formData.get("meta") ?? "").trim();
   const metaFaturamentoMensalCentavos = meta ? reaisParaCentavos(meta) : null;
@@ -109,8 +109,8 @@ export async function atualizarMetaFaturamentoMensal(
   }
 
   await prisma.configuracaoFinanceira.upsert({
-    where: { id: "singleton" },
-    create: { id: "singleton", metaFaturamentoMensalCentavos },
+    where: { barbeariaId: session.barbeariaId },
+    create: { barbeariaId: session.barbeariaId, metaFaturamentoMensalCentavos },
     update: { metaFaturamentoMensalCentavos },
   });
 

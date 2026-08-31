@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatarReais, LABEL_FORMA_PAGAMENTO, LABEL_CATEGORIA_DESPESA, paraCampoDataHora } from "@/lib/format";
 import { type Periodo, calcularIntervalo, validarPeriodo } from "@/lib/periodo";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
+import { requireSession } from "@/lib/session";
 import { FiltroRelatorio } from "../filtro-relatorio";
 import { BotaoExcluirAtendimento } from "../excluir-atendimento-button";
 import { EditarHorarioAtendimento } from "../editar-horario-atendimento";
@@ -20,6 +21,7 @@ export default async function FinanceiroPage({
     barbeiroId?: string;
   }>;
 }) {
+  const session = await requireSession(["ADMIN"]);
   const { periodo: periodoParam, dataInicio, dataFim, servicoId, barbeiroId } = await searchParams;
   const periodo: Periodo = validarPeriodo(periodoParam, "hoje");
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
@@ -38,7 +40,7 @@ export default async function FinanceiroPage({
     prisma.servico.findMany({ orderBy: { nome: "asc" } }),
     prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
     prisma.movimentoCaixa.findMany({ where: { criadoEm: { gte: inicio, lte: fim } } }),
-    prisma.configuracaoFinanceira.findUnique({ where: { id: "singleton" } }),
+    prisma.configuracaoFinanceira.findUnique({ where: { barbeariaId: session.barbeariaId } }),
     prisma.vendaProduto.findMany({
       where: { criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
     }),
