@@ -7,9 +7,12 @@ export const dynamic = "force-dynamic";
 export default async function RoletaPage({ params }: { params: Promise<{ barbeiroId: string }> }) {
   const { barbeiroId } = await params;
 
-  const barbeiro = await prisma.barbeiro.findFirst({ where: { id: barbeiroId, ativo: true } });
+  const barbeiro = await prisma.barbeiro.findFirst({
+    where: { id: barbeiroId, ativo: true },
+    include: { barbearia: true },
+  });
 
-  if (!barbeiro || !barbeiro.barbeariaId) {
+  if (!barbeiro || !barbeiro.barbearia || !barbeiro.barbearia.ativa) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <p className="text-white text-center">Essa roleta não está disponível no momento.</p>

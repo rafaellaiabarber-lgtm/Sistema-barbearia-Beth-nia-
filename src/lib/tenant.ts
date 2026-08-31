@@ -1,6 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { setCurrentBarbearia } from "@/lib/tenant-context";
+import { requireSession } from "@/lib/session";
 
 // Resolve a barbearia mais antiga cadastrada (a Bethânia). Usada só pelos
 // redirects de compatibilidade das URLs antigas sem slug (/totem, /roleta/{id})
@@ -18,4 +19,20 @@ export async function requireBarbeariaBySlug(slug: string) {
   if (!barbearia || !barbearia.ativa) notFound();
   setCurrentBarbearia(barbearia.id);
   return barbearia;
+}
+
+// O "dono da plataforma" é o ADMIN da barbearia mais antiga cadastrada (a
+// Bethânia, a primeira a existir no sistema) — só ele acessa o painel /dono,
+// que lista e ativa/desativa as demais barbearias.
+export async function ehDonoPlataforma(barbeariaId: string): Promise<boolean> {
+  const barbeariaMaisAntiga = await prisma.barbearia.findFirst({ orderBy: { criadoEm: "asc" } });
+  return barbeariaMaisAntiga?.id === barbeariaId;
+}
+
+export async function requireDonoPlataforma() {
+  const session = await requireSession(["ADMIN"]);
+  if (!(await ehDonoPlataforma(session.barbeariaId))) {
+    redirect("/admin");
+  }
+  return session;
 }

@@ -12,11 +12,13 @@ import { ValoresToggle } from "../valores-toggle";
 export function BarbeiroMobileNav({
   links,
   nome,
+  nomeBarbearia,
   mostrarPainelAdmin,
   logoUrl,
 }: {
   links: BarbeiroNavLink[];
   nome: string;
+  nomeBarbearia: string;
   mostrarPainelAdmin: boolean;
   logoUrl: string | null;
 }) {
@@ -40,7 +42,7 @@ export function BarbeiroMobileNav({
             <img src={logoUrl} alt="" className="h-9 w-auto max-w-9 rounded-md object-contain shrink-0" />
           )}
           <div className="min-w-0">
-            <p className="font-bold text-lg text-white">Barbearia Bethânia</p>
+            <p className="font-bold text-lg text-white truncate">{nomeBarbearia}</p>
             <p className="text-orange-400 text-sm">Olá, {nome}</p>
           </div>
         </div>

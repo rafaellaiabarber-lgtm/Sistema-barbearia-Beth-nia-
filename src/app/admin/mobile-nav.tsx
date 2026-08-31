@@ -9,7 +9,17 @@ import { ICONES_NAV } from "./nav-icones";
 import { ThemeToggle } from "../theme-toggle";
 import { ValoresToggle } from "../valores-toggle";
 
-export function MobileNav({ grupos, nome, logoUrl }: { grupos: NavGrupo[]; nome: string; logoUrl: string | null }) {
+export function MobileNav({
+  grupos,
+  nome,
+  nomeBarbearia,
+  logoUrl,
+}: {
+  grupos: NavGrupo[];
+  nome: string;
+  nomeBarbearia: string;
+  logoUrl: string | null;
+}) {
   const [aberto, setAberto] = useState(false);
 
   return (
@@ -30,7 +40,7 @@ export function MobileNav({ grupos, nome, logoUrl }: { grupos: NavGrupo[]; nome:
             <img src={logoUrl} alt="" className="h-9 w-auto max-w-9 rounded-md object-contain shrink-0" />
           )}
           <div className="min-w-0">
-            <p className="font-bold text-lg text-white">Barbearia Bethânia</p>
+            <p className="font-bold text-lg text-white truncate">{nomeBarbearia}</p>
             <p className="text-orange-400 text-sm">Olá, {nome}</p>
           </div>
         </div>
