@@ -128,7 +128,7 @@ export default async function ComissoesPage({
         servicoIds={servicoIds}
         barbeiroId={barbeiroId}
         servicos={servicos}
-        barbeiros={barbeiros.filter((b) => b.ativo)}
+        barbeiros={barbeiros}
       />
 
       {barbeiroSelecionado && servicoSelecionado && itensDoServico.length > 0 && (

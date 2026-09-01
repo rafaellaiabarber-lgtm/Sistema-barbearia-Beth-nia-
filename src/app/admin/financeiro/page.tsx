@@ -118,7 +118,7 @@ export default async function FinanceiroPage({
         servicoIds={servicoIds}
         barbeiroId={barbeiroId}
         servicos={servicos}
-        barbeiros={barbeiros.filter((b) => b.ativo)}
+        barbeiros={barbeiros}
       />
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
