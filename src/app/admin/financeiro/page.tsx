@@ -3,7 +3,7 @@ import { formatarReais, LABEL_FORMA_PAGAMENTO, LABEL_CATEGORIA_DESPESA, paraCamp
 import { type Periodo, calcularIntervalo, validarPeriodo } from "@/lib/periodo";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { requireSession } from "@/lib/session";
-import { FiltroRelatorio } from "../filtro-relatorio";
+import { FiltroRelatorio, normalizarServicoIds } from "../filtro-relatorio";
 import { BotaoExcluirAtendimento } from "../excluir-atendimento-button";
 import { EditarHorarioAtendimento } from "../editar-horario-atendimento";
 import { EditarComissaoServico } from "../editar-comissao-servico";
@@ -17,12 +17,13 @@ export default async function FinanceiroPage({
     periodo?: string;
     dataInicio?: string;
     dataFim?: string;
-    servicoId?: string;
+    servicoId?: string | string[];
     barbeiroId?: string;
   }>;
 }) {
   const session = await requireSession(["ADMIN"]);
   const { periodo: periodoParam, dataInicio, dataFim, servicoId, barbeiroId } = await searchParams;
+  const servicoIds = normalizarServicoIds(servicoId);
   const periodo: Periodo = validarPeriodo(periodoParam, "hoje");
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
 
@@ -32,7 +33,7 @@ export default async function FinanceiroPage({
         status: "CONCLUIDO",
         concluidoEm: { gte: inicio, lte: fim },
         ...(barbeiroId ? { barbeiroId } : {}),
-        ...(servicoId ? { servicos: { some: { servicoId } } } : {}),
+        ...(servicoIds.length > 0 ? { servicos: { some: { servicoId: { in: servicoIds } } } } : {}),
       },
       include: { barbeiro: true, cliente: true, servicos: true },
       orderBy: { concluidoEm: "desc" },
@@ -114,7 +115,7 @@ export default async function FinanceiroPage({
         periodo={periodo}
         dataInicio={dataInicio}
         dataFim={dataFim}
-        servicoId={servicoId}
+        servicoIds={servicoIds}
         barbeiroId={barbeiroId}
         servicos={servicos}
         barbeiros={barbeiros.filter((b) => b.ativo)}
