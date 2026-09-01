@@ -1,12 +1,17 @@
 import type { Barbeiro, Servico } from "@prisma/client";
 import type { Periodo } from "@/lib/periodo";
 
+export function normalizarServicoIds(servicoId?: string | string[]): string[] {
+  if (!servicoId) return [];
+  return Array.isArray(servicoId) ? servicoId : [servicoId];
+}
+
 export function FiltroRelatorio({
   basePath,
   periodo,
   dataInicio,
   dataFim,
-  servicoId,
+  servicoIds = [],
   barbeiroId,
   servicos,
   barbeiros,
@@ -16,7 +21,7 @@ export function FiltroRelatorio({
   periodo: Periodo;
   dataInicio?: string;
   dataFim?: string;
-  servicoId?: string;
+  servicoIds?: string[];
   barbeiroId?: string;
   servicos: Servico[];
   barbeiros: Barbeiro[];
@@ -64,19 +69,26 @@ export function FiltroRelatorio({
       )}
       {mostrarServico && (
         <div>
-          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">Serviço</label>
-          <select
-            name="servicoId"
-            defaultValue={servicoId ?? ""}
-            className="rounded-lg border border-neutral-300 dark:border-neutral-600 px-3 py-2 text-sm bg-white dark:bg-neutral-900"
-          >
-            <option value="">Todos</option>
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1">
+            Serviços {servicoIds.length === 0 && "(todos)"}
+          </label>
+          <div className="flex flex-wrap gap-1.5 max-w-sm">
             {servicos.map((s) => (
-              <option key={s.id} value={s.id}>
+              <label
+                key={s.id}
+                className="flex items-center gap-1.5 rounded-lg border border-neutral-300 dark:border-neutral-600 px-2 py-1.5 text-sm cursor-pointer has-[:checked]:bg-orange-50 has-[:checked]:border-orange-400 dark:has-[:checked]:bg-orange-950"
+              >
+                <input
+                  type="checkbox"
+                  name="servicoId"
+                  value={s.id}
+                  defaultChecked={servicoIds.includes(s.id)}
+                  className="accent-orange-600"
+                />
                 {s.nome}
-              </option>
+              </label>
             ))}
-          </select>
+          </div>
         </div>
       )}
       <div>
@@ -100,7 +112,7 @@ export function FiltroRelatorio({
       >
         Buscar
       </button>
-      {(servicoId || barbeiroId || periodo === "personalizado" || periodo === "dia") && (
+      {(servicoIds.length > 0 || barbeiroId || periodo === "personalizado" || periodo === "dia") && (
         <a href={basePath} className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 text-sm">
           Limpar filtros
         </a>

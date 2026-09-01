@@ -4,7 +4,7 @@ import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo, chavePeriodo, validarPeriodo } from "@/lib/periodo";
 import { marcarComissaoPaga, desmarcarComissaoPaga } from "@/lib/actions/comissoes";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
-import { FiltroRelatorio } from "../filtro-relatorio";
+import { FiltroRelatorio, normalizarServicoIds } from "../filtro-relatorio";
 import { CorrigirComissaoCobertaButton } from "./corrigir-comissao-coberta-button";
 import { CalculadoraComissaoCombinada } from "./calculadora-comissao-combinada";
 import { Valor } from "../../valor";
@@ -16,12 +16,13 @@ export default async function ComissoesPage({
     periodo?: string;
     dataInicio?: string;
     dataFim?: string;
-    servicoId?: string;
+    servicoId?: string | string[];
     barbeiroId?: string;
   }>;
 }) {
   const session = await requireSession(["ADMIN"]);
   const { periodo: periodoParam, dataInicio, dataFim, servicoId, barbeiroId } = await searchParams;
+  const servicoIds = normalizarServicoIds(servicoId);
   const periodo: Periodo = validarPeriodo(periodoParam, "hoje");
   const { inicio, fim } = calcularIntervalo(periodo, new Date(), { dataInicio, dataFim });
   const podeMarcarPago = periodo !== "personalizado" && periodo !== "dia";
@@ -34,7 +35,7 @@ export default async function ComissoesPage({
         status: "CONCLUIDO",
         concluidoEm: { gte: inicio, lte: fim },
         ...(barbeiroId ? { barbeiroId } : {}),
-        ...(servicoId ? { servicos: { some: { servicoId } } } : {}),
+        ...(servicoIds.length > 0 ? { servicos: { some: { servicoId: { in: servicoIds } } } } : {}),
       },
       include: { barbeiro: true, servicos: true },
       orderBy: { concluidoEm: "desc" },
@@ -105,9 +106,12 @@ export default async function ComissoesPage({
   }
   const ranking = [...rankingServicos.values()].sort((a, b) => b.qtd - a.qtd);
 
+  const servicoIdUnico = servicoIds.length === 1 ? servicoIds[0] : null;
   const barbeiroSelecionado = barbeiroId ? barbeirosPorId.get(barbeiroId) : null;
-  const servicoSelecionado = servicoId ? servicos.find((s) => s.id === servicoId) : null;
-  const itensDoServico = servicoId ? atendimentos.flatMap((a) => a.servicos.filter((s) => s.servicoId === servicoId)) : [];
+  const servicoSelecionado = servicoIdUnico ? servicos.find((s) => s.id === servicoIdUnico) : null;
+  const itensDoServico = servicoIdUnico
+    ? atendimentos.flatMap((a) => a.servicos.filter((s) => s.servicoId === servicoIdUnico))
+    : [];
   const periodoLabel = `${inicio.toLocaleDateString("pt-BR")} até ${fim.toLocaleDateString("pt-BR")}`;
 
   return (
@@ -121,7 +125,7 @@ export default async function ComissoesPage({
         periodo={periodo}
         dataInicio={dataInicio}
         dataFim={dataFim}
-        servicoId={servicoId}
+        servicoIds={servicoIds}
         barbeiroId={barbeiroId}
         servicos={servicos}
         barbeiros={barbeiros.filter((b) => b.ativo)}
