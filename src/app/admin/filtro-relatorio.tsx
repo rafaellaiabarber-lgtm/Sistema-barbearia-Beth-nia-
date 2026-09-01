@@ -102,6 +102,7 @@ export function FiltroRelatorio({
           {barbeiros.map((b) => (
             <option key={b.id} value={b.id}>
               {b.nome}
+              {!b.ativo && " (inativo)"}
             </option>
           ))}
         </select>

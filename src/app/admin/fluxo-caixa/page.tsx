@@ -43,7 +43,7 @@ export default async function FluxoCaixaPage({
       where: { criadoEm: { gte: inicio, lte: fim }, barbeariaId: session.barbeariaId },
     }),
     prisma.servico.findMany({ where: { barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
-    prisma.barbeiro.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ where: { barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
   ]);
 
   const porDia = new Map<string, { entradas: number; saidas: number }>();
