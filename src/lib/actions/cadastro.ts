@@ -27,6 +27,8 @@ const SLUGS_RESERVADOS = new Set([
   "assets",
   "favicon.ico",
   "_next",
+  "termos",
+  "privacidade",
 ]);
 
 export type CadastroState = { erro?: string };
@@ -39,6 +41,7 @@ export async function cadastrarBarbearia(_prevState: CadastroState, formData: Fo
   const login = String(formData.get("login") ?? "").trim();
   const senha = String(formData.get("senha") ?? "");
   const confirmarSenha = String(formData.get("confirmarSenha") ?? "");
+  const aceitouTermos = formData.get("aceitouTermos") === "on";
 
   if (!nomeBarbearia || nomeBarbearia.length < 2) {
     return { erro: "Informe o nome da barbearia." };
@@ -61,6 +64,9 @@ export async function cadastrarBarbearia(_prevState: CadastroState, formData: Fo
   if (senha !== confirmarSenha) {
     return { erro: "As senhas não coincidem." };
   }
+  if (!aceitouTermos) {
+    return { erro: "É preciso aceitar os Termos de Uso e a Política de Privacidade pra continuar." };
+  }
 
   const [slugExistente, loginExistente] = await Promise.all([
     prisma.barbearia.findUnique({ where: { slug } }),
@@ -73,7 +79,13 @@ export async function cadastrarBarbearia(_prevState: CadastroState, formData: Fo
 
   await prisma.$transaction(async (tx) => {
     const barbearia = await tx.barbearia.create({
-      data: { slug, nome: nomeBarbearia, cnpj: cnpj || null, validaAte: proximaDataDeVencimento() },
+      data: {
+        slug,
+        nome: nomeBarbearia,
+        cnpj: cnpj || null,
+        validaAte: proximaDataDeVencimento(),
+        termosAceitosEm: new Date(),
+      },
     });
     await tx.usuario.create({
       data: { barbeariaId: barbearia.id, nome: nomeResponsavel, login, senhaHash, role: "ADMIN" },

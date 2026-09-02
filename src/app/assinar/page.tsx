@@ -49,6 +49,13 @@ export default async function AssinarPage() {
           ))}
         </div>
       </section>
+
+      <footer className="border-t border-neutral-100 py-6">
+        <div className="max-w-5xl mx-auto px-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-sm text-neutral-400">
+          <Link href="/termos" className="hover:text-orange-600">Termos de Uso</Link>
+          <Link href="/privacidade" className="hover:text-orange-600">Política de Privacidade</Link>
+        </div>
+      </footer>
     </div>
   );
 }

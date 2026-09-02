@@ -130,6 +130,27 @@ export function CadastroForm() {
         />
       </div>
 
+      <div className="flex items-start gap-2">
+        <input
+          id="aceitouTermos"
+          name="aceitouTermos"
+          type="checkbox"
+          required
+          className="mt-1 accent-orange-600"
+        />
+        <label className="text-sm text-neutral-600" htmlFor="aceitouTermos">
+          Li e aceito os{" "}
+          <a href="/termos" target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:underline">
+            Termos de Uso
+          </a>{" "}
+          e a{" "}
+          <a href="/privacidade" target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:underline">
+            Política de Privacidade
+          </a>
+          .
+        </label>
+      </div>
+
       {estado.erro && <p className="text-red-600 text-sm">{estado.erro}</p>}
 
       <button
