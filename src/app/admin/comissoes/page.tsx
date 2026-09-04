@@ -37,7 +37,7 @@ export default async function ComissoesPage({
         ...(barbeiroId ? { barbeiroId } : {}),
         ...(servicoIds.length > 0 ? { servicos: { some: { servicoId: { in: servicoIds } } } } : {}),
       },
-      include: { barbeiro: true, servicos: true },
+      include: { barbeiro: true, servicos: true, cliente: true },
       orderBy: { concluidoEm: "desc" },
     }),
     prisma.servico.findMany({ where: { barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
@@ -52,7 +52,13 @@ export default async function ComissoesPage({
 
   const porBarbeiro = new Map<
     string,
-    { nome: string; totalCentavos: number; comissaoCentavos: number; qtd: number }
+    {
+      nome: string;
+      totalCentavos: number;
+      comissaoCentavos: number;
+      qtd: number;
+      atendimentos: { clienteNome: string; servicos: string[]; valorCentavos: number }[];
+    }
   >();
   for (const a of atendimentos) {
     if (!a.barbeiro) continue;
@@ -61,10 +67,16 @@ export default async function ComissoesPage({
       totalCentavos: 0,
       comissaoCentavos: 0,
       qtd: 0,
+      atendimentos: [],
     };
     atual.totalCentavos += a.precoTotalCentavos;
     atual.comissaoCentavos += comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual);
     atual.qtd += 1;
+    atual.atendimentos.push({
+      clienteNome: a.cliente.nome,
+      servicos: a.servicos.map((s) => s.nomeSnapshot),
+      valorCentavos: a.precoTotalCentavos,
+    });
     porBarbeiro.set(a.barbeiro.id, atual);
   }
   const vendasPorBarbeiro = new Map<string, typeof vendasProduto>();
@@ -75,7 +87,7 @@ export default async function ComissoesPage({
   for (const [barbeiroId, vendas] of vendasPorBarbeiro) {
     const barbeiro = barbeirosPorId.get(barbeiroId);
     if (!barbeiro) continue;
-    const atual = porBarbeiro.get(barbeiroId) ?? { nome: barbeiro.nome, totalCentavos: 0, comissaoCentavos: 0, qtd: 0 };
+    const atual = porBarbeiro.get(barbeiroId) ?? { nome: barbeiro.nome, totalCentavos: 0, comissaoCentavos: 0, qtd: 0, atendimentos: [] };
     atual.comissaoCentavos += comissaoProdutos(vendas);
     porBarbeiro.set(barbeiroId, atual);
   }
@@ -203,6 +215,23 @@ export default async function ComissoesPage({
                   ))}
                 </div>
               </div>
+              {b.atendimentos.length > 0 && (
+                <details className="mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+                  <summary className="cursor-pointer text-sm text-orange-600 dark:text-orange-400 hover:underline select-none">
+                    Ver atendimentos ({b.atendimentos.length})
+                  </summary>
+                  <div className="mt-2 space-y-1.5">
+                    {b.atendimentos.map((at, i) => (
+                      <div key={i} className="flex items-center justify-between gap-2 text-sm">
+                        <span className="text-neutral-700 dark:text-neutral-200">{at.clienteNome}</span>
+                        <span className="text-neutral-500 dark:text-neutral-400 text-xs text-right">
+                          {at.servicos.join(", ")} · <Valor>{formatarReais(at.valorCentavos)}</Valor>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              )}
             </div>
           );
         })}
