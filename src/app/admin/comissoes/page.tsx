@@ -28,7 +28,7 @@ export default async function ComissoesPage({
   const podeMarcarPago = periodo !== "personalizado" && periodo !== "dia";
   const chave = podeMarcarPago ? chavePeriodo(periodo) : "";
 
-  const [atendimentos, servicos, barbeiros, vendasProduto] = await Promise.all([
+  const [atendimentos, servicos, barbeiros, vendasProduto, produtosAtivos] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
         barbeariaId: session.barbeariaId,
@@ -45,6 +45,7 @@ export default async function ComissoesPage({
     prisma.vendaProduto.findMany({
       where: { barbeariaId: session.barbeariaId, criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
     }),
+    prisma.produto.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
   ]);
 
   const barbeirosPorId = new Map(barbeiros.map((b) => [b.id, b]));
@@ -105,6 +106,20 @@ export default async function ComissoesPage({
     }
   }
   const ranking = [...rankingServicos.values()].sort((a, b) => b.qtd - a.qtd);
+
+  const qtdServicoPorId = new Map<string, number>();
+  for (const a of atendimentos) {
+    for (const s of a.servicos) {
+      qtdServicoPorId.set(s.servicoId, (qtdServicoPorId.get(s.servicoId) ?? 0) + 1);
+    }
+  }
+  const servicosSemVenda = servicos.filter((s) => s.ativo && !qtdServicoPorId.has(s.id));
+
+  const qtdProdutoPorId = new Map<string, number>();
+  for (const v of vendasProduto) {
+    qtdProdutoPorId.set(v.produtoId, (qtdProdutoPorId.get(v.produtoId) ?? 0) + v.quantidade);
+  }
+  const produtosSemVenda = produtosAtivos.filter((p) => !qtdProdutoPorId.has(p.id));
 
   const servicoIdUnico = servicoIds.length === 1 ? servicoIds[0] : null;
   const barbeiroSelecionado = barbeiroId ? barbeirosPorId.get(barbeiroId) : null;
@@ -213,6 +228,36 @@ export default async function ComissoesPage({
         ))}
         {ranking.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum serviço vendido no período.</p>}
       </div>
+
+      <h2 className="text-lg font-semibold mb-1">Sem nenhuma venda no período</h2>
+      <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-3">
+        De {atendimentos.length} atendimento(s) concluído(s) no período, estes serviços e produtos ativos não foram
+        vendidos nenhuma vez — bom parâmetro pra ver onde a equipe pode oferecer mais.
+      </p>
+      {servicosSemVenda.length === 0 && produtosSemVenda.length === 0 ? (
+        <p className="text-neutral-400 dark:text-neutral-500 text-sm">
+          Todos os serviços e produtos ativos tiveram pelo menos uma venda no período. 🎉
+        </p>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {servicosSemVenda.map((s) => (
+            <span
+              key={s.id}
+              className="rounded-full bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-sm px-3 py-1"
+            >
+              {s.nome}
+            </span>
+          ))}
+          {produtosSemVenda.map((p) => (
+            <span
+              key={p.id}
+              className="rounded-full bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 text-sm px-3 py-1"
+            >
+              {p.nome} (produto)
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

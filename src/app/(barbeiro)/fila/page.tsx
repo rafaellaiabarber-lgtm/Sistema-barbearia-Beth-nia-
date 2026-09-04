@@ -132,6 +132,7 @@ export default async function FilaPage({
   const meuAtendimento = session.barbeiroId
     ? emAtendimento.find((a) => a.barbeiroId === session.barbeiroId)
     : null;
+  const idsBarbeirosOcupados = new Set(emAtendimento.map((a) => a.barbeiroId).filter((id): id is string => !!id));
 
   const clienteIdsNaFila = [...new Set([...aguardando, ...emAtendimento].map((a) => a.clienteId))];
   const assinaturasAtivas = clienteIdsNaFila.length
@@ -593,16 +594,21 @@ export default async function FilaPage({
               <div className="mt-4">
                 <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-2">Chamar próximo em nome de:</p>
                 <div className="flex flex-wrap gap-2">
-                  {barbeirosAtivos.map((b) => (
-                    <form key={b.id} action={chamarProximo.bind(null, b.id)}>
-                      <button
-                        disabled={aguardando.length === 0}
-                        className="rounded-lg bg-white dark:bg-neutral-900 hover:bg-neutral-100 disabled:opacity-40 border border-neutral-300 dark:border-neutral-600 px-4 py-2 text-sm"
-                      >
-                        {b.nome}
-                      </button>
-                    </form>
-                  ))}
+                  {barbeirosAtivos.map((b) => {
+                    const ocupado = idsBarbeirosOcupados.has(b.id);
+                    return (
+                      <form key={b.id} action={chamarProximo.bind(null, b.id)}>
+                        <button
+                          disabled={aguardando.length === 0 || ocupado}
+                          title={ocupado ? `${b.nome} já está atendendo alguém` : undefined}
+                          className="rounded-lg bg-white dark:bg-neutral-900 hover:bg-neutral-100 disabled:opacity-40 border border-neutral-300 dark:border-neutral-600 px-4 py-2 text-sm"
+                        >
+                          {b.nome}
+                          {ocupado && " (ocupado)"}
+                        </button>
+                      </form>
+                    );
+                  })}
                 </div>
               </div>
             </section>
