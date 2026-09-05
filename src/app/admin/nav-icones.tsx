@@ -31,6 +31,7 @@ import {
   RotateCcw,
   MessageCircle,
   Building2,
+  GitCompare,
   type LucideIcon,
 } from "lucide-react";
 
@@ -67,4 +68,5 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   taxaRetorno: RotateCcw,
   pedirAvaliacao: MessageCircle,
   plataforma: Building2,
+  comparativo: GitCompare,
 };
