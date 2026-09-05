@@ -28,7 +28,7 @@ export default async function ComissoesPage({
   const podeMarcarPago = periodo !== "personalizado" && periodo !== "dia";
   const chave = podeMarcarPago ? chavePeriodo(periodo) : "";
 
-  const [atendimentos, servicos, barbeiros, vendasProduto] = await Promise.all([
+  const [atendimentos, servicos, barbeiros, vendasProduto, produtosAtivos] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
         barbeariaId: session.barbeariaId,
@@ -37,7 +37,7 @@ export default async function ComissoesPage({
         ...(barbeiroId ? { barbeiroId } : {}),
         ...(servicoIds.length > 0 ? { servicos: { some: { servicoId: { in: servicoIds } } } } : {}),
       },
-      include: { barbeiro: true, servicos: true },
+      include: { barbeiro: true, servicos: true, cliente: true },
       orderBy: { concluidoEm: "desc" },
     }),
     prisma.servico.findMany({ where: { barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
@@ -45,13 +45,20 @@ export default async function ComissoesPage({
     prisma.vendaProduto.findMany({
       where: { barbeariaId: session.barbeariaId, criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
     }),
+    prisma.produto.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
   ]);
 
   const barbeirosPorId = new Map(barbeiros.map((b) => [b.id, b]));
 
   const porBarbeiro = new Map<
     string,
-    { nome: string; totalCentavos: number; comissaoCentavos: number; qtd: number }
+    {
+      nome: string;
+      totalCentavos: number;
+      comissaoCentavos: number;
+      qtd: number;
+      atendimentos: { clienteNome: string; servicos: string[]; valorCentavos: number }[];
+    }
   >();
   for (const a of atendimentos) {
     if (!a.barbeiro) continue;
@@ -60,10 +67,16 @@ export default async function ComissoesPage({
       totalCentavos: 0,
       comissaoCentavos: 0,
       qtd: 0,
+      atendimentos: [],
     };
     atual.totalCentavos += a.precoTotalCentavos;
     atual.comissaoCentavos += comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual);
     atual.qtd += 1;
+    atual.atendimentos.push({
+      clienteNome: a.cliente.nome,
+      servicos: a.servicos.map((s) => s.nomeSnapshot),
+      valorCentavos: a.precoTotalCentavos,
+    });
     porBarbeiro.set(a.barbeiro.id, atual);
   }
   const vendasPorBarbeiro = new Map<string, typeof vendasProduto>();
@@ -74,7 +87,7 @@ export default async function ComissoesPage({
   for (const [barbeiroId, vendas] of vendasPorBarbeiro) {
     const barbeiro = barbeirosPorId.get(barbeiroId);
     if (!barbeiro) continue;
-    const atual = porBarbeiro.get(barbeiroId) ?? { nome: barbeiro.nome, totalCentavos: 0, comissaoCentavos: 0, qtd: 0 };
+    const atual = porBarbeiro.get(barbeiroId) ?? { nome: barbeiro.nome, totalCentavos: 0, comissaoCentavos: 0, qtd: 0, atendimentos: [] };
     atual.comissaoCentavos += comissaoProdutos(vendas);
     porBarbeiro.set(barbeiroId, atual);
   }
@@ -105,6 +118,20 @@ export default async function ComissoesPage({
     }
   }
   const ranking = [...rankingServicos.values()].sort((a, b) => b.qtd - a.qtd);
+
+  const qtdServicoPorId = new Map<string, number>();
+  for (const a of atendimentos) {
+    for (const s of a.servicos) {
+      qtdServicoPorId.set(s.servicoId, (qtdServicoPorId.get(s.servicoId) ?? 0) + 1);
+    }
+  }
+  const servicosSemVenda = servicos.filter((s) => s.ativo && !qtdServicoPorId.has(s.id));
+
+  const qtdProdutoPorId = new Map<string, number>();
+  for (const v of vendasProduto) {
+    qtdProdutoPorId.set(v.produtoId, (qtdProdutoPorId.get(v.produtoId) ?? 0) + v.quantidade);
+  }
+  const produtosSemVenda = produtosAtivos.filter((p) => !qtdProdutoPorId.has(p.id));
 
   const servicoIdUnico = servicoIds.length === 1 ? servicoIds[0] : null;
   const barbeiroSelecionado = barbeiroId ? barbeirosPorId.get(barbeiroId) : null;
@@ -188,6 +215,23 @@ export default async function ComissoesPage({
                   ))}
                 </div>
               </div>
+              {b.atendimentos.length > 0 && (
+                <details className="mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+                  <summary className="cursor-pointer text-sm text-orange-600 dark:text-orange-400 hover:underline select-none">
+                    Ver atendimentos ({b.atendimentos.length})
+                  </summary>
+                  <div className="mt-2 space-y-1.5">
+                    {b.atendimentos.map((at, i) => (
+                      <div key={i} className="flex items-center justify-between gap-2 text-sm">
+                        <span className="text-neutral-700 dark:text-neutral-200">{at.clienteNome}</span>
+                        <span className="text-neutral-500 dark:text-neutral-400 text-xs text-right">
+                          {at.servicos.join(", ")} · <Valor>{formatarReais(at.valorCentavos)}</Valor>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              )}
             </div>
           );
         })}
@@ -213,6 +257,36 @@ export default async function ComissoesPage({
         ))}
         {ranking.length === 0 && <p className="text-neutral-400 dark:text-neutral-500">Nenhum serviço vendido no período.</p>}
       </div>
+
+      <h2 className="text-lg font-semibold mb-1">Sem nenhuma venda no período</h2>
+      <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-3">
+        De {atendimentos.length} atendimento(s) concluído(s) no período, estes serviços e produtos ativos não foram
+        vendidos nenhuma vez — bom parâmetro pra ver onde a equipe pode oferecer mais.
+      </p>
+      {servicosSemVenda.length === 0 && produtosSemVenda.length === 0 ? (
+        <p className="text-neutral-400 dark:text-neutral-500 text-sm">
+          Todos os serviços e produtos ativos tiveram pelo menos uma venda no período. 🎉
+        </p>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {servicosSemVenda.map((s) => (
+            <span
+              key={s.id}
+              className="rounded-full bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-sm px-3 py-1"
+            >
+              {s.nome}
+            </span>
+          ))}
+          {produtosSemVenda.map((p) => (
+            <span
+              key={p.id}
+              className="rounded-full bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 text-sm px-3 py-1"
+            >
+              {p.nome} (produto)
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
