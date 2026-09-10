@@ -3,6 +3,26 @@ import { prisma } from "@/lib/prisma";
 import { calcularIntervalo } from "@/lib/periodo";
 import { valorAtualPorTipo, type ProgressoBarbeiro } from "@/lib/metas";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
+import { calcularPote, limitesCompetencia } from "@/lib/pote";
+import { competenciaAtual } from "@/lib/assinaturas";
+
+// Atendimentos cobertos por assinatura não têm o serviço cobrado avulso (precoCentavos
+// zerado) — o que o barbeiro realmente recebe deles vem do rateio mensal do pote da
+// assinatura (fichas), não de um percentual sobre o preço cheio do serviço. Por isso a
+// meta de comissão só soma o rateio real quando o período da meta corresponde a um mês
+// inteiro (a "competência" do rateio); fora disso, esses atendimentos simplesmente não
+// entram na conta (melhor não contar do que contar um valor bruto inflado).
+function competenciaDoMesInteiro(meta: MetaComNiveis): string | null {
+  if (!meta.dataInicio && !meta.dataFim) return competenciaAtual(new Date());
+  if (meta.dataInicio && meta.dataFim) {
+    const competencia = competenciaAtual(meta.dataInicio);
+    const { inicio, fim } = limitesCompetencia(competencia);
+    const mesmoDia = (a: Date, b: Date) =>
+      a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    if (mesmoDia(meta.dataInicio, inicio) && mesmoDia(meta.dataFim, fim)) return competencia;
+  }
+  return null;
+}
 
 export type MetaComNiveis = {
   id: string;
@@ -62,7 +82,11 @@ export async function calcularProgressoMeta(meta: MetaComNiveis, comissaoPadraoB
     const clientesNovosIds = new Set<string>();
     for (const item of itens) {
       progresso.faturamentoCentavos += item.precoCentavos;
-      progresso.comissaoCentavos += comissaoServicos([item], comissaoPadraoBarbeiro);
+      // Coberto por assinatura: o valor real vem do rateio do pote, não é atribuível a
+      // um serviço específico — não soma aqui pra não inflar com o valor cheio do serviço.
+      if (!item.atendimento.cobertoPorAssinatura) {
+        progresso.comissaoCentavos += comissaoServicos([item], comissaoPadraoBarbeiro);
+      }
       progresso.qtdAtendimentos += 1;
       const cliente = item.atendimento.cliente;
       if (cliente.criadoEm >= periodo.inicio && cliente.criadoEm <= periodo.fim) {
@@ -82,7 +106,11 @@ export async function calcularProgressoMeta(meta: MetaComNiveis, comissaoPadraoB
     });
     for (const a of atendimentos) {
       progresso.faturamentoCentavos += a.precoTotalCentavos;
-      progresso.comissaoCentavos += comissaoServicos(a.servicos, comissaoPadraoBarbeiro);
+      // Coberto por assinatura: não soma pelo preço cheio do serviço — o valor real
+      // (se der pra apurar, veja abaixo) vem do rateio mensal do pote da assinatura.
+      if (!a.cobertoPorAssinatura) {
+        progresso.comissaoCentavos += comissaoServicos(a.servicos, comissaoPadraoBarbeiro);
+      }
       progresso.qtdAtendimentos += 1;
       if (a.cliente.criadoEm >= periodo.inicio && a.cliente.criadoEm <= periodo.fim) {
         progresso.clientesNovos += 1;
@@ -95,6 +123,13 @@ export async function calcularProgressoMeta(meta: MetaComNiveis, comissaoPadraoB
         where: { barbeariaId: meta.barbeariaId, barbeiroId: meta.barbeiroId, criadoEm: { gte: periodo.inicio, lte: periodo.fim } },
       });
       progresso.comissaoCentavos += comissaoProdutos(vendasProduto);
+
+      const competencia = competenciaDoMesInteiro(meta);
+      if (competencia) {
+        const pote = await calcularPote(meta.barbeariaId, competencia);
+        const itemPote = pote.itens.find((i) => i.barbeiroId === meta.barbeiroId);
+        if (itemPote) progresso.comissaoCentavos += itemPote.valorCentavos;
+      }
     }
   }
 
