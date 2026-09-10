@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Wallet, Target, Quote } from "lucide-react";
+import { Wallet, Target, Quote, ListChecks, BookOpen } from "lucide-react";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { chamarProximo, chamarCliente, cancelarAtendimento, pausarDisponibilidadeHoje, retomarDisponibilidadeHoje } from "@/lib/actions/fila";
@@ -13,6 +13,8 @@ import { textoPremioRoleta } from "@/lib/roleta";
 import { LABEL_TIPO_META, formatarValorMeta, calcularNiveisAtingidos, nivelAtual, proximoNivel } from "@/lib/metas";
 import { calcularProgressoMeta } from "@/lib/metas-server";
 import { fraseDoDia } from "@/lib/frases";
+import { atividadeDoDia } from "@/lib/atividades-dia";
+import { versiculoDoDia } from "@/lib/versiculos";
 import { identificarJanelaBaixaOcupacao, gerarDicasPessoais } from "@/lib/gerente-virtual";
 import { limitesJornada } from "@/lib/jornada";
 import { buscarAtendimentosParaAvaliacao } from "@/lib/avaliacao";
@@ -330,6 +332,7 @@ export default async function FilaPage({
   }
 
   const mostrarAvisoCampanha = !!session.barbeiroId && itensFaltandoCampanha.length > 0;
+  const versiculo = versiculoDoDia();
 
   return (
     <div className={`p-6 ${mostrarAvisoCampanha ? "pb-28" : ""}`}>
@@ -342,6 +345,32 @@ export default async function FilaPage({
         <div className="mb-8 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-sm flex items-start gap-3">
           <Quote className="w-5 h-5 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
           <p className="text-sm text-neutral-600 dark:text-neutral-300 italic">{fraseDoDia()}</p>
+        </div>
+      )}
+
+      {session.barbeiroId && (
+        <div className="mb-8 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-sm flex items-start gap-3">
+          <ListChecks className="w-5 h-5 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase mb-0.5">
+              Atividade do dia
+            </p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">{atividadeDoDia()}</p>
+          </div>
+        </div>
+      )}
+
+      {session.barbeiroId && (
+        <div className="mb-8 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-sm flex items-start gap-3">
+          <BookOpen className="w-5 h-5 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase mb-0.5">
+              Versículo do dia
+            </p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300 italic">
+              &ldquo;{versiculo.texto}&rdquo; — {versiculo.referencia}
+            </p>
+          </div>
         </div>
       )}
 
