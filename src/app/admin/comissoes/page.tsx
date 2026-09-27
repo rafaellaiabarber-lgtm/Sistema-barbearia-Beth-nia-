@@ -4,6 +4,8 @@ import { formatarReais } from "@/lib/format";
 import { type Periodo, calcularIntervalo, chavePeriodo, validarPeriodo } from "@/lib/periodo";
 import { marcarComissaoPaga, desmarcarComissaoPaga } from "@/lib/actions/comissoes";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
+import { calcularPote, competenciaDoIntervalo } from "@/lib/pote";
+import { competenciaAtual } from "@/lib/assinaturas";
 import { FiltroRelatorio, normalizarServicoIds } from "../filtro-relatorio";
 import { Scissors, Package, Sparkles } from "lucide-react";
 import { CorrigirComissaoCobertaButton } from "./corrigir-comissao-coberta-button";
@@ -80,11 +82,16 @@ export default async function ComissoesPage({
       motorProdutosCentavos: 0,
     };
     atual.totalCentavos += a.precoTotalCentavos;
-    atual.comissaoCentavos += comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual);
-    for (const item of a.servicos) {
-      const comissaoItem = comissaoServicos([item], a.barbeiro.comissaoPercentual);
-      if (categoriaPorServicoId.get(item.servicoId) === "EXTRA") atual.motorExtraCentavos += comissaoItem;
-      else atual.motorPrincipalCentavos += comissaoItem;
+    // Coberto por assinatura: o serviço não é cobrado avulso (precoCentavos zerado) — o
+    // valor real que o barbeiro recebe vem do rateio mensal do pote (fichas), somado mais
+    // abaixo, e não de um percentual sobre o preço cheio do serviço.
+    if (!a.cobertoPorAssinatura) {
+      atual.comissaoCentavos += comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual);
+      for (const item of a.servicos) {
+        const comissaoItem = comissaoServicos([item], a.barbeiro.comissaoPercentual);
+        if (categoriaPorServicoId.get(item.servicoId) === "EXTRA") atual.motorExtraCentavos += comissaoItem;
+        else atual.motorPrincipalCentavos += comissaoItem;
+      }
     }
     atual.qtd += 1;
     atual.atendimentos.push({
@@ -116,6 +123,23 @@ export default async function ComissoesPage({
     atual.comissaoCentavos += comissaoProdutosBarbeiro;
     atual.motorProdutosCentavos += comissaoProdutosBarbeiro;
     porBarbeiro.set(barbeiroId, atual);
+  }
+
+  // Rateio real da assinatura (atendimentos cobertos): só dá pra apurar quando o período
+  // exibido é um mês inteiro (a "competência" do pote). O filtro "Mês" vai do dia 1º até
+  // agora (mês ainda em andamento), não até o fim do mês — por isso trata esse caso à
+  // parte, igual já era feito em Metas, em vez de exigir o intervalo batendo exato.
+  // Conta como parte do motor Corte & Barba, já que é isso que a assinatura cobre.
+  const competenciaPeriodo = periodo === "mes" ? competenciaAtual(new Date()) : competenciaDoIntervalo(inicio, fim);
+  if (competenciaPeriodo) {
+    const pote = await calcularPote(session.barbeariaId, competenciaPeriodo);
+    for (const [id, atual] of porBarbeiro) {
+      const itemPote = pote.itens.find((i) => i.barbeiroId === id);
+      if (itemPote) {
+        atual.comissaoCentavos += itemPote.valorCentavos;
+        atual.motorPrincipalCentavos += itemPote.valorCentavos;
+      }
+    }
   }
 
   const categoriaFaturamento = { PRINCIPAL: 0, EXTRA: 0 } as Record<"PRINCIPAL" | "EXTRA", number>;

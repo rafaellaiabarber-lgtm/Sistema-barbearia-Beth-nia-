@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { calcularIntervalo } from "@/lib/periodo";
 import { valorAtualPorTipo, type ProgressoBarbeiro } from "@/lib/metas";
 import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
-import { calcularPote, limitesCompetencia } from "@/lib/pote";
+import { calcularPote, competenciaDoIntervalo } from "@/lib/pote";
 import { competenciaAtual } from "@/lib/assinaturas";
 
 // Atendimentos cobertos por assinatura não têm o serviço cobrado avulso (precoCentavos
@@ -14,13 +14,7 @@ import { competenciaAtual } from "@/lib/assinaturas";
 // entram na conta (melhor não contar do que contar um valor bruto inflado).
 function competenciaDoMesInteiro(meta: MetaComNiveis): string | null {
   if (!meta.dataInicio && !meta.dataFim) return competenciaAtual(new Date());
-  if (meta.dataInicio && meta.dataFim) {
-    const competencia = competenciaAtual(meta.dataInicio);
-    const { inicio, fim } = limitesCompetencia(competencia);
-    const mesmoDia = (a: Date, b: Date) =>
-      a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-    if (mesmoDia(meta.dataInicio, inicio) && mesmoDia(meta.dataFim, fim)) return competencia;
-  }
+  if (meta.dataInicio && meta.dataFim) return competenciaDoIntervalo(meta.dataInicio, meta.dataFim);
   return null;
 }
 
