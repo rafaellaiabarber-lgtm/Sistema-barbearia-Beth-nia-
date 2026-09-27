@@ -53,7 +53,7 @@ export default async function AdminHomePage() {
         status: "CONCLUIDO",
         concluidoEm: { gte: mesAnteriorIntervalo.inicio, lte: mesAnteriorIntervalo.fim },
       },
-      include: { barbeiro: true, servicos: true },
+      include: { barbeiro: true, servicos: true, cliente: true },
     }),
     prisma.atendimento.count({ where: { barbeariaId: session.barbeariaId, status: "AGUARDANDO" } }),
     prisma.atendimento.count({ where: { barbeariaId: session.barbeariaId, status: "EM_ATENDIMENTO" } }),
@@ -156,6 +156,11 @@ export default async function AdminHomePage() {
     if (criadoEm >= mes.inicio) clientesNovos += 1;
     else clientesRecorrentes += 1;
   }
+
+  const clientesUnicosMesAnterior = new Set(atendimentosMesAnterior.map((a) => a.cliente.id));
+  const ticketMedioPorClienteMes = clientesUnicos.size > 0 ? Math.round(faturamentoMes / clientesUnicos.size) : 0;
+  const ticketMedioPorClienteMesAnterior =
+    clientesUnicosMesAnterior.size > 0 ? Math.round(faturamentoMesAnterior / clientesUnicosMesAnterior.size) : 0;
 
   const inadimplentes = assinaturasParaInadimplencia.filter((a) =>
     estaInadimplente(a.diaVencimento, a.pagamentos.length > 0, agora)
@@ -296,9 +301,16 @@ export default async function AdminHomePage() {
           <Variacao atual={qtdAtendimentosMes} anterior={qtdAtendimentosMesAnterior} />
         </div>
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
-          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Ticket médio</p>
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Ticket médio (por atendimento)</p>
           <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-1"><Valor>{formatarReais(ticketMedioMes)}</Valor></p>
           <Variacao atual={ticketMedioMes} anterior={ticketMedioMesAnterior} />
+          <div className="mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+            <p className="text-neutral-500 dark:text-neutral-400 text-xs">Ticket médio (por cliente)</p>
+            <p className="text-lg font-semibold text-neutral-700 dark:text-neutral-200">
+              <Valor>{formatarReais(ticketMedioPorClienteMes)}</Valor>
+            </p>
+            <Variacao atual={ticketMedioPorClienteMes} anterior={ticketMedioPorClienteMesAnterior} />
+          </div>
         </div>
       </div>
 
