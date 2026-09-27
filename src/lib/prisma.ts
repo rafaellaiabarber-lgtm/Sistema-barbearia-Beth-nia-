@@ -64,6 +64,9 @@ export const prisma = basePrisma.$extends({
 
         const argsComEscopo = args as Record<string, unknown>;
 
+        // Em todos os casos abaixo, barbeariaId vai ANTES do resto (data/where/create) no
+        // spread — se o call-site já informou barbeariaId explicitamente, ele prevalece por
+        // vir depois na ordem de propriedades; o valor "ambiente" só preenche quando falta.
         if (operation === "create") {
           const data = (argsComEscopo.data ?? {}) as Record<string, unknown>;
           argsComEscopo.data = { barbeariaId, ...data };
@@ -72,7 +75,7 @@ export const prisma = basePrisma.$extends({
           argsComEscopo.data = data.map((item) => ({ barbeariaId, ...item }));
         } else {
           const where = (argsComEscopo.where ?? {}) as Record<string, unknown>;
-          argsComEscopo.where = { ...where, barbeariaId };
+          argsComEscopo.where = { barbeariaId, ...where };
           if (operation === "upsert") {
             const create = (argsComEscopo.create ?? {}) as Record<string, unknown>;
             argsComEscopo.create = { barbeariaId, ...create };
