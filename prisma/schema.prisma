@@ -81,6 +81,11 @@ enum PeriodicidadeFeedback {
   AVULSO
 }
 
+enum CategoriaServico {
+  PRINCIPAL
+  EXTRA
+}
+
 // Cada barbearia é um tenant isolado do sistema.
 model Barbearia {
   id              String    @id @default(cuid())
@@ -283,6 +288,7 @@ model Servico {
   fichas              Int                  @default(0)
   ativo               Boolean              @default(true)
   pontuaRanking       Boolean              @default(true)
+  categoria           CategoriaServico     @default(PRINCIPAL)
   criadoEm            DateTime             @default(now())
   atendimentoServicos AtendimentoServico[]
   metas               Meta[]

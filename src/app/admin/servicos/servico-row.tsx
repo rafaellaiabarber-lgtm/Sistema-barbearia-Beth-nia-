@@ -6,6 +6,7 @@ import {
   atualizarServico,
   alternarAtivoServico,
   alternarPontuaRanking,
+  alternarCategoriaServico,
   excluirServico,
   type ServicoState,
 } from "@/lib/actions/servicos";
@@ -123,6 +124,10 @@ export function ServicoRow({ servico, comissoesPadrao }: { servico: Servico; com
                 </span>
               )}{" "}
               · {servico.fichas} ficha(s)
+              {" · "}
+              <span className={servico.categoria === "EXTRA" ? "text-amber-600 dark:text-amber-400" : "text-neutral-500 dark:text-neutral-400"}>
+                {servico.categoria === "EXTRA" ? "serviço extra" : "corte/barba (principal)"}
+              </span>
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
@@ -148,6 +153,20 @@ export function ServicoRow({ servico, comissoesPadrao }: { servico: Servico; com
               >
                 Editar
               </button>
+              <form
+                action={alternarCategoriaServico.bind(
+                  null,
+                  servico.id,
+                  servico.categoria === "EXTRA" ? "PRINCIPAL" : "EXTRA"
+                )}
+              >
+                <button
+                  className={`text-sm ${servico.categoria === "EXTRA" ? "text-amber-600 dark:text-amber-400 hover:text-amber-800" : "text-neutral-600 dark:text-neutral-300 hover:text-orange-600 dark:hover:text-orange-400"}`}
+                  title="Usado no resumo dos '3 motores' na Visão geral: Corte/Barba, Produtos e Serviços extras"
+                >
+                  {servico.categoria === "EXTRA" ? "Marcar como principal" : "Marcar como extra"}
+                </button>
+              </form>
               <form action={alternarPontuaRanking.bind(null, servico.id, !servico.pontuaRanking)}>
                 <button
                   className={`text-sm ${servico.pontuaRanking ? "text-orange-600 dark:text-orange-400 hover:text-orange-800" : "text-neutral-400 dark:text-neutral-500 hover:text-orange-600 dark:hover:text-orange-400"}`}
