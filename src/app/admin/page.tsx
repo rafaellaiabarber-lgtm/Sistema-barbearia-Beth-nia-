@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShoppingCart, BarChart3, ThumbsUp, ThumbsDown } from "lucide-react";
+import { ShoppingCart, BarChart3, ThumbsUp, ThumbsDown, Scissors, Package, Sparkles } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { formatarReais } from "@/lib/format";
@@ -40,6 +40,8 @@ export default async function AdminHomePage() {
     assinaturasAtivas,
     assinaturasParaInadimplencia,
     atendimentosGrafico,
+    servicosCategorias,
+    vendasProdutoHoje,
   ] = await Promise.all([
     prisma.atendimento.findMany({
       where: { barbeariaId: session.barbeariaId, status: "CONCLUIDO", concluidoEm: { gte: mes.inicio, lte: mes.fim } },
@@ -80,10 +82,25 @@ export default async function AdminHomePage() {
       where: { barbeariaId: session.barbeariaId, status: "CONCLUIDO", concluidoEm: { gte: inicioGrafico, lte: agora } },
       select: { concluidoEm: true, precoTotalCentavos: true },
     }),
+    prisma.servico.findMany({ where: { barbeariaId: session.barbeariaId }, select: { id: true, categoria: true } }),
+    prisma.vendaProduto.findMany({
+      where: { barbeariaId: session.barbeariaId, criadoEm: { gte: hoje.inicio, lte: hoje.fim } },
+    }),
   ]);
 
   const atendimentosHoje = atendimentosMes.filter((a) => a.concluidoEm! >= hoje.inicio);
   const atendimentosSemana = atendimentosMes.filter((a) => a.concluidoEm! >= semana.inicio);
+
+  const categoriaPorServicoId = new Map(servicosCategorias.map((s) => [s.id, s.categoria]));
+  let motorPrincipalHojeCentavos = 0;
+  let motorExtraHojeCentavos = 0;
+  for (const a of atendimentosHoje) {
+    for (const s of a.servicos) {
+      if (categoriaPorServicoId.get(s.servicoId) === "EXTRA") motorExtraHojeCentavos += s.precoCentavos;
+      else motorPrincipalHojeCentavos += s.precoCentavos;
+    }
+  }
+  const motorProdutosHojeCentavos = vendasProdutoHoje.reduce((s, v) => s + v.totalCentavos, 0);
 
   const faturamentoHoje = atendimentosHoje.reduce((s, a) => s + a.precoTotalCentavos, 0);
   const faturamentoSemana = atendimentosSemana.reduce((s, a) => s + a.precoTotalCentavos, 0);
@@ -200,6 +217,37 @@ export default async function AdminHomePage() {
           </div>
           <ThumbsDown className="w-8 h-8 text-red-200 shrink-0" />
         </Link>
+      </div>
+
+      <h2 className="text-lg font-semibold mb-3">Os 3 motores — hoje</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm flex items-start justify-between">
+          <div>
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-1">Corte &amp; Barba</p>
+            <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
+              <Valor>{formatarReais(motorPrincipalHojeCentavos)}</Valor>
+            </p>
+          </div>
+          <Scissors className="w-6 h-6 text-orange-400 shrink-0" />
+        </div>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm flex items-start justify-between">
+          <div>
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-1">Produtos</p>
+            <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
+              <Valor>{formatarReais(motorProdutosHojeCentavos)}</Valor>
+            </p>
+          </div>
+          <Package className="w-6 h-6 text-orange-400 shrink-0" />
+        </div>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm flex items-start justify-between">
+          <div>
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-1">Serviços extras</p>
+            <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
+              <Valor>{formatarReais(motorExtraHojeCentavos)}</Valor>
+            </p>
+          </div>
+          <Sparkles className="w-6 h-6 text-orange-400 shrink-0" />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">

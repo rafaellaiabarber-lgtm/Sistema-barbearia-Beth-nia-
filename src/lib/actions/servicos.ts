@@ -138,6 +138,13 @@ export async function alternarPontuaRanking(id: string, pontuaRanking: boolean) 
   revalidatePath("/ranking");
 }
 
+export async function alternarCategoriaServico(id: string, categoria: "PRINCIPAL" | "EXTRA") {
+  await requireSession(["ADMIN"]);
+  await prisma.servico.update({ where: { id }, data: { categoria } });
+  revalidatePath("/admin/servicos");
+  revalidatePath("/admin");
+}
+
 export async function excluirServico(id: string) {
   await requireSession(["ADMIN"]);
   const emUso = await prisma.atendimentoServico.findFirst({ where: { servicoId: id } });

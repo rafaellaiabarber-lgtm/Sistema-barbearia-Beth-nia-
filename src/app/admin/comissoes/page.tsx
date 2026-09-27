@@ -7,6 +7,7 @@ import { comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { FiltroRelatorio, normalizarServicoIds } from "../filtro-relatorio";
 import { CorrigirComissaoCobertaButton } from "./corrigir-comissao-coberta-button";
 import { CalculadoraComissaoCombinada } from "./calculadora-comissao-combinada";
+import { ExportarRelatorioBarbeirosButton } from "./exportar-relatorio-barbeiros-button";
 import { Valor } from "../../valor";
 
 export default async function ComissoesPage({
@@ -28,7 +29,7 @@ export default async function ComissoesPage({
   const podeMarcarPago = periodo !== "personalizado" && periodo !== "dia";
   const chave = podeMarcarPago ? chavePeriodo(periodo) : "";
 
-  const [atendimentos, servicos, barbeiros, vendasProduto, produtosAtivos] = await Promise.all([
+  const [atendimentos, servicos, barbeiros, vendasProduto, produtosAtivos, minhaBarbearia] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
         barbeariaId: session.barbeariaId,
@@ -46,6 +47,7 @@ export default async function ComissoesPage({
       where: { barbeariaId: session.barbeariaId, criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
     }),
     prisma.produto.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.barbearia.findUnique({ where: { id: session.barbeariaId }, select: { nome: true } }),
   ]);
 
   const barbeirosPorId = new Map(barbeiros.map((b) => [b.id, b]));
@@ -143,7 +145,19 @@ export default async function ComissoesPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Comissões</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <h1 className="text-2xl font-bold">Comissões</h1>
+        <ExportarRelatorioBarbeirosButton
+          barbeariaNome={minhaBarbearia?.nome ?? "Barbearia"}
+          periodoLabel={periodoLabel}
+          barbeiros={[...porBarbeiro.values()].map((b) => ({
+            nome: b.nome,
+            qtd: b.qtd,
+            totalCentavos: b.totalCentavos,
+            comissaoCentavos: b.comissaoCentavos,
+          }))}
+        />
+      </div>
 
       <CorrigirComissaoCobertaButton />
 
