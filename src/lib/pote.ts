@@ -1,10 +1,23 @@
 import { prisma } from "@/lib/prisma";
+import { competenciaAtual } from "@/lib/assinaturas";
 
 export function limitesCompetencia(competencia: string) {
   const [ano, mes] = competencia.split("-").map(Number);
   const inicio = new Date(ano, mes - 1, 1, 0, 0, 0, 0);
   const fim = new Date(ano, mes, 0, 23, 59, 59, 999);
   return { inicio, fim };
+}
+
+// Se o intervalo [inicio, fim] corresponde exatamente a um mês inteiro (a "competência"
+// do rateio), devolve essa competência — senão null. Usado em telas que mostram comissão
+// de atendimentos cobertos por assinatura: só dá pra somar o valor real do rateio quando o
+// período em questão é o mês inteiro, já que o pote é apurado mensalmente.
+export function competenciaDoIntervalo(inicio: Date, fim: Date): string | null {
+  const competencia = competenciaAtual(inicio);
+  const { inicio: inicioMes, fim: fimMes } = limitesCompetencia(competencia);
+  const mesmoDia = (a: Date, b: Date) =>
+    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  return mesmoDia(inicio, inicioMes) && mesmoDia(fim, fimMes) ? competencia : null;
 }
 
 export type ItemPote = { barbeiroId: string; nome: string; fichas: number; valorCentavos: number };
