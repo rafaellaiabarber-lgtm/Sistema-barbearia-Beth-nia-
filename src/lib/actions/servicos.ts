@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { reaisParaCentavos } from "@/lib/format";
+import { categoriaPorNome } from "@/lib/servicos";
 
 export type ServicoState = { erro?: string; sucesso?: boolean };
 
@@ -39,6 +40,7 @@ export async function criarServico(_prevState: ServicoState, formData: FormData)
       custoCentavos,
       duracaoMinutos: duracao || 30,
       comissaoPercentual,
+      categoria: categoriaPorNome(nome),
     },
   });
 
@@ -143,6 +145,28 @@ export async function alternarCategoriaServico(id: string, categoria: "PRINCIPAL
   await prisma.servico.update({ where: { id }, data: { categoria } });
   revalidatePath("/admin/servicos");
   revalidatePath("/admin");
+}
+
+export async function classificarServicosPorNome() {
+  const session = await requireSession(["ADMIN"]);
+  const servicos = await prisma.servico.findMany({
+    where: { barbeariaId: session.barbeariaId },
+    select: { id: true, nome: true, categoria: true },
+  });
+
+  let alterados = 0;
+  for (const s of servicos) {
+    const categoria = categoriaPorNome(s.nome);
+    if (categoria !== s.categoria) {
+      await prisma.servico.update({ where: { id: s.id }, data: { categoria } });
+      alterados += 1;
+    }
+  }
+
+  revalidatePath("/admin/servicos");
+  revalidatePath("/admin");
+  revalidatePath("/admin/comissoes");
+  return { alterados };
 }
 
 export async function excluirServico(id: string) {

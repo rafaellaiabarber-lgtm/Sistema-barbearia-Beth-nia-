@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { NovoServicoForm } from "./novo-servico-form";
 import { ServicoRow } from "./servico-row";
+import { ClassificarServicosButton } from "./classificar-servicos-button";
 
 export default async function ServicosPage() {
   const session = await requireSession(["ADMIN"]);
@@ -22,6 +23,8 @@ export default async function ServicosPage() {
       <h1 className="text-2xl font-bold mb-6">Serviços</h1>
 
       <NovoServicoForm />
+
+      <ClassificarServicosButton />
 
       <div className="space-y-2">
         {servicos.map((s) => (
