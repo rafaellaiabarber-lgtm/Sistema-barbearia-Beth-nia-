@@ -314,7 +314,7 @@ export default async function AdminHomePage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
           <p className="text-neutral-500 dark:text-neutral-400 text-sm">Na fila agora</p>
           <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{aguardando}</p>
@@ -322,6 +322,10 @@ export default async function AdminHomePage() {
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
           <p className="text-neutral-500 dark:text-neutral-400 text-sm">Em atendimento</p>
           <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{emAtendimento}</p>
+        </div>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">Clientes únicos (mês)</p>
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{clientesUnicos.size}</p>
         </div>
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm">
           <p className="text-neutral-500 dark:text-neutral-400 text-sm">Clientes novos (mês)</p>
