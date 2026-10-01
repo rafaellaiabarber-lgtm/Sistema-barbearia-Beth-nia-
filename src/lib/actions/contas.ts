@@ -56,7 +56,7 @@ export async function marcarContaPaga(id: string, _prevState: ContaState, formDa
   }
   const formaPagamento = formaPagamentoRaw as FormaPagamento;
 
-  const conta = await prisma.contaFinanceira.findUnique({ where: { id } });
+  const conta = await prisma.contaFinanceira.findFirst({ where: { id, barbeariaId: session.barbeariaId } });
   if (!conta || conta.status === "PAGO") return {};
 
   const movimento = await prisma.movimentoCaixa.create({
@@ -80,7 +80,7 @@ export async function marcarContaPaga(id: string, _prevState: ContaState, formDa
 }
 
 export async function excluirConta(id: string) {
-  await requireSession(["ADMIN"]);
-  await prisma.contaFinanceira.delete({ where: { id } });
+  const session = await requireSession(["ADMIN"]);
+  await prisma.contaFinanceira.deleteMany({ where: { id, barbeariaId: session.barbeariaId } });
   revalidar();
 }

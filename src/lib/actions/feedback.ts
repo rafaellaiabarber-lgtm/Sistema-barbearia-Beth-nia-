@@ -21,8 +21,8 @@ export async function criarTemaFeedback(_prevState: TemaState, formData: FormDat
 }
 
 export async function alternarAtivoTema(id: string, ativo: boolean) {
-  await requireSession(["ADMIN"]);
-  await prisma.temaFeedback.update({ where: { id }, data: { ativo } });
+  const session = await requireSession(["ADMIN"]);
+  await prisma.temaFeedback.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { ativo } });
   revalidatePath("/admin/feedback");
 }
 
@@ -46,8 +46,8 @@ export async function criarFeedback(_prevState: FeedbackState, formData: FormDat
   if (Number.isNaN(nota) || nota < 0 || nota > 10) return { erro: "A nota deve ser de 0 a 10." };
 
   const [barbeiro, tema] = await Promise.all([
-    prisma.barbeiro.findUnique({ where: { id: barbeiroId } }),
-    prisma.temaFeedback.findUnique({ where: { id: temaId } }),
+    prisma.barbeiro.findFirst({ where: { id: barbeiroId, barbeariaId: session.barbeariaId } }),
+    prisma.temaFeedback.findFirst({ where: { id: temaId, barbeariaId: session.barbeariaId } }),
   ]);
   if (!barbeiro) return { erro: "Barbeiro inválido." };
   if (!tema) return { erro: "Tema inválido." };
@@ -69,7 +69,7 @@ export async function criarFeedback(_prevState: FeedbackState, formData: FormDat
 }
 
 export async function excluirFeedback(id: string) {
-  await requireSession(["ADMIN"]);
-  await prisma.feedback.delete({ where: { id } });
+  const session = await requireSession(["ADMIN"]);
+  await prisma.feedback.deleteMany({ where: { id, barbeariaId: session.barbeariaId } });
   revalidatePath("/admin/feedback");
 }
