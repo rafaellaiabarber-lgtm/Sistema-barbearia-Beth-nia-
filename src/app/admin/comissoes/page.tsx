@@ -8,8 +8,7 @@ import { FiltroRelatorio, normalizarServicoIds } from "../filtro-relatorio";
 import { Scissors, Package, Sparkles } from "lucide-react";
 import { CorrigirComissaoCobertaButton } from "./corrigir-comissao-coberta-button";
 import { CalculadoraComissaoCombinada } from "./calculadora-comissao-combinada";
-import { ExportarRelatorioBarbeirosButton } from "./exportar-relatorio-barbeiros-button";
-import { ExportarRelatorioMotoresButton } from "./exportar-relatorio-motores-button";
+import { ExportarRelatorioDetalhadoButton } from "./exportar-relatorio-detalhado-button";
 import { Valor } from "../../valor";
 
 export default async function ComissoesPage({
@@ -234,28 +233,19 @@ export default async function ComissoesPage({
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold">Comissões</h1>
         <div className="flex flex-wrap items-center gap-2">
-          <ExportarRelatorioBarbeirosButton
+          <ExportarRelatorioDetalhadoButton
             barbeariaNome={minhaBarbearia?.nome ?? "Barbearia"}
             periodoLabel={periodoLabel}
             barbeiros={[...porBarbeiro.values()].map((b) => ({
               nome: b.nome,
-              qtd: b.qtd,
-              totalCentavos: b.totalCentavos,
+              atendimentos: b.qtd,
               comissaoCentavos: b.comissaoCentavos,
-            }))}
-          />
-          <ExportarRelatorioMotoresButton
-            barbeariaNome={minhaBarbearia?.nome ?? "Barbearia"}
-            periodoLabel={periodoLabel}
-            barbeiros={[...porBarbeiro.values()].map((b) => ({
-              nome: b.nome,
-              clientesAtendidos: b.qtd,
-              qtdExtras: b.qtdExtras,
-              extras: [...b.extrasPorNome.entries()]
-                .map(([nome, qtd]) => ({ nome, qtd }))
-                .sort((x, y) => y.qtd - x.qtd),
               qtdProdutos: b.qtdProdutos,
               produtos: [...b.produtosPorNome.entries()]
+                .map(([nome, qtd]) => ({ nome, qtd }))
+                .sort((x, y) => y.qtd - x.qtd),
+              qtdExtras: b.qtdExtras,
+              extras: [...b.extrasPorNome.entries()]
                 .map(([nome, qtd]) => ({ nome, qtd }))
                 .sort((x, y) => y.qtd - x.qtd),
             }))}
