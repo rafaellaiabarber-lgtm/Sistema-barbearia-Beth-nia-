@@ -82,9 +82,13 @@ export default async function AdminHomePage() {
       where: { barbeariaId: session.barbeariaId, status: "CONCLUIDO", concluidoEm: { gte: inicioGrafico, lte: agora } },
       select: { concluidoEm: true, precoTotalCentavos: true },
     }),
-    prisma.servico.findMany({ where: { barbeariaId: session.barbeariaId }, select: { id: true, categoria: true } }),
+    prisma.servico.findMany({
+      where: { barbeariaId: session.barbeariaId },
+      select: { id: true, categoria: true, custoCentavos: true },
+    }),
     prisma.vendaProduto.findMany({
       where: { barbeariaId: session.barbeariaId, criadoEm: { gte: hoje.inicio, lte: hoje.fim } },
+      include: { produto: true },
     }),
   ]);
 
@@ -92,15 +96,25 @@ export default async function AdminHomePage() {
   const atendimentosSemana = atendimentosMes.filter((a) => a.concluidoEm! >= semana.inicio);
 
   const categoriaPorServicoId = new Map(servicosCategorias.map((s) => [s.id, s.categoria]));
+  const custoPorServicoId = new Map(servicosCategorias.map((s) => [s.id, s.custoCentavos]));
   let motorPrincipalHojeCentavos = 0;
   let motorExtraHojeCentavos = 0;
+  let motorPrincipalCustoHojeCentavos = 0;
+  let motorExtraCustoHojeCentavos = 0;
   for (const a of atendimentosHoje) {
     for (const s of a.servicos) {
-      if (categoriaPorServicoId.get(s.servicoId) === "EXTRA") motorExtraHojeCentavos += s.precoCentavos;
-      else motorPrincipalHojeCentavos += s.precoCentavos;
+      const custo = custoPorServicoId.get(s.servicoId) ?? 0;
+      if (categoriaPorServicoId.get(s.servicoId) === "EXTRA") {
+        motorExtraHojeCentavos += s.precoCentavos;
+        motorExtraCustoHojeCentavos += custo;
+      } else {
+        motorPrincipalHojeCentavos += s.precoCentavos;
+        motorPrincipalCustoHojeCentavos += custo;
+      }
     }
   }
   const motorProdutosHojeCentavos = vendasProdutoHoje.reduce((s, v) => s + v.totalCentavos, 0);
+  const motorProdutosCustoHojeCentavos = vendasProdutoHoje.reduce((s, v) => s + v.produto.custoCentavos * v.quantidade, 0);
 
   const faturamentoHoje = atendimentosHoje.reduce((s, a) => s + a.precoTotalCentavos, 0);
   const faturamentoSemana = atendimentosSemana.reduce((s, a) => s + a.precoTotalCentavos, 0);
@@ -229,8 +243,13 @@ export default async function AdminHomePage() {
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm flex items-start justify-between">
           <div>
             <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-1">Corte &amp; Barba</p>
-            <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs">Bruto</p>
+            <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               <Valor>{formatarReais(motorPrincipalHojeCentavos)}</Valor>
+            </p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Líquido</p>
+            <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
+              <Valor>{formatarReais(motorPrincipalHojeCentavos - motorPrincipalCustoHojeCentavos)}</Valor>
             </p>
           </div>
           <Scissors className="w-6 h-6 text-orange-400 shrink-0" />
@@ -238,8 +257,13 @@ export default async function AdminHomePage() {
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm flex items-start justify-between">
           <div>
             <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-1">Produtos</p>
-            <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs">Bruto</p>
+            <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               <Valor>{formatarReais(motorProdutosHojeCentavos)}</Valor>
+            </p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Líquido</p>
+            <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
+              <Valor>{formatarReais(motorProdutosHojeCentavos - motorProdutosCustoHojeCentavos)}</Valor>
             </p>
           </div>
           <Package className="w-6 h-6 text-orange-400 shrink-0" />
@@ -247,8 +271,13 @@ export default async function AdminHomePage() {
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm flex items-start justify-between">
           <div>
             <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-1">Serviços extras</p>
-            <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs">Bruto</p>
+            <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               <Valor>{formatarReais(motorExtraHojeCentavos)}</Valor>
+            </p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Líquido</p>
+            <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
+              <Valor>{formatarReais(motorExtraHojeCentavos - motorExtraCustoHojeCentavos)}</Valor>
             </p>
           </div>
           <Sparkles className="w-6 h-6 text-orange-400 shrink-0" />
