@@ -19,15 +19,17 @@ import { MetaMensalForm } from "./meta-mensal-form";
 import { ClienteInativoRow } from "./cliente-inativo-row";
 import { Valor } from "../../valor";
 
-async function buscarComparativo(inicio: Date, fim: Date): Promise<ComparativoMes> {
+async function buscarComparativo(barbeariaId: string, inicio: Date, fim: Date): Promise<ComparativoMes> {
   const [atendimentos, movimentos, clientesNovos, vendasProduto] = await Promise.all([
     prisma.atendimento.findMany({
-      where: { status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim } },
+      where: { barbeariaId, status: "CONCLUIDO", concluidoEm: { gte: inicio, lte: fim } },
       include: { barbeiro: true, servicos: true },
     }),
-    prisma.movimentoCaixa.findMany({ where: { tipo: "SAIDA", criadoEm: { gte: inicio, lte: fim } } }),
-    prisma.cliente.count({ where: { criadoEm: { gte: inicio, lte: fim } } }),
-    prisma.vendaProduto.findMany({ where: { criadoEm: { gte: inicio, lte: fim } } }),
+    prisma.movimentoCaixa.findMany({
+      where: { barbeariaId, tipo: "SAIDA", criadoEm: { gte: inicio, lte: fim } },
+    }),
+    prisma.cliente.count({ where: { barbeariaId, criadoEm: { gte: inicio, lte: fim } } }),
+    prisma.vendaProduto.findMany({ where: { barbeariaId, criadoEm: { gte: inicio, lte: fim } } }),
   ]);
 
   const faturamentoCentavos = atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
@@ -60,16 +62,19 @@ export default async function GerenteVirtualPage({
 
   const [comparativoAtual, comparativoAnterior, configuracao, clientesComAtendimento, barbeirosAtivos, atendimentosMesTodos] =
     await Promise.all([
-      buscarComparativo(mesAtual.inicio, mesAtual.fim),
-      buscarComparativo(mesAnterior.inicio, mesAnterior.fim),
+      buscarComparativo(session.barbeariaId, mesAtual.inicio, mesAtual.fim),
+      buscarComparativo(session.barbeariaId, mesAnterior.inicio, mesAnterior.fim),
       prisma.configuracaoFinanceira.findUnique({ where: { barbeariaId: session.barbeariaId } }),
       prisma.cliente.findMany({
-        where: { atendimentos: { some: { status: "CONCLUIDO" } } },
+        where: { barbeariaId: session.barbeariaId, atendimentos: { some: { status: "CONCLUIDO" } } },
         include: { atendimentos: { where: { status: "CONCLUIDO" }, select: { concluidoEm: true } } },
       }),
-      prisma.barbeiro.findMany({ where: { ativo: true }, include: { jornadas: true } }),
+      prisma.barbeiro.findMany({
+        where: { ativo: true, barbeariaId: session.barbeariaId },
+        include: { jornadas: true },
+      }),
       prisma.atendimento.findMany({
-        where: { criadoEm: { gte: mesAtual.inicio, lte: mesAtual.fim } },
+        where: { barbeariaId: session.barbeariaId, criadoEm: { gte: mesAtual.inicio, lte: mesAtual.fim } },
         select: { criadoEm: true, chamadoEm: true, concluidoEm: true, barbeiroId: true, status: true },
       }),
     ]);

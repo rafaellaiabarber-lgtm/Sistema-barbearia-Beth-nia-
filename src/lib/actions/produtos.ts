@@ -45,7 +45,7 @@ export async function atualizarComissaoProduto(
   _prevState: ProdutoState,
   formData: FormData
 ): Promise<ProdutoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const comissaoRaw = String(formData.get("comissao") ?? "").trim();
   let comissaoPercentual: number | null = null;
@@ -56,7 +56,7 @@ export async function atualizarComissaoProduto(
     }
   }
 
-  await prisma.produto.update({ where: { id }, data: { comissaoPercentual } });
+  await prisma.produto.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { comissaoPercentual } });
   revalidatePath("/admin/produtos");
   revalidatePath("/admin/caixa");
   revalidatePath("/admin/comissoes");
@@ -72,7 +72,7 @@ export async function atualizarProduto(
   _prevState: ProdutoState,
   formData: FormData
 ): Promise<ProdutoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   const preco = String(formData.get("preco") ?? "");
@@ -85,7 +85,10 @@ export async function atualizarProduto(
   const custoCentavos = custo ? reaisParaCentavos(custo) : 0;
   if (custoCentavos < 0) return { erro: "Informe um custo válido." };
 
-  await prisma.produto.update({ where: { id }, data: { nome, precoCentavos, custoCentavos } });
+  await prisma.produto.updateMany({
+    where: { id, barbeariaId: session.barbeariaId },
+    data: { nome, precoCentavos, custoCentavos },
+  });
 
   revalidatePath("/admin/produtos");
   revalidatePath("/admin/caixa");
@@ -94,14 +97,17 @@ export async function atualizarProduto(
 }
 
 export async function alternarAtivoProduto(id: string, ativo: boolean) {
-  await requireSession(["ADMIN"]);
-  await prisma.produto.update({ where: { id }, data: { ativo } });
+  const session = await requireSession(["ADMIN"]);
+  await prisma.produto.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { ativo } });
   revalidatePath("/admin/produtos");
   revalidatePath("/admin/caixa");
 }
 
 export async function excluirProduto(id: string) {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
+  const produto = await prisma.produto.findFirst({ where: { id, barbeariaId: session.barbeariaId } });
+  if (!produto) return;
+
   const [venda, meta] = await Promise.all([
     prisma.vendaProduto.findFirst({ where: { produtoId: id } }),
     prisma.meta.findFirst({ where: { produtoId: id } }),

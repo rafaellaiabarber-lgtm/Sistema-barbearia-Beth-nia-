@@ -53,7 +53,7 @@ export async function atualizarServico(
   _prevState: ServicoState,
   formData: FormData
 ): Promise<ServicoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   const preco = String(formData.get("preco") ?? "");
@@ -63,8 +63,8 @@ export async function atualizarServico(
   const precoCentavos = reaisParaCentavos(preco);
   if (precoCentavos <= 0) return { erro: "Informe um preço válido." };
 
-  await prisma.servico.update({
-    where: { id },
+  await prisma.servico.updateMany({
+    where: { id, barbeariaId: session.barbeariaId },
     data: { nome, precoCentavos, duracaoMinutos: duracao || 30 },
   });
 
@@ -73,8 +73,8 @@ export async function atualizarServico(
 }
 
 export async function alternarAtivoServico(id: string, ativo: boolean) {
-  await requireSession(["ADMIN"]);
-  await prisma.servico.update({ where: { id }, data: { ativo } });
+  const session = await requireSession(["ADMIN"]);
+  await prisma.servico.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { ativo } });
   revalidatePath("/admin/servicos");
 }
 
@@ -83,7 +83,7 @@ export async function atualizarComissaoServico(
   _prevState: ServicoState,
   formData: FormData
 ): Promise<ServicoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const comissaoRaw = String(formData.get("comissao") ?? "").trim();
   let comissaoPercentual: number | null = null;
@@ -94,7 +94,7 @@ export async function atualizarComissaoServico(
     }
   }
 
-  await prisma.servico.update({ where: { id }, data: { comissaoPercentual } });
+  await prisma.servico.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { comissaoPercentual } });
   revalidatePath("/admin/servicos");
   return {};
 }
@@ -104,7 +104,7 @@ export async function atualizarFichasServico(
   _prevState: ServicoState,
   formData: FormData
 ): Promise<ServicoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const fichasRaw = String(formData.get("fichas") ?? "").trim();
   const fichas = fichasRaw ? Number(fichasRaw) : 0;
@@ -112,7 +112,7 @@ export async function atualizarFichasServico(
     return { erro: "Fichas deve ser um número maior ou igual a 0." };
   }
 
-  await prisma.servico.update({ where: { id }, data: { fichas } });
+  await prisma.servico.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { fichas } });
   revalidatePath("/admin/servicos");
   return {};
 }
@@ -122,27 +122,27 @@ export async function atualizarCustoServico(
   _prevState: ServicoState,
   formData: FormData
 ): Promise<ServicoState> {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
 
   const custo = String(formData.get("custo") ?? "").trim();
   const custoCentavos = custo ? reaisParaCentavos(custo) : 0;
   if (custoCentavos < 0) return { erro: "Informe um custo válido." };
 
-  await prisma.servico.update({ where: { id }, data: { custoCentavos } });
+  await prisma.servico.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { custoCentavos } });
   revalidatePath("/admin/servicos");
   return {};
 }
 
 export async function alternarPontuaRanking(id: string, pontuaRanking: boolean) {
-  await requireSession(["ADMIN"]);
-  await prisma.servico.update({ where: { id }, data: { pontuaRanking } });
+  const session = await requireSession(["ADMIN"]);
+  await prisma.servico.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { pontuaRanking } });
   revalidatePath("/admin/servicos");
   revalidatePath("/ranking");
 }
 
 export async function alternarCategoriaServico(id: string, categoria: "PRINCIPAL" | "EXTRA") {
-  await requireSession(["ADMIN"]);
-  await prisma.servico.update({ where: { id }, data: { categoria } });
+  const session = await requireSession(["ADMIN"]);
+  await prisma.servico.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { categoria } });
   revalidatePath("/admin/servicos");
   revalidatePath("/admin");
 }
@@ -170,7 +170,10 @@ export async function classificarServicosPorNome() {
 }
 
 export async function excluirServico(id: string) {
-  await requireSession(["ADMIN"]);
+  const session = await requireSession(["ADMIN"]);
+  const servico = await prisma.servico.findFirst({ where: { id, barbeariaId: session.barbeariaId } });
+  if (!servico) return;
+
   const emUso = await prisma.atendimentoServico.findFirst({ where: { servicoId: id } });
   if (emUso) {
     await prisma.servico.update({ where: { id }, data: { ativo: false } });

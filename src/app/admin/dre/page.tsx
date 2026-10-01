@@ -24,18 +24,25 @@ export default async function DrePage({
   const [atendimentos, movimentos, servicos, barbeiros, configuracaoFinanceira, vendasProduto] = await Promise.all([
     prisma.atendimento.findMany({
       where: {
+        barbeariaId: session.barbeariaId,
         status: "CONCLUIDO",
         concluidoEm: { gte: inicio, lte: fim },
         ...(barbeiroId ? { barbeiroId } : {}),
       },
       include: { barbeiro: true, servicos: true },
     }),
-    prisma.movimentoCaixa.findMany({ where: { criadoEm: { gte: inicio, lte: fim } } }),
-    prisma.servico.findMany({ orderBy: { nome: "asc" } }),
-    prisma.barbeiro.findMany({ orderBy: { nome: "asc" } }),
+    prisma.movimentoCaixa.findMany({
+      where: { barbeariaId: session.barbeariaId, criadoEm: { gte: inicio, lte: fim } },
+    }),
+    prisma.servico.findMany({ where: { barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
+    prisma.barbeiro.findMany({ where: { barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
     prisma.configuracaoFinanceira.findUnique({ where: { barbeariaId: session.barbeariaId } }),
     prisma.vendaProduto.findMany({
-      where: { criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
+      where: {
+        barbeariaId: session.barbeariaId,
+        criadoEm: { gte: inicio, lte: fim },
+        ...(barbeiroId ? { barbeiroId } : {}),
+      },
     }),
   ]);
 
