@@ -245,7 +245,11 @@ export default async function AdminHomePage() {
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               <Valor>{formatarReais(motorPrincipalHojeCentavos)}</Valor>
             </p>
-            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Líquido (bruto − comissão)</p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Comissão dos barbeiros</p>
+            <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
+              <Valor>{formatarReais(motorPrincipalComissaoHojeCentavos)}</Valor>
+            </p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Margem líquida de lucro</p>
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               <Valor>{formatarReais(motorPrincipalHojeCentavos - motorPrincipalComissaoHojeCentavos)}</Valor>
             </p>
@@ -259,7 +263,11 @@ export default async function AdminHomePage() {
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               <Valor>{formatarReais(motorProdutosHojeCentavos)}</Valor>
             </p>
-            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Líquido (bruto − comissão)</p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Comissão dos barbeiros</p>
+            <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
+              <Valor>{formatarReais(motorProdutosComissaoHojeCentavos)}</Valor>
+            </p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Margem líquida de lucro</p>
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               <Valor>{formatarReais(motorProdutosHojeCentavos - motorProdutosComissaoHojeCentavos)}</Valor>
             </p>
@@ -273,7 +281,11 @@ export default async function AdminHomePage() {
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               <Valor>{formatarReais(motorExtraHojeCentavos)}</Valor>
             </p>
-            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Líquido (bruto − comissão)</p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Comissão dos barbeiros</p>
+            <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
+              <Valor>{formatarReais(motorExtraComissaoHojeCentavos)}</Valor>
+            </p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Margem líquida de lucro</p>
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               <Valor>{formatarReais(motorExtraHojeCentavos - motorExtraComissaoHojeCentavos)}</Valor>
             </p>

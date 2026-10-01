@@ -220,7 +220,9 @@ export default async function ComissoesPage({
             <p className="text-orange-100 text-sm mb-2">Corte &amp; Barba</p>
             <p className="text-orange-100 text-xs">Bruto</p>
             <p className="text-xl font-bold"><Valor>{formatarReais(motores[0].faturamentoCentavos)}</Valor></p>
-            <p className="text-orange-100 text-xs mt-1">Líquido (bruto − comissão)</p>
+            <p className="text-orange-100 text-xs mt-1">Comissão dos barbeiros</p>
+            <p className="text-xl font-bold"><Valor>{formatarReais(motores[0].comissaoCentavos)}</Valor></p>
+            <p className="text-orange-100 text-xs mt-1">Margem líquida de lucro</p>
             <p className="text-xl font-bold">
               <Valor>{formatarReais(motores[0].faturamentoCentavos - motores[0].comissaoCentavos)}</Valor>
             </p>
@@ -232,7 +234,9 @@ export default async function ComissoesPage({
             <p className="text-amber-100 text-sm mb-2">Produtos</p>
             <p className="text-amber-100 text-xs">Bruto</p>
             <p className="text-xl font-bold"><Valor>{formatarReais(motores[1].faturamentoCentavos)}</Valor></p>
-            <p className="text-amber-100 text-xs mt-1">Líquido (bruto − comissão)</p>
+            <p className="text-amber-100 text-xs mt-1">Comissão dos barbeiros</p>
+            <p className="text-xl font-bold"><Valor>{formatarReais(motores[1].comissaoCentavos)}</Valor></p>
+            <p className="text-amber-100 text-xs mt-1">Margem líquida de lucro</p>
             <p className="text-xl font-bold">
               <Valor>{formatarReais(motores[1].faturamentoCentavos - motores[1].comissaoCentavos)}</Valor>
             </p>
@@ -244,7 +248,9 @@ export default async function ComissoesPage({
             <p className="text-rose-100 text-sm mb-2">Serviços extras</p>
             <p className="text-rose-100 text-xs">Bruto</p>
             <p className="text-xl font-bold"><Valor>{formatarReais(motores[2].faturamentoCentavos)}</Valor></p>
-            <p className="text-rose-100 text-xs mt-1">Líquido (bruto − comissão)</p>
+            <p className="text-rose-100 text-xs mt-1">Comissão dos barbeiros</p>
+            <p className="text-xl font-bold"><Valor>{formatarReais(motores[2].comissaoCentavos)}</Valor></p>
+            <p className="text-rose-100 text-xs mt-1">Margem líquida de lucro</p>
             <p className="text-xl font-bold">
               <Valor>{formatarReais(motores[2].faturamentoCentavos - motores[2].comissaoCentavos)}</Valor>
             </p>
