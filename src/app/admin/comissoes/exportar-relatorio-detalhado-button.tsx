@@ -3,23 +3,26 @@
 import { useState } from "react";
 import { formatarReais } from "@/lib/format";
 
-type ItemComQtd = { nome: string; qtd: number };
+type ItemComparativo = {
+  nome: string;
+  qtd: number;
+  taxaEquipePercentual: number;
+  oportunidadeCentavos: number;
+};
 
 type BarbeiroDetalhado = {
   nome: string;
   atendimentos: number;
   comissaoCentavos: number;
   qtdProdutos: number;
-  produtos: ItemComQtd[];
+  produtos: ItemComparativo[];
   qtdExtras: number;
-  extras: ItemComQtd[];
+  extras: ItemComparativo[];
 };
 
-function taxaConversao(qtd: number, atendimentos: number) {
-  if (atendimentos <= 0 || qtd <= 0) return { percentual: 0, label: "sem vendas no período" };
-  const percentual = (qtd / atendimentos) * 100;
-  const aCadaX = Math.round(atendimentos / qtd);
-  return { percentual, label: `${percentual.toFixed(0)}% dos atendimentos · 1 a cada ${aCadaX} atendimento(s)` };
+function taxaBarbeiro(qtd: number, atendimentos: number) {
+  if (atendimentos <= 0) return 0;
+  return (qtd / atendimentos) * 100;
 }
 
 export function ExportarRelatorioDetalhadoButton({
@@ -39,11 +42,12 @@ export function ExportarRelatorioDetalhadoButton({
       const { jsPDF } = await import("jspdf");
       const doc = new jsPDF();
       const margemEsquerda = 20;
-      const larguraBarra = 80;
+      const larguraBarra = 70;
       const alturaPagina = doc.internal.pageSize.getHeight();
 
       function cabecalho() {
         doc.setFontSize(16);
+        doc.setTextColor(0, 0, 0);
         doc.text(barbeariaNome, margemEsquerda, 20);
         doc.setFontSize(12);
         doc.text("Relatório detalhado por barbeiro", margemEsquerda, 30);
@@ -60,12 +64,40 @@ export function ExportarRelatorioDetalhadoButton({
         return y;
       }
 
-      function barraConversao(y: number, percentual: number) {
-        const pct = Math.max(0, Math.min(100, percentual));
+      function duasBarras(y: number, pctBarbeiro: number, pctEquipe: number) {
         doc.setFillColor(230, 230, 230);
         doc.rect(margemEsquerda, y, larguraBarra, 3, "F");
         doc.setFillColor(234, 88, 12);
-        doc.rect(margemEsquerda, y, (larguraBarra * pct) / 100, 3, "F");
+        doc.rect(margemEsquerda, y, (larguraBarra * Math.max(0, Math.min(100, pctBarbeiro))) / 100, 3, "F");
+        // Marcador da média da equipe, pra comparar visualmente com a barra do barbeiro.
+        const xMarcador = margemEsquerda + (larguraBarra * Math.max(0, Math.min(100, pctEquipe))) / 100;
+        doc.setDrawColor(30, 30, 30);
+        doc.setLineWidth(0.6);
+        doc.line(xMarcador, y - 1, xMarcador, y + 4);
+      }
+
+      function linhaItem(y: number, atendimentos: number, item: ItemComparativo) {
+        const pctBarbeiro = taxaBarbeiro(item.qtd, atendimentos);
+        doc.setFontSize(9);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`- ${item.nome}: ${item.qtd} (${pctBarbeiro.toFixed(0)}%)`, margemEsquerda + 4, y);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`média equipe: ${item.taxaEquipePercentual.toFixed(0)}%`, margemEsquerda + 100, y);
+        y += 4.5;
+        duasBarras(y, pctBarbeiro, item.taxaEquipePercentual);
+        y += 5.5;
+        if (item.oportunidadeCentavos > 0) {
+          doc.setFontSize(8);
+          doc.setTextColor(180, 60, 0);
+          doc.text(
+            `Se vendesse no ritmo da equipe: +${formatarReais(item.oportunidadeCentavos)} de comissão no período`,
+            margemEsquerda + 4,
+            y
+          );
+          y += 5;
+        }
+        doc.setTextColor(0, 0, 0);
+        return y;
       }
 
       cabecalho();
@@ -83,25 +115,19 @@ export function ExportarRelatorioDetalhadoButton({
         y += 9;
 
         // Produtos
-        const taxaProdutos = taxaConversao(b.qtdProdutos, b.atendimentos);
         doc.setFontSize(10);
         doc.setTextColor(80, 80, 80);
-        doc.text(`Produtos vendidos: ${b.qtdProdutos} — ${taxaProdutos.label}`, margemEsquerda, y);
-        y += 5;
-        barraConversao(y, taxaProdutos.percentual);
-        y += 8;
+        doc.text(`Produtos vendidos: ${b.qtdProdutos}`, margemEsquerda, y);
         doc.setTextColor(0, 0, 0);
+        y += 6;
         for (const p of b.produtos) {
-          y = espacoOuNovaPagina(y, 20);
-          const t = taxaConversao(p.qtd, b.atendimentos);
-          doc.setFontSize(9);
-          doc.text(`- ${p.nome}: ${p.qtd} (${t.label})`, margemEsquerda + 4, y);
-          y += 5;
+          y = espacoOuNovaPagina(y, 26);
+          y = linhaItem(y, b.atendimentos, p);
         }
         if (b.produtos.length === 0) {
           doc.setFontSize(9);
           doc.setTextColor(140, 140, 140);
-          doc.text("- nenhum produto vendido no período", margemEsquerda + 4, y);
+          doc.text("- nenhum produto vendido no período (pela barbearia toda)", margemEsquerda + 4, y);
           doc.setTextColor(0, 0, 0);
           y += 5;
         }
@@ -109,27 +135,19 @@ export function ExportarRelatorioDetalhadoButton({
 
         // Serviços extras
         y = espacoOuNovaPagina(y, 30);
-        const taxaExtras = taxaConversao(b.qtdExtras, b.atendimentos);
         doc.setFontSize(10);
         doc.setTextColor(80, 80, 80);
-        doc.text(`Serviços extras vendidos: ${b.qtdExtras} — ${taxaExtras.label}`, margemEsquerda, y);
-        y += 5;
-        barraConversao(y, taxaExtras.percentual);
-        y += 8;
+        doc.text(`Serviços extras vendidos: ${b.qtdExtras}`, margemEsquerda, y);
         doc.setTextColor(0, 0, 0);
+        y += 6;
         for (const e of b.extras) {
-          y = espacoOuNovaPagina(y, 24);
-          const t = taxaConversao(e.qtd, b.atendimentos);
-          doc.setFontSize(9);
-          doc.text(`- ${e.nome}: ${e.qtd} (${t.label})`, margemEsquerda + 4, y);
-          y += 5;
-          barraConversao(y, t.percentual);
-          y += 7;
+          y = espacoOuNovaPagina(y, 26);
+          y = linhaItem(y, b.atendimentos, e);
         }
         if (b.extras.length === 0) {
           doc.setFontSize(9);
           doc.setTextColor(140, 140, 140);
-          doc.text("- nenhum serviço extra vendido no período", margemEsquerda + 4, y);
+          doc.text("- nenhum serviço extra vendido no período (pela barbearia toda)", margemEsquerda + 4, y);
           doc.setTextColor(0, 0, 0);
           y += 5;
         }
@@ -141,9 +159,15 @@ export function ExportarRelatorioDetalhadoButton({
         doc.text("Nenhum atendimento no período.", margemEsquerda, y);
       }
 
-      doc.setFontSize(9);
+      doc.setFontSize(8);
       doc.setTextColor(140, 140, 140);
-      doc.text(`Gerado em ${new Date().toLocaleDateString("pt-BR")}`, margemEsquerda, alturaPagina - 12);
+      const notaFinal =
+        "Legenda: a barra laranja é o quanto o barbeiro vendeu (em % dos atendimentos dele); o tracinho preto marca a média da equipe no mesmo período. \"Se vendesse no ritmo da equipe\" é uma estimativa (preço do item × comissão aplicável), não um valor já pago.";
+      const linhasNota = doc.splitTextToSize(notaFinal, 170);
+      doc.text(linhasNota, margemEsquerda, alturaPagina - 20);
+
+      doc.setFontSize(9);
+      doc.text(`Gerado em ${new Date().toLocaleDateString("pt-BR")}`, margemEsquerda, alturaPagina - 8);
 
       doc.save(`relatorio-detalhado-barbeiros-${new Date().toISOString().slice(0, 10)}.pdf`);
     } finally {
