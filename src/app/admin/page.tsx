@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { formatarReais } from "@/lib/format";
 import { calcularIntervalo, intervaloAnterior } from "@/lib/periodo";
-import { lucroServicos } from "@/lib/comissao";
+import { lucroServicos, comissaoServicos, comissaoProdutos } from "@/lib/comissao";
 import { competenciaAtual, estaInadimplente } from "@/lib/assinaturas";
 import { Variacao } from "./variacao";
 import { GraficoBarras } from "./grafico-barras";
@@ -84,11 +84,10 @@ export default async function AdminHomePage() {
     }),
     prisma.servico.findMany({
       where: { barbeariaId: session.barbeariaId },
-      select: { id: true, categoria: true, custoCentavos: true },
+      select: { id: true, categoria: true },
     }),
     prisma.vendaProduto.findMany({
       where: { barbeariaId: session.barbeariaId, criadoEm: { gte: hoje.inicio, lte: hoje.fim } },
-      include: { produto: true },
     }),
   ]);
 
@@ -96,25 +95,24 @@ export default async function AdminHomePage() {
   const atendimentosSemana = atendimentosMes.filter((a) => a.concluidoEm! >= semana.inicio);
 
   const categoriaPorServicoId = new Map(servicosCategorias.map((s) => [s.id, s.categoria]));
-  const custoPorServicoId = new Map(servicosCategorias.map((s) => [s.id, s.custoCentavos]));
   let motorPrincipalHojeCentavos = 0;
   let motorExtraHojeCentavos = 0;
-  let motorPrincipalCustoHojeCentavos = 0;
-  let motorExtraCustoHojeCentavos = 0;
+  let motorPrincipalComissaoHojeCentavos = 0;
+  let motorExtraComissaoHojeCentavos = 0;
   for (const a of atendimentosHoje) {
     for (const s of a.servicos) {
-      const custo = custoPorServicoId.get(s.servicoId) ?? 0;
-      if (categoriaPorServicoId.get(s.servicoId) === "EXTRA") {
-        motorExtraHojeCentavos += s.precoCentavos;
-        motorExtraCustoHojeCentavos += custo;
-      } else {
-        motorPrincipalHojeCentavos += s.precoCentavos;
-        motorPrincipalCustoHojeCentavos += custo;
+      const extra = categoriaPorServicoId.get(s.servicoId) === "EXTRA";
+      if (extra) motorExtraHojeCentavos += s.precoCentavos;
+      else motorPrincipalHojeCentavos += s.precoCentavos;
+      if (a.barbeiro && !a.cobertoPorAssinatura) {
+        const comissaoItem = comissaoServicos([s], a.barbeiro.comissaoPercentual);
+        if (extra) motorExtraComissaoHojeCentavos += comissaoItem;
+        else motorPrincipalComissaoHojeCentavos += comissaoItem;
       }
     }
   }
   const motorProdutosHojeCentavos = vendasProdutoHoje.reduce((s, v) => s + v.totalCentavos, 0);
-  const motorProdutosCustoHojeCentavos = vendasProdutoHoje.reduce((s, v) => s + v.produto.custoCentavos * v.quantidade, 0);
+  const motorProdutosComissaoHojeCentavos = comissaoProdutos(vendasProdutoHoje);
 
   const faturamentoHoje = atendimentosHoje.reduce((s, a) => s + a.precoTotalCentavos, 0);
   const faturamentoSemana = atendimentosSemana.reduce((s, a) => s + a.precoTotalCentavos, 0);
@@ -247,9 +245,9 @@ export default async function AdminHomePage() {
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               <Valor>{formatarReais(motorPrincipalHojeCentavos)}</Valor>
             </p>
-            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Líquido</p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Líquido (bruto − comissão)</p>
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
-              <Valor>{formatarReais(motorPrincipalHojeCentavos - motorPrincipalCustoHojeCentavos)}</Valor>
+              <Valor>{formatarReais(motorPrincipalHojeCentavos - motorPrincipalComissaoHojeCentavos)}</Valor>
             </p>
           </div>
           <Scissors className="w-6 h-6 text-orange-400 shrink-0" />
@@ -261,9 +259,9 @@ export default async function AdminHomePage() {
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               <Valor>{formatarReais(motorProdutosHojeCentavos)}</Valor>
             </p>
-            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Líquido</p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Líquido (bruto − comissão)</p>
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
-              <Valor>{formatarReais(motorProdutosHojeCentavos - motorProdutosCustoHojeCentavos)}</Valor>
+              <Valor>{formatarReais(motorProdutosHojeCentavos - motorProdutosComissaoHojeCentavos)}</Valor>
             </p>
           </div>
           <Package className="w-6 h-6 text-orange-400 shrink-0" />
@@ -275,9 +273,9 @@ export default async function AdminHomePage() {
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               <Valor>{formatarReais(motorExtraHojeCentavos)}</Valor>
             </p>
-            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Líquido</p>
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-1">Líquido (bruto − comissão)</p>
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
-              <Valor>{formatarReais(motorExtraHojeCentavos - motorExtraCustoHojeCentavos)}</Valor>
+              <Valor>{formatarReais(motorExtraHojeCentavos - motorExtraComissaoHojeCentavos)}</Valor>
             </p>
           </div>
           <Sparkles className="w-6 h-6 text-orange-400 shrink-0" />

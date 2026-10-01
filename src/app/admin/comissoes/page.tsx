@@ -46,7 +46,6 @@ export default async function ComissoesPage({
     prisma.barbeiro.findMany({ where: { barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
     prisma.vendaProduto.findMany({
       where: { barbeariaId: session.barbeariaId, criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
-      include: { produto: true },
     }),
     prisma.produto.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
     prisma.barbearia.findUnique({ where: { id: session.barbeariaId }, select: { nome: true } }),
@@ -123,35 +122,28 @@ export default async function ComissoesPage({
     porBarbeiro.set(barbeiroId, atual);
   }
 
-  const custoPorServicoId = new Map(servicos.map((s) => [s.id, s.custoCentavos]));
   const categoriaFaturamento = { PRINCIPAL: 0, EXTRA: 0 } as Record<"PRINCIPAL" | "EXTRA", number>;
-  const categoriaCusto = { PRINCIPAL: 0, EXTRA: 0 } as Record<"PRINCIPAL" | "EXTRA", number>;
   for (const a of atendimentos) {
     for (const s of a.servicos) {
       const categoria = categoriaPorServicoId.get(s.servicoId) ?? "PRINCIPAL";
       categoriaFaturamento[categoria] += s.precoCentavos;
-      categoriaCusto[categoria] += custoPorServicoId.get(s.servicoId) ?? 0;
     }
   }
   const motorProdutosFaturamentoCentavos = vendasProduto.reduce((soma, v) => soma + v.totalCentavos, 0);
-  const motorProdutosCustoCentavos = vendasProduto.reduce((soma, v) => soma + v.produto.custoCentavos * v.quantidade, 0);
   const motores = [
     {
       nome: "Corte & Barba",
       faturamentoCentavos: categoriaFaturamento.PRINCIPAL,
-      liquidoCentavos: categoriaFaturamento.PRINCIPAL - categoriaCusto.PRINCIPAL,
       comissaoCentavos: [...porBarbeiro.values()].reduce((s, b) => s + b.motorPrincipalCentavos, 0),
     },
     {
       nome: "Produtos",
       faturamentoCentavos: motorProdutosFaturamentoCentavos,
-      liquidoCentavos: motorProdutosFaturamentoCentavos - motorProdutosCustoCentavos,
       comissaoCentavos: [...porBarbeiro.values()].reduce((s, b) => s + b.motorProdutosCentavos, 0),
     },
     {
       nome: "Serviços extras",
       faturamentoCentavos: categoriaFaturamento.EXTRA,
-      liquidoCentavos: categoriaFaturamento.EXTRA - categoriaCusto.EXTRA,
       comissaoCentavos: [...porBarbeiro.values()].reduce((s, b) => s + b.motorExtraCentavos, 0),
     },
   ];
@@ -228,10 +220,9 @@ export default async function ComissoesPage({
             <p className="text-orange-100 text-sm mb-2">Corte &amp; Barba</p>
             <p className="text-orange-100 text-xs">Bruto</p>
             <p className="text-xl font-bold"><Valor>{formatarReais(motores[0].faturamentoCentavos)}</Valor></p>
-            <p className="text-orange-100 text-xs mt-1">Líquido</p>
-            <p className="text-xl font-bold"><Valor>{formatarReais(motores[0].liquidoCentavos)}</Valor></p>
-            <p className="text-orange-100 text-xs mt-1">
-              comissão <Valor>{formatarReais(motores[0].comissaoCentavos)}</Valor>
+            <p className="text-orange-100 text-xs mt-1">Líquido (bruto − comissão)</p>
+            <p className="text-xl font-bold">
+              <Valor>{formatarReais(motores[0].faturamentoCentavos - motores[0].comissaoCentavos)}</Valor>
             </p>
           </div>
           <Scissors className="w-7 h-7 text-orange-200 shrink-0" />
@@ -241,10 +232,9 @@ export default async function ComissoesPage({
             <p className="text-amber-100 text-sm mb-2">Produtos</p>
             <p className="text-amber-100 text-xs">Bruto</p>
             <p className="text-xl font-bold"><Valor>{formatarReais(motores[1].faturamentoCentavos)}</Valor></p>
-            <p className="text-amber-100 text-xs mt-1">Líquido</p>
-            <p className="text-xl font-bold"><Valor>{formatarReais(motores[1].liquidoCentavos)}</Valor></p>
-            <p className="text-amber-100 text-xs mt-1">
-              comissão <Valor>{formatarReais(motores[1].comissaoCentavos)}</Valor>
+            <p className="text-amber-100 text-xs mt-1">Líquido (bruto − comissão)</p>
+            <p className="text-xl font-bold">
+              <Valor>{formatarReais(motores[1].faturamentoCentavos - motores[1].comissaoCentavos)}</Valor>
             </p>
           </div>
           <Package className="w-7 h-7 text-amber-200 shrink-0" />
@@ -254,10 +244,9 @@ export default async function ComissoesPage({
             <p className="text-rose-100 text-sm mb-2">Serviços extras</p>
             <p className="text-rose-100 text-xs">Bruto</p>
             <p className="text-xl font-bold"><Valor>{formatarReais(motores[2].faturamentoCentavos)}</Valor></p>
-            <p className="text-rose-100 text-xs mt-1">Líquido</p>
-            <p className="text-xl font-bold"><Valor>{formatarReais(motores[2].liquidoCentavos)}</Valor></p>
-            <p className="text-rose-100 text-xs mt-1">
-              comissão <Valor>{formatarReais(motores[2].comissaoCentavos)}</Valor>
+            <p className="text-rose-100 text-xs mt-1">Líquido (bruto − comissão)</p>
+            <p className="text-xl font-bold">
+              <Valor>{formatarReais(motores[2].faturamentoCentavos - motores[2].comissaoCentavos)}</Valor>
             </p>
           </div>
           <Sparkles className="w-7 h-7 text-rose-200 shrink-0" />
