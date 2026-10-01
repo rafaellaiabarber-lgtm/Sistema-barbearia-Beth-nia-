@@ -339,17 +339,21 @@ export default async function ComissoesPage({
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800">
-                <span className="text-neutral-400 dark:text-neutral-500 text-xs mr-1">Detalhamento da comissão:</span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400 text-xs px-2 py-0.5">
-                  <Scissors className="w-3 h-3" /> Corte &amp; Barba <Valor>{formatarReais(b.motorPrincipalCentavos)}</Valor>
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 text-xs px-2 py-0.5">
-                  <Package className="w-3 h-3" /> Produtos <Valor>{formatarReais(b.motorProdutosCentavos)}</Valor>
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 text-xs px-2 py-0.5">
-                  <Sparkles className="w-3 h-3" /> Extras <Valor>{formatarReais(b.motorExtraCentavos)}</Valor>
-                </span>
+              <div className="mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+                <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-1.5">
+                  De onde veio a comissão total acima (os 3 valores somados batem com ela):
+                </p>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400 text-xs px-2 py-0.5">
+                    <Scissors className="w-3 h-3" /> comissão Corte &amp; Barba <Valor>{formatarReais(b.motorPrincipalCentavos)}</Valor>
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 text-xs px-2 py-0.5">
+                    <Package className="w-3 h-3" /> comissão Produtos <Valor>{formatarReais(b.motorProdutosCentavos)}</Valor>
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 text-xs px-2 py-0.5">
+                    <Sparkles className="w-3 h-3" /> comissão Extras <Valor>{formatarReais(b.motorExtraCentavos)}</Valor>
+                  </span>
+                </div>
               </div>
 
               {b.atendimentos.length > 0 && (
