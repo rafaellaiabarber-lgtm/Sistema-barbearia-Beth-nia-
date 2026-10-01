@@ -296,26 +296,18 @@ export default async function ComissoesPage({
               key={id}
               className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                   <p className="font-semibold">{b.nome}</p>
                   <p className="text-neutral-500 dark:text-neutral-400 text-sm">
-                    {b.qtd} atendimento(s) · faturamento <Valor>{formatarReais(b.totalCentavos)}</Valor>
+                    {b.qtd} atendimento(s) · faturamento total <Valor>{formatarReais(b.totalCentavos)}</Valor>
                   </p>
-                  <div className="flex flex-wrap gap-1.5 mt-1.5">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400 text-xs px-2 py-0.5">
-                      <Scissors className="w-3 h-3" /> <Valor>{formatarReais(b.motorPrincipalCentavos)}</Valor>
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 text-xs px-2 py-0.5">
-                      <Package className="w-3 h-3" /> <Valor>{formatarReais(b.motorProdutosCentavos)}</Valor>
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 text-xs px-2 py-0.5">
-                      <Sparkles className="w-3 h-3" /> <Valor>{formatarReais(b.motorExtraCentavos)}</Valor>
-                    </span>
-                  </div>
                 </div>
                 <div className="text-right flex items-center gap-3">
-                  <p className="text-orange-600 dark:text-orange-400 font-bold text-lg"><Valor>{formatarReais(b.comissaoCentavos)}</Valor></p>
+                  <div>
+                    <p className="text-neutral-400 dark:text-neutral-500 text-xs">Comissão total</p>
+                    <p className="text-orange-600 dark:text-orange-400 font-bold text-lg"><Valor>{formatarReais(b.comissaoCentavos)}</Valor></p>
+                  </div>
                   {podeMarcarPago &&
                     (pago ? (
                       <form action={desmarcarComissaoPaga.bind(null, id, periodo as "hoje" | "semana" | "mes", chave)}>
@@ -340,6 +332,20 @@ export default async function ComissoesPage({
                   ))}
                 </div>
               </div>
+
+              <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+                <span className="text-neutral-400 dark:text-neutral-500 text-xs mr-1">Detalhamento da comissão:</span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400 text-xs px-2 py-0.5">
+                  <Scissors className="w-3 h-3" /> Corte &amp; Barba <Valor>{formatarReais(b.motorPrincipalCentavos)}</Valor>
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 text-xs px-2 py-0.5">
+                  <Package className="w-3 h-3" /> Produtos <Valor>{formatarReais(b.motorProdutosCentavos)}</Valor>
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 text-xs px-2 py-0.5">
+                  <Sparkles className="w-3 h-3" /> Extras <Valor>{formatarReais(b.motorExtraCentavos)}</Valor>
+                </span>
+              </div>
+
               {b.atendimentos.length > 0 && (
                 <details className="mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800">
                   <summary className="cursor-pointer text-sm text-orange-600 dark:text-orange-400 hover:underline select-none">
