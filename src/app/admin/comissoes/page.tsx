@@ -61,7 +61,7 @@ export default async function ComissoesPage({
       totalCentavos: number;
       comissaoCentavos: number;
       qtd: number;
-      atendimentos: { clienteNome: string; servicos: string[]; valorCentavos: number }[];
+      atendimentos: { clienteNome: string; servicos: string[]; valorCentavos: number; comissaoCentavos: number }[];
       motorPrincipalCentavos: number;
       motorExtraCentavos: number;
       motorProdutosCentavos: number;
@@ -82,8 +82,9 @@ export default async function ComissoesPage({
     atual.totalCentavos += a.precoTotalCentavos;
     // Coberto por assinatura: não entra na comissão — o gestor não quer contar o rateio
     // do clube junto com a comissão de serviço/produto.
+    const comissaoAtendimento = a.cobertoPorAssinatura ? 0 : comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual);
     if (!a.cobertoPorAssinatura) {
-      atual.comissaoCentavos += comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual);
+      atual.comissaoCentavos += comissaoAtendimento;
       for (const item of a.servicos) {
         const comissaoItem = comissaoServicos([item], a.barbeiro.comissaoPercentual);
         if (categoriaPorServicoId.get(item.servicoId) === "EXTRA") atual.motorExtraCentavos += comissaoItem;
@@ -95,6 +96,7 @@ export default async function ComissoesPage({
       clienteNome: a.cliente.nome,
       servicos: a.servicos.map((s) => s.nomeSnapshot),
       valorCentavos: a.precoTotalCentavos,
+      comissaoCentavos: comissaoAtendimento,
     });
     porBarbeiro.set(a.barbeiro.id, atual);
   }
@@ -360,7 +362,8 @@ export default async function ComissoesPage({
                       <div key={i} className="flex items-center justify-between gap-2 text-sm">
                         <span className="text-neutral-700 dark:text-neutral-200">{at.clienteNome}</span>
                         <span className="text-neutral-500 dark:text-neutral-400 text-xs text-right">
-                          {at.servicos.join(", ")} · <Valor>{formatarReais(at.valorCentavos)}</Valor>
+                          {at.servicos.join(", ")} · <Valor>{formatarReais(at.valorCentavos)}</Valor> · comissão{" "}
+                          <Valor>{formatarReais(at.comissaoCentavos)}</Valor>
                         </span>
                       </div>
                     ))}
