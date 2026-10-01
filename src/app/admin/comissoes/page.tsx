@@ -9,6 +9,7 @@ import { Scissors, Package, Sparkles } from "lucide-react";
 import { CorrigirComissaoCobertaButton } from "./corrigir-comissao-coberta-button";
 import { CalculadoraComissaoCombinada } from "./calculadora-comissao-combinada";
 import { ExportarRelatorioBarbeirosButton } from "./exportar-relatorio-barbeiros-button";
+import { ExportarRelatorioMotoresButton } from "./exportar-relatorio-motores-button";
 import { Valor } from "../../valor";
 
 export default async function ComissoesPage({
@@ -46,6 +47,7 @@ export default async function ComissoesPage({
     prisma.barbeiro.findMany({ where: { barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
     prisma.vendaProduto.findMany({
       where: { barbeariaId: session.barbeariaId, criadoEm: { gte: inicio, lte: fim }, ...(barbeiroId ? { barbeiroId } : {}) },
+      include: { produto: true },
     }),
     prisma.produto.findMany({ where: { ativo: true, barbeariaId: session.barbeariaId }, orderBy: { nome: "asc" } }),
     prisma.barbearia.findUnique({ where: { id: session.barbeariaId }, select: { nome: true } }),
@@ -65,6 +67,10 @@ export default async function ComissoesPage({
       motorPrincipalCentavos: number;
       motorExtraCentavos: number;
       motorProdutosCentavos: number;
+      qtdExtras: number;
+      extrasPorNome: Map<string, number>;
+      qtdProdutos: number;
+      produtosPorNome: Map<string, number>;
     }
   >();
   for (const a of atendimentos) {
@@ -78,8 +84,20 @@ export default async function ComissoesPage({
       motorPrincipalCentavos: 0,
       motorExtraCentavos: 0,
       motorProdutosCentavos: 0,
+      qtdExtras: 0,
+      extrasPorNome: new Map<string, number>(),
+      qtdProdutos: 0,
+      produtosPorNome: new Map<string, number>(),
     };
     atual.totalCentavos += a.precoTotalCentavos;
+    // Contagem de atendimento/serviço extra conta mesmo quando coberto por assinatura — é
+    // desempenho operacional (o barbeiro atendeu e ofereceu o extra), não cálculo de comissão.
+    for (const item of a.servicos) {
+      if (categoriaPorServicoId.get(item.servicoId) === "EXTRA") {
+        atual.qtdExtras += 1;
+        atual.extrasPorNome.set(item.nomeSnapshot, (atual.extrasPorNome.get(item.nomeSnapshot) ?? 0) + 1);
+      }
+    }
     // Coberto por assinatura: não entra na comissão — o gestor não quer contar o rateio
     // do clube junto com a comissão de serviço/produto.
     const comissaoAtendimento = a.cobertoPorAssinatura ? 0 : comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual);
@@ -117,10 +135,18 @@ export default async function ComissoesPage({
       motorPrincipalCentavos: 0,
       motorExtraCentavos: 0,
       motorProdutosCentavos: 0,
+      qtdExtras: 0,
+      extrasPorNome: new Map<string, number>(),
+      qtdProdutos: 0,
+      produtosPorNome: new Map<string, number>(),
     };
     const comissaoProdutosBarbeiro = comissaoProdutos(vendas);
     atual.comissaoCentavos += comissaoProdutosBarbeiro;
     atual.motorProdutosCentavos += comissaoProdutosBarbeiro;
+    for (const v of vendas) {
+      atual.qtdProdutos += v.quantidade;
+      atual.produtosPorNome.set(v.produto.nome, (atual.produtosPorNome.get(v.produto.nome) ?? 0) + v.quantidade);
+    }
     porBarbeiro.set(barbeiroId, atual);
   }
 
@@ -207,16 +233,34 @@ export default async function ComissoesPage({
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold">Comissões</h1>
-        <ExportarRelatorioBarbeirosButton
-          barbeariaNome={minhaBarbearia?.nome ?? "Barbearia"}
-          periodoLabel={periodoLabel}
-          barbeiros={[...porBarbeiro.values()].map((b) => ({
-            nome: b.nome,
-            qtd: b.qtd,
-            totalCentavos: b.totalCentavos,
-            comissaoCentavos: b.comissaoCentavos,
-          }))}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <ExportarRelatorioBarbeirosButton
+            barbeariaNome={minhaBarbearia?.nome ?? "Barbearia"}
+            periodoLabel={periodoLabel}
+            barbeiros={[...porBarbeiro.values()].map((b) => ({
+              nome: b.nome,
+              qtd: b.qtd,
+              totalCentavos: b.totalCentavos,
+              comissaoCentavos: b.comissaoCentavos,
+            }))}
+          />
+          <ExportarRelatorioMotoresButton
+            barbeariaNome={minhaBarbearia?.nome ?? "Barbearia"}
+            periodoLabel={periodoLabel}
+            barbeiros={[...porBarbeiro.values()].map((b) => ({
+              nome: b.nome,
+              clientesAtendidos: b.qtd,
+              qtdExtras: b.qtdExtras,
+              extras: [...b.extrasPorNome.entries()]
+                .map(([nome, qtd]) => ({ nome, qtd }))
+                .sort((x, y) => y.qtd - x.qtd),
+              qtdProdutos: b.qtdProdutos,
+              produtos: [...b.produtosPorNome.entries()]
+                .map(([nome, qtd]) => ({ nome, qtd }))
+                .sort((x, y) => y.qtd - x.qtd),
+            }))}
+          />
+        </div>
       </div>
 
       <h2 className="text-lg font-semibold mb-3">Os 3 motores no período</h2>
