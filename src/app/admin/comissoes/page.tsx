@@ -160,16 +160,20 @@ export default async function ComissoesPage({
     : [];
   const pagosPorBarbeiro = new Map(pagamentos.map((p) => [p.barbeiroId, p]));
 
-  const rankingServicos = new Map<string, { nome: string; qtd: number; totalCentavos: number }>();
+  const rankingServicos = new Map<string, { nome: string; qtd: number; totalCentavos: number; comissaoCentavos: number }>();
   for (const a of atendimentos) {
     for (const s of a.servicos) {
       const atual = rankingServicos.get(s.nomeSnapshot) ?? {
         nome: s.nomeSnapshot,
         qtd: 0,
         totalCentavos: 0,
+        comissaoCentavos: 0,
       };
       atual.qtd += 1;
       atual.totalCentavos += s.precoCentavos;
+      if (a.barbeiro && !a.cobertoPorAssinatura) {
+        atual.comissaoCentavos += comissaoServicos([s], a.barbeiro.comissaoPercentual);
+      }
       rankingServicos.set(s.nomeSnapshot, atual);
     }
   }
@@ -382,7 +386,9 @@ export default async function ComissoesPage({
             </div>
             <div className="text-right">
               <p className="font-semibold">{r.qtd}x</p>
-              <p className="text-neutral-400 dark:text-neutral-500 text-xs"><Valor>{formatarReais(r.totalCentavos)}</Valor></p>
+              <p className="text-neutral-400 dark:text-neutral-500 text-xs">
+                comissão <Valor>{formatarReais(r.comissaoCentavos)}</Valor>
+              </p>
             </div>
           </div>
         ))}
