@@ -54,14 +54,26 @@ export default async function FinanceiroPage({
     }),
   ]);
 
-  const totalServicosCentavos = atendimentos.reduce((s, a) => s + a.precoTotalCentavos, 0);
+  // Quando a tela está filtrada por serviço, um atendimento pode ter vindo pra cá por ter
+  // UM dos serviços filtrados, mas conter também outros serviços que não foram selecionados
+  // (ex. corte + hidratação no mesmo atendimento, filtrando só por hidratação). Os totais abaixo
+  // devem contar só o valor dos itens que batem com o filtro, não o atendimento inteiro —
+  // senão o "faturamento desse serviço" vem inflado com serviços que não são dele.
+  function itensFiltrados(a: (typeof atendimentos)[number]) {
+    return servicoIds.length > 0 ? a.servicos.filter((s) => servicoIds.includes(s.servicoId)) : a.servicos;
+  }
+  function valorFiltradoCentavos(a: (typeof atendimentos)[number]) {
+    return itensFiltrados(a).reduce((s, item) => s + item.precoCentavos, 0);
+  }
+
+  const totalServicosCentavos = atendimentos.reduce((s, a) => s + valorFiltradoCentavos(a), 0);
   const totalProdutosCentavos = vendasProduto.reduce((s, v) => s + v.totalCentavos, 0);
   const totalCentavos = totalServicosCentavos + totalProdutosCentavos;
 
   const porFormaPagamento = new Map<string, number>();
   for (const a of atendimentos) {
     if (!a.formaPagamento) continue;
-    porFormaPagamento.set(a.formaPagamento, (porFormaPagamento.get(a.formaPagamento) ?? 0) + a.precoTotalCentavos);
+    porFormaPagamento.set(a.formaPagamento, (porFormaPagamento.get(a.formaPagamento) ?? 0) + valorFiltradoCentavos(a));
   }
   for (const m of movimentos) {
     if (m.tipo !== "ENTRADA" || !m.formaPagamento) continue;
@@ -93,8 +105,8 @@ export default async function FinanceiroPage({
       comissaoCentavos: 0,
       qtd: 0,
     };
-    atual.totalCentavos += a.precoTotalCentavos;
-    atual.comissaoCentavos += comissaoServicos(a.servicos, a.barbeiro.comissaoPercentual);
+    atual.totalCentavos += valorFiltradoCentavos(a);
+    atual.comissaoCentavos += comissaoServicos(itensFiltrados(a), a.barbeiro.comissaoPercentual);
     atual.qtd += 1;
     porBarbeiro.set(a.barbeiro.id, atual);
   }
