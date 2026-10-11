@@ -52,8 +52,55 @@ export default async function ComissoesPage({
     prisma.barbearia.findUnique({ where: { id: session.barbeariaId }, select: { nome: true } }),
   ]);
 
+  // Pra comparar o desempenho de cada barbeiro com a média da equipe (quando a tela está
+  // filtrada por um barbeiro só), precisamos do conjunto COMPLETO da equipe no mesmo período —
+  // ignorando o filtro de barbeiro, mas respeitando o filtro de serviço escolhido na tela.
+  const [atendimentosEquipe, vendasProdutoEquipe] = barbeiroId
+    ? await Promise.all([
+        prisma.atendimento.findMany({
+          where: {
+            barbeariaId: session.barbeariaId,
+            status: "CONCLUIDO",
+            concluidoEm: { gte: inicio, lte: fim },
+            ...(servicoIds.length > 0 ? { servicos: { some: { servicoId: { in: servicoIds } } } } : {}),
+          },
+          include: { servicos: true },
+        }),
+        prisma.vendaProduto.findMany({
+          where: { barbeariaId: session.barbeariaId, criadoEm: { gte: inicio, lte: fim } },
+          include: { produto: true },
+        }),
+      ])
+    : [atendimentos, vendasProduto];
+
   const barbeirosPorId = new Map(barbeiros.map((b) => [b.id, b]));
+  const servicoPorId = new Map(servicos.map((s) => [s.id, s]));
   const categoriaPorServicoId = new Map(servicos.map((s) => [s.id, s.categoria]));
+
+  // Benchmark da equipe: quantas vezes cada serviço extra / produto foi vendido no período,
+  // somando TODOS os barbeiros, pra servir de referência ("média da equipe") pro barbeiro
+  // individual. Usado pra calcular a "oportunidade perdida" em R$ abaixo.
+  const atendimentosEquipeTotal = atendimentosEquipe.length;
+  const extrasEquipePorServicoId = new Map<string, number>();
+  for (const a of atendimentosEquipe) {
+    for (const item of a.servicos) {
+      if (categoriaPorServicoId.get(item.servicoId) === "EXTRA") {
+        extrasEquipePorServicoId.set(item.servicoId, (extrasEquipePorServicoId.get(item.servicoId) ?? 0) + 1);
+      }
+    }
+  }
+  const produtosEquipePorProdutoId = new Map<string, number>();
+  const produtoInfoPorId = new Map<string, { nome: string; precoCentavos: number; comissaoPercentual: number | null }>();
+  for (const v of vendasProdutoEquipe) {
+    produtosEquipePorProdutoId.set(v.produtoId, (produtosEquipePorProdutoId.get(v.produtoId) ?? 0) + v.quantidade);
+    if (!produtoInfoPorId.has(v.produtoId)) {
+      produtoInfoPorId.set(v.produtoId, {
+        nome: v.produto.nome,
+        precoCentavos: v.produto.precoCentavos,
+        comissaoPercentual: v.produto.comissaoPercentual,
+      });
+    }
+  }
 
   const porBarbeiro = new Map<
     string,
@@ -67,9 +114,9 @@ export default async function ComissoesPage({
       motorExtraCentavos: number;
       motorProdutosCentavos: number;
       qtdExtras: number;
-      extrasPorNome: Map<string, number>;
+      extrasPorServicoId: Map<string, number>;
       qtdProdutos: number;
-      produtosPorNome: Map<string, number>;
+      produtosPorProdutoId: Map<string, number>;
     }
   >();
   for (const a of atendimentos) {
@@ -84,9 +131,9 @@ export default async function ComissoesPage({
       motorExtraCentavos: 0,
       motorProdutosCentavos: 0,
       qtdExtras: 0,
-      extrasPorNome: new Map<string, number>(),
+      extrasPorServicoId: new Map<string, number>(),
       qtdProdutos: 0,
-      produtosPorNome: new Map<string, number>(),
+      produtosPorProdutoId: new Map<string, number>(),
     };
     atual.totalCentavos += a.precoTotalCentavos;
     // Contagem de atendimento/serviço extra conta mesmo quando coberto por assinatura — é
@@ -94,7 +141,7 @@ export default async function ComissoesPage({
     for (const item of a.servicos) {
       if (categoriaPorServicoId.get(item.servicoId) === "EXTRA") {
         atual.qtdExtras += 1;
-        atual.extrasPorNome.set(item.nomeSnapshot, (atual.extrasPorNome.get(item.nomeSnapshot) ?? 0) + 1);
+        atual.extrasPorServicoId.set(item.servicoId, (atual.extrasPorServicoId.get(item.servicoId) ?? 0) + 1);
       }
     }
     // Coberto por assinatura: não entra na comissão — o gestor não quer contar o rateio
@@ -135,16 +182,16 @@ export default async function ComissoesPage({
       motorExtraCentavos: 0,
       motorProdutosCentavos: 0,
       qtdExtras: 0,
-      extrasPorNome: new Map<string, number>(),
+      extrasPorServicoId: new Map<string, number>(),
       qtdProdutos: 0,
-      produtosPorNome: new Map<string, number>(),
+      produtosPorProdutoId: new Map<string, number>(),
     };
     const comissaoProdutosBarbeiro = comissaoProdutos(vendas);
     atual.comissaoCentavos += comissaoProdutosBarbeiro;
     atual.motorProdutosCentavos += comissaoProdutosBarbeiro;
     for (const v of vendas) {
       atual.qtdProdutos += v.quantidade;
-      atual.produtosPorNome.set(v.produto.nome, (atual.produtosPorNome.get(v.produto.nome) ?? 0) + v.quantidade);
+      atual.produtosPorProdutoId.set(v.produtoId, (atual.produtosPorProdutoId.get(v.produtoId) ?? 0) + v.quantidade);
     }
     porBarbeiro.set(barbeiroId, atual);
   }
@@ -228,6 +275,38 @@ export default async function ComissoesPage({
     : [];
   const periodoLabel = `${inicio.toLocaleDateString("pt-BR")} até ${fim.toLocaleDateString("pt-BR")}`;
 
+  // Compara a quantidade vendida de cada item (extra/produto) pelo barbeiro com a média da
+  // equipe no mesmo período, e estima em R$ quanto a comissão dele teria sido maior se tivesse
+  // vendido no ritmo da equipe — é só uma estimativa (preço de tabela × comissão aplicável),
+  // não um lançamento real, mas dá o "mapa" de onde cada um está deixando comissão na mesa.
+  function construirItensComparativo(
+    idsBarbeiro: Map<string, number>,
+    idsEquipe: Map<string, number>,
+    atendimentosBarbeiro: number,
+    getInfo: (id: string) => { nome: string; precoCentavos: number; comissaoPercentualAplicavel: number } | null
+  ) {
+    const ids = new Set([...idsBarbeiro.keys(), ...idsEquipe.keys()]);
+    const itens: {
+      nome: string;
+      qtd: number;
+      taxaEquipePercentual: number;
+      oportunidadeCentavos: number;
+    }[] = [];
+    for (const id of ids) {
+      const info = getInfo(id);
+      if (!info) continue;
+      const qtd = idsBarbeiro.get(id) ?? 0;
+      const qtdEquipe = idsEquipe.get(id) ?? 0;
+      const taxaEquipePercentual = atendimentosEquipeTotal > 0 ? (qtdEquipe / atendimentosEquipeTotal) * 100 : 0;
+      const metaVendas =
+        atendimentosEquipeTotal > 0 ? Math.round((qtdEquipe / atendimentosEquipeTotal) * atendimentosBarbeiro) : 0;
+      const gap = Math.max(0, metaVendas - qtd);
+      const oportunidadeCentavos = Math.round((gap * info.precoCentavos * info.comissaoPercentualAplicavel) / 100);
+      itens.push({ nome: info.nome, qtd, taxaEquipePercentual, oportunidadeCentavos });
+    }
+    return itens.sort((a, b) => b.qtd - a.qtd);
+  }
+
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
@@ -236,19 +315,40 @@ export default async function ComissoesPage({
           <ExportarRelatorioDetalhadoButton
             barbeariaNome={minhaBarbearia?.nome ?? "Barbearia"}
             periodoLabel={periodoLabel}
-            barbeiros={[...porBarbeiro.values()].map((b) => ({
-              nome: b.nome,
-              atendimentos: b.qtd,
-              comissaoCentavos: b.comissaoCentavos,
-              qtdProdutos: b.qtdProdutos,
-              produtos: [...b.produtosPorNome.entries()]
-                .map(([nome, qtd]) => ({ nome, qtd }))
-                .sort((x, y) => y.qtd - x.qtd),
-              qtdExtras: b.qtdExtras,
-              extras: [...b.extrasPorNome.entries()]
-                .map(([nome, qtd]) => ({ nome, qtd }))
-                .sort((x, y) => y.qtd - x.qtd),
-            }))}
+            barbeiros={[...porBarbeiro.entries()].map(([id, b]) => {
+              const comissaoPadrao = barbeirosPorId.get(id)?.comissaoPercentual ?? 0;
+              return {
+                nome: b.nome,
+                atendimentos: b.qtd,
+                comissaoCentavos: b.comissaoCentavos,
+                qtdProdutos: b.qtdProdutos,
+                produtos: construirItensComparativo(
+                  b.produtosPorProdutoId,
+                  produtosEquipePorProdutoId,
+                  b.qtd,
+                  (produtoId) => {
+                    const p = produtoInfoPorId.get(produtoId);
+                    if (!p) return null;
+                    return { nome: p.nome, precoCentavos: p.precoCentavos, comissaoPercentualAplicavel: p.comissaoPercentual ?? 0 };
+                  }
+                ),
+                qtdExtras: b.qtdExtras,
+                extras: construirItensComparativo(
+                  b.extrasPorServicoId,
+                  extrasEquipePorServicoId,
+                  b.qtd,
+                  (servicoId) => {
+                    const s = servicoPorId.get(servicoId);
+                    if (!s) return null;
+                    return {
+                      nome: s.nome,
+                      precoCentavos: s.precoCentavos,
+                      comissaoPercentualAplicavel: s.comissaoPercentual ?? comissaoPadrao,
+                    };
+                  }
+                ),
+              };
+            })}
           />
         </div>
       </div>
