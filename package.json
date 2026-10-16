@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma db push --skip-generate && next build",
+    "build": "prisma generate && node scripts/verificar-banco.mjs && prisma db push --skip-generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "db:push": "prisma db push"
+    "db:push": "node scripts/verificar-banco.mjs && prisma db push"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
