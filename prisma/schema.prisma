@@ -86,14 +86,6 @@ enum CategoriaServico {
   EXTRA
 }
 
-// Fases do corte marcadas no cronômetro, sempre nessa ordem.
-enum EtapaCorte {
-  MAQUINA
-  TRANSICAO
-  ACABAMENTO
-  FINALIZACAO
-}
-
 // Cada barbearia é um tenant isolado do sistema.
 model Barbearia {
   id              String    @id @default(cuid())
@@ -137,10 +129,6 @@ model Barbearia {
   feedbacks             Feedback[]
   ofertasRoleta         OfertaRoleta[]
   girosRoleta           GiroRoleta[]
-  tecnicasCorte         TecnicaCorte[]
-  passosTecnicaCorte    PassoTecnicaCorte[]
-  registrosCorte        RegistroCorte[]
-  desafiosCorte         DesafioCorte[]
 
   configuracaoTotem      ConfiguracaoTotem?
   configuracaoAvaliacao  ConfiguracaoAvaliacao?
@@ -187,7 +175,6 @@ model Barbeiro {
   itensDistribuicaoPote   ItemDistribuicaoPote[]
   girosRoleta             GiroRoleta[]
   despesas                DespesaBarbeiro[]
-  registrosCorte          RegistroCorte[]
   criadoEm                DateTime               @default(now())
 }
 
@@ -650,66 +637,4 @@ model GiroRoleta {
   ofertaId    String
   resgatadoEm DateTime?
   criadoEm    DateTime     @default(now())
-}
-
-// Técnica de corte (ex.: Mid Fade) usada no cronômetro, com o checklist que o admin ensina.
-model TecnicaCorte {
-  id          String              @id @default(cuid())
-  barbeariaId String
-  barbearia   Barbearia           @relation(fields: [barbeariaId], references: [id])
-  nome        String
-  ativo       Boolean             @default(true)
-  ordem       Int                 @default(0)
-  criadoEm    DateTime            @default(now())
-  passos      PassoTecnicaCorte[]
-  registros   RegistroCorte[]
-  desafios    DesafioCorte[]
-}
-
-model PassoTecnicaCorte {
-  id          String       @id @default(cuid())
-  barbeariaId String
-  barbearia   Barbearia    @relation(fields: [barbeariaId], references: [id])
-  tecnica     TecnicaCorte @relation(fields: [tecnicaId], references: [id], onDelete: Cascade)
-  tecnicaId   String
-  etapa       EtapaCorte
-  texto       String
-  ordem       Int          @default(0)
-}
-
-// Um corte cronometrado, com o tempo gasto em cada etapa (em segundos).
-model RegistroCorte {
-  id                  String        @id @default(cuid())
-  barbeariaId         String
-  barbearia           Barbearia     @relation(fields: [barbeariaId], references: [id])
-  barbeiro            Barbeiro      @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
-  barbeiroId          String
-  tecnica             TecnicaCorte? @relation(fields: [tecnicaId], references: [id], onDelete: SetNull)
-  tecnicaId           String?
-  tecnicaNomeSnapshot String
-  segundosMaquina     Int
-  segundosTransicao   Int
-  segundosAcabamento  Int
-  segundosFinalizacao Int
-  segundosTotal       Int
-  iniciadoEm          DateTime
-  concluidoEm         DateTime      @default(now())
-
-  @@index([barbeariaId, tecnicaId, concluidoEm])
-  @@index([barbeiroId, concluidoEm])
-}
-
-// Desafio do tipo "N dias de trabalho seguidos com média abaixo de X minutos".
-// Sem técnica = vale qualquer corte.
-model DesafioCorte {
-  id           String        @id @default(cuid())
-  barbeariaId  String
-  barbearia    Barbearia     @relation(fields: [barbeariaId], references: [id])
-  titulo       String
-  tecnica      TecnicaCorte? @relation(fields: [tecnicaId], references: [id], onDelete: SetNull)
-  tecnicaId    String?
-  metaMinutos  Int
-  diasSeguidos Int
-  ativo        Boolean       @default(true)
-  criadoEm     DateTime      @default(now())
 }

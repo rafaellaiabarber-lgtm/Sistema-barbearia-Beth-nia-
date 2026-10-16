@@ -38,7 +38,6 @@ export const gruposNav: NavGrupo[] = [
       { href: "/admin/comissoes", label: "Comissões", icone: "comissoes" },
       { href: "/admin/rateio-assinatura", label: "Distribuição de Assinatura", icone: "rateio" },
       { href: "/admin/treinamento", label: "Treinamentos", icone: "treinamento" },
-      { href: "/admin/cronometro", label: "Cronômetro de corte", icone: "cronometro" },
       { href: "/admin/feedback", label: "Feedback", icone: "feedback" },
     ],
   },
