@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { buscarConfiguracao } from "@/lib/cronometro-server";
 import { CalculadoraGanho } from "@/components/calculadora-ganho";
 
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 
 // Página aberta (sem login) pra divulgar o curso: o barbeiro coloca os números dele e vê o ganho.
 export default async function CalculadoraPublicaPage() {
+  await connection(); // nome do curso sempre atualizado (e o build não precisa de banco pronto)
   const config = await buscarConfiguracao();
   return (
     <main className="flex-1 p-4 sm:p-6">

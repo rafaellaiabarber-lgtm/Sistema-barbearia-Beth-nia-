@@ -19,7 +19,7 @@ Painel do instrutor (`/instrutor`): cadastra alunos (o app gera a senha), liga/d
 2. Em [vercel.com](https://vercel.com) → **Add New → Project**, importe este repositório.
 3. Em **Environment Variables**, adicione:
    - `DATABASE_URL`: a string do passo 1
-   - `SESSION_SECRET`: um texto aleatório e longo
+   - `SESSION_SECRET` (opcional): um texto aleatório e longo. Se não configurar, o app gera um sozinho.
 4. Clique em **Deploy**. As tabelas são criadas automaticamente no build.
 5. Abra o endereço gerado: na primeira vez aparece **Configurar o app** — crie a sua conta de instrutor. Essa tela some depois disso, então faça esse passo logo após o deploy.
 
@@ -27,7 +27,7 @@ Painel do instrutor (`/instrutor`): cadastra alunos (o app gera a senha), liga/d
 
 ```bash
 npm install
-cp .env.example .env   # preencha DATABASE_URL e SESSION_SECRET
+cp .env.example .env   # preencha DATABASE_URL
 npm run db:push
 npm run dev
 ```

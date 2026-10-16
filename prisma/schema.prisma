@@ -39,6 +39,8 @@ model Configuracao {
   nomeCurso     String   @default("Cronômetro de Corte")
   // Código que o aluno digita pra criar a própria conta. Nulo = cadastro fechado.
   codigoConvite String?
+  // Chave que assina o login, gerada sozinha na primeira vez (quando SESSION_SECRET não está configurado).
+  segredoSessao String?
   atualizadoEm  DateTime @updatedAt
 }
 

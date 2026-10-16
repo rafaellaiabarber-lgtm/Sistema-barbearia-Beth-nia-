@@ -41,14 +41,13 @@ export async function buscarParticipantes() {
   return prisma.usuario.findMany({ where: { ativo: true }, select: { id: true, nome: true }, orderBy: { nome: "asc" } });
 }
 
+// Só os campos que as telas usam (nunca o segredoSessao).
 export async function buscarConfiguracao() {
   return (
-    (await prisma.configuracao.findUnique({ where: { id: "unica" } })) ?? {
-      id: "unica",
-      nomeCurso: "Cronômetro de Corte",
-      codigoConvite: null,
-      atualizadoEm: new Date(),
-    }
+    (await prisma.configuracao.findUnique({
+      where: { id: "unica" },
+      select: { nomeCurso: true, codigoConvite: true },
+    })) ?? { nomeCurso: "Cronômetro de Corte", codigoConvite: null }
   );
 }
 
