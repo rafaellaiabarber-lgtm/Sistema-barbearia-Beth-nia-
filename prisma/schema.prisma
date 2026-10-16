@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Papel {
+  INSTRUTOR
+  ALUNO
+}
+
+// Fases do corte marcadas no cronômetro, sempre nessa ordem.
+enum EtapaCorte {
+  MAQUINA
+  TRANSICAO
+  ACABAMENTO
+  FINALIZACAO
+}
+
+model Usuario {
+  id        String          @id @default(cuid())
+  nome      String
+  // E-mail ou telefone, sempre em minúsculas e sem espaços.
+  login     String          @unique
+  senhaHash String
+  papel     Papel           @default(ALUNO)
+  // Aluno bloqueado não consegue entrar nem aparece no ranking.
+  ativo     Boolean         @default(true)
+  criadoEm  DateTime        @default(now())
+  registros RegistroCorte[]
+}
+
+// Configuração única do app (sempre a linha com id "unica").
+model Configuracao {
+  id            String   @id @default("unica")
+  nomeCurso     String   @default("Cronômetro de Corte")
+  // Código que o aluno digita pra criar a própria conta. Nulo = cadastro fechado.
+  codigoConvite String?
+  atualizadoEm  DateTime @updatedAt
+}
+
+// Técnica de corte (ex.: Mid Fade), com o checklist que o instrutor ensina.
+model TecnicaCorte {
+  id        String              @id @default(cuid())
+  nome      String
+  ativo     Boolean             @default(true)
+  ordem     Int                 @default(0)
+  criadoEm  DateTime            @default(now())
+  passos    PassoTecnicaCorte[]
+  registros RegistroCorte[]
+  desafios  DesafioCorte[]
+}
+
+model PassoTecnicaCorte {
+  id        String       @id @default(cuid())
+  tecnica   TecnicaCorte @relation(fields: [tecnicaId], references: [id], onDelete: Cascade)
+  tecnicaId String
+  etapa     EtapaCorte
+  texto     String
+  ordem     Int          @default(0)
+}
+
+// Um corte cronometrado, com o tempo gasto em cada etapa (em segundos).
+model RegistroCorte {
+  id                  String        @id @default(cuid())
+  usuario             Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId           String
+  tecnica             TecnicaCorte? @relation(fields: [tecnicaId], references: [id], onDelete: SetNull)
+  tecnicaId           String?
+  tecnicaNomeSnapshot String
+  segundosMaquina     Int
+  segundosTransicao   Int
+  segundosAcabamento  Int
+  segundosFinalizacao Int
+  segundosTotal       Int
+  iniciadoEm          DateTime
+  concluidoEm         DateTime      @default(now())
+
+  @@index([tecnicaId, concluidoEm])
+  @@index([usuarioId, concluidoEm])
+}
+
+// Desafio do tipo "N dias de trabalho seguidos com média abaixo de X minutos".
+// Sem técnica = vale qualquer corte.
+model DesafioCorte {
+  id           String        @id @default(cuid())
+  titulo       String
+  tecnica      TecnicaCorte? @relation(fields: [tecnicaId], references: [id], onDelete: SetNull)
+  tecnicaId    String?
+  metaMinutos  Int
+  diasSeguidos Int
+  ativo        Boolean       @default(true)
+  criadoEm     DateTime      @default(now())
+}
