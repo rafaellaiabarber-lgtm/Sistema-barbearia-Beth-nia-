@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -10,6 +10,12 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Barbearia Bethânia",
   description: "Sistema de fila, clientes e financeiro da Barbearia Bethânia",
+  appleWebApp: { capable: true, title: "Cronômetro", statusBarStyle: "black-translucent" },
+  icons: { apple: "/icons/apple-touch-icon.png" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

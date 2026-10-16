@@ -6,6 +6,8 @@ Sistema web para barbearia que atende por **ordem de chegada** (fila), com:
 - **Painel da fila** (`/fila`): os barbeiros chamam o próximo cliente e, ao concluir, escolhem o(s) serviço(s) realizado(s) — isso calcula o valor e já registra no financeiro. O admin acompanha todos os atendimentos em andamento.
 - **Painel administrativo** (`/admin`): cadastro de serviços e preços, cadastro de barbeiros (com login próprio, comissão e foto), histórico de clientes e relatório financeiro (hoje / semana / mês, total e por barbeiro).
 
+- **Cronômetro de corte** (`/cronometro`): o barbeiro marca cada fase do corte (máquina, transição, acabamento, finalização) e vê onde perde mais tempo, a evolução em gráfico, desafios com selos, a calculadora de ganho e o ranking da equipe. O admin cadastra as técnicas, o checklist de cada uma e os desafios em `/admin/cronometro` (tem um botão com modelos prontos de Low/Mid/High Fade). No celular, dá pra instalar como app pela opção **Adicionar à tela inicial** — abre direto no cronômetro.
+
 ## Tecnologias
 
 Next.js (App Router) + TypeScript + Tailwind CSS + Prisma (PostgreSQL) + autenticação própria via JWT em cookie httpOnly.

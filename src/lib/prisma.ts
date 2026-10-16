@@ -51,6 +51,10 @@ const MODELS_COM_BARBEARIA_ID = new Set<string>([
   "Feedback",
   "OfertaRoleta",
   "GiroRoleta",
+  "TecnicaCorte",
+  "PassoTecnicaCorte",
+  "RegistroCorte",
+  "DesafioCorte",
 ]);
 
 export const prisma = basePrisma.$extends({

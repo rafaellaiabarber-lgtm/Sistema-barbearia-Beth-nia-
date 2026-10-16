@@ -32,6 +32,7 @@ import {
   MessageCircle,
   Building2,
   GitCompare,
+  Timer,
   type LucideIcon,
 } from "lucide-react";
 
@@ -41,6 +42,7 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   clientes: Users,
   barbeiros: Scissors,
   treinamento: GraduationCap,
+  cronometro: Timer,
   servicos: Tag,
   produtos: Package,
   atendimentos: Clock,
