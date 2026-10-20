@@ -7,7 +7,7 @@ import { textoPremioRoleta } from "@/lib/roleta";
 
 const estadoInicial: GirarRoletaState = {};
 
-const CORES = ["#7c3aed", "#db2777", "#84cc16", "#dc2626", "#0ea5e9", "#f59e0b"];
+const CORES = ["#7c3aed", "#db2777", "#84cc16", "#dc2626", "#0ea5e9", "#f59e0b", "#14b8a6"];
 
 export function RoletaWheel({
   barbeiroId,
@@ -81,7 +81,7 @@ export function RoletaWheel({
       )}
 
       {(etapa === "girando" || etapa === "resultado") && (
-        <div className="relative w-72 h-72">
+        <div className="relative w-80 h-80">
           <div
             className="absolute -top-2 left-1/2 -tranneutral-x-1/2 z-10"
             style={{
@@ -93,7 +93,7 @@ export function RoletaWheel({
             }}
           />
           <div
-            className="w-72 h-72 rounded-full border-4 border-neutral-700 relative overflow-hidden"
+            className="w-80 h-80 rounded-full border-4 border-neutral-700 relative overflow-hidden"
             style={{
               background: `conic-gradient(${gradiente})`,
               transform: `rotate(${rotacao}deg)`,
@@ -105,9 +105,9 @@ export function RoletaWheel({
               return (
                 <span
                   key={o.id}
-                  className="absolute left-1/2 top-1/2 text-white text-xs font-semibold whitespace-nowrap"
+                  className="absolute left-1/2 top-1/2 w-16 text-white text-[10px] leading-tight text-center font-semibold"
                   style={{
-                    transform: `rotate(${anguloLabel}deg) translate(0, -100px) rotate(${-anguloLabel}deg)`,
+                    transform: `rotate(${anguloLabel}deg) translate(0, -118px) rotate(${-anguloLabel}deg) translateX(-50%)`,
                     transformOrigin: "0 0",
                   }}
                 >

@@ -6,6 +6,7 @@ import { textoPremioRoleta } from "@/lib/roleta";
 import { NovaOfertaForm } from "./nova-oferta-form";
 import { OfertaRow } from "./oferta-row";
 import { BarbeiroQr } from "./barbeiro-qr";
+import { ConfigurarPadraoButton } from "./configurar-padrao-button";
 
 export const dynamic = "force-dynamic";
 
@@ -37,11 +38,12 @@ export default async function RoletaAdminPage() {
     <div>
       <h1 className="text-2xl font-bold mb-2">Roleta de Prêmios</h1>
       <p className="text-neutral-400 dark:text-neutral-500 text-sm mb-6">
-        Cadastre até 6 prêmios ativos por vez. Cada barbeiro tem um link/QR Code próprio — o cliente escaneia,
+        Cadastre até 7 prêmios ativos por vez. Cada barbeiro tem um link/QR Code próprio — o cliente escaneia,
         gira a roleta e ganha um prêmio. Quando ele voltar pra usar, um aviso aparece na Fila.
       </p>
 
       <h2 className="text-lg font-semibold mb-3">Prêmios da roleta</h2>
+      <ConfigurarPadraoButton />
       <NovaOfertaForm />
       <div className="space-y-2 mb-8">
         {ofertas.map((o) => (

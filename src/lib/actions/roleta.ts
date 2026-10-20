@@ -8,8 +8,18 @@ import { barbeariaEstaAtiva } from "@/lib/barbearia-status";
 import { normalizarTelefone } from "@/lib/format";
 import { textoPremioRoleta } from "@/lib/roleta";
 
-const MAX_OFERTAS_ATIVAS = 6;
+const MAX_OFERTAS_ATIVAS = 7;
 const HORAS_ENTRE_GIROS = 24;
+
+const PREMIOS_PADRAO: { nome: string; descontoPercentual: number }[] = [
+  { nome: "Sobrancelha", descontoPercentual: 10 },
+  { nome: "Selagem", descontoPercentual: 10 },
+  { nome: "Botox", descontoPercentual: 10 },
+  { nome: "Hidratação", descontoPercentual: 10 },
+  { nome: "Limpeza de pele", descontoPercentual: 10 },
+  { nome: "Depilação nasal", descontoPercentual: 10 },
+  { nome: "Produtos", descontoPercentual: 10 },
+];
 
 export type OfertaState = { erro?: string };
 
@@ -48,6 +58,37 @@ export async function criarOferta(_prevState: OfertaState, formData: FormData): 
 
   revalidatePath("/admin/roleta");
   return {};
+}
+
+export async function configurarPremiosPadrao() {
+  const session = await requireSession(["ADMIN"]);
+
+  // Desativa (não apaga — preserva o histórico de giros já registrados) tudo que estiver
+  // ativo hoje, e recria do zero os prêmios padrão: sobrancelha, selagem, botox, hidratação,
+  // limpeza de pele, depilação nasal e produtos, todos com 10% de desconto.
+  await prisma.ofertaRoleta.updateMany({
+    where: { barbeariaId: session.barbeariaId, ativo: true },
+    data: { ativo: false },
+  });
+
+  const ultima = await prisma.ofertaRoleta.findFirst({
+    where: { barbeariaId: session.barbeariaId },
+    orderBy: { ordem: "desc" },
+  });
+  let ordem = (ultima?.ordem ?? -1) + 1;
+
+  for (const premio of PREMIOS_PADRAO) {
+    await prisma.ofertaRoleta.create({
+      data: {
+        barbeariaId: session.barbeariaId,
+        nome: premio.nome,
+        descontoPercentual: premio.descontoPercentual,
+        ordem: ordem++,
+      },
+    });
+  }
+
+  revalidatePath("/admin/roleta");
 }
 
 export async function alternarAtivoOferta(id: string, ativo: boolean) {
