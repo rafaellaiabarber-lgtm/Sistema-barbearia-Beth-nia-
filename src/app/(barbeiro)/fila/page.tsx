@@ -117,7 +117,9 @@ export default async function FilaPage({
 
   const [aguardando, emAtendimento, barbeirosAtivos, servicosAtivos, produtosAtivos] = await Promise.all([
     prisma.atendimento.findMany({
-      where: { status: "AGUARDANDO", barbeariaId: session.barbeariaId },
+      // horarioAgendado: null — agendamentos da Agenda não entram na fila de ordem de chegada,
+      // têm sua própria tela (/admin/agenda) e seu próprio botão de iniciar atendimento.
+      where: { status: "AGUARDANDO", barbeariaId: session.barbeariaId, horarioAgendado: null },
       orderBy: { criadoEm: "asc" },
       include: { cliente: true, barbeiroPreferido: true },
     }),

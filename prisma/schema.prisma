@@ -293,6 +293,7 @@ model Servico {
   atendimentoServicos AtendimentoServico[]
   metas               Meta[]
   itensCampanha       ItemCampanhaVenda[]
+  atendimentosAgendados Atendimento[]      @relation("ServicoAgendado")
 }
 
 model Produto {
@@ -370,6 +371,13 @@ model Atendimento {
   chamadoEm            DateTime?
   concluidoEm          DateTime?
   observacao           String?
+  // Preenchidos só quando o atendimento vem da Agenda (marcação de horário), não da fila de
+  // ordem de chegada. horarioAgendado nulo = fluxo normal de fila/totem.
+  horarioAgendado      DateTime?
+  servicoAgendado      Servico?             @relation("ServicoAgendado", fields: [servicoAgendadoId], references: [id])
+  servicoAgendadoId    String?
+
+  @@index([barbeariaId, barbeiroId, horarioAgendado])
 }
 
 model MovimentoCaixa {

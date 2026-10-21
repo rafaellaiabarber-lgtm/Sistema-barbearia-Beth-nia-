@@ -87,7 +87,7 @@ export async function entrarNaFila(
   });
 
   const [posicao, acompanhanteCliente] = await Promise.all([
-    prisma.atendimento.count({ where: { status: "AGUARDANDO", barbeariaId: barbearia.id } }),
+    prisma.atendimento.count({ where: { status: "AGUARDANDO", barbeariaId: barbearia.id, horarioAgendado: null } }),
     acompanhanteNome
       ? acompanhanteTelefone
         ? prisma.cliente.upsert({
@@ -111,7 +111,7 @@ export async function entrarNaFila(
     });
 
     acompanhantePosicao = await prisma.atendimento.count({
-      where: { status: "AGUARDANDO", barbeariaId: barbearia.id },
+      where: { status: "AGUARDANDO", barbeariaId: barbearia.id, horarioAgendado: null },
     });
   }
 
@@ -136,7 +136,7 @@ export async function chamarProximo(barbeiroIdSelecionado?: string) {
   if (emAndamento) return;
 
   const proximo = await prisma.atendimento.findFirst({
-    where: { status: "AGUARDANDO", barbeariaId: session.barbeariaId },
+    where: { status: "AGUARDANDO", barbeariaId: session.barbeariaId, horarioAgendado: null },
     orderBy: { criadoEm: "asc" },
   });
   if (!proximo) return;
@@ -160,7 +160,7 @@ export async function chamarCliente(atendimentoId: string) {
   if (emAndamento) return;
 
   const atendimento = await prisma.atendimento.findFirst({
-    where: { id: atendimentoId, status: "AGUARDANDO", barbeariaId: session.barbeariaId },
+    where: { id: atendimentoId, status: "AGUARDANDO", barbeariaId: session.barbeariaId, horarioAgendado: null },
   });
   if (!atendimento) return;
 
