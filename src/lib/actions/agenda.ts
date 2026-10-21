@@ -69,6 +69,11 @@ export async function buscarSlotsDisponiveis(
       return { inicio, fim };
     });
 
+  const bloqueiosNoDia = await prisma.bloqueioAgenda.findMany({
+    where: { barbeariaId: barbearia.id, barbeiroId: barbeiro.id, inicio: { lte: fimDoDia }, fim: { gte: data } },
+  });
+  for (const b of bloqueiosNoDia) ocupados.push({ inicio: b.inicio, fim: b.fim });
+
   const jornadaDoDia: JornadaDia | undefined = barbeiro.jornadas.find((j) => j.diaSemana === data.getDay());
 
   const slots = slotsDisponiveisNoDia({
@@ -137,6 +142,11 @@ export async function criarAgendamento(_prevState: AgendarState, formData: FormD
       const inicio = a.horarioAgendado!;
       return { inicio, fim: new Date(inicio.getTime() + duracao * 60000) };
     });
+  const bloqueiosNoDia = await prisma.bloqueioAgenda.findMany({
+    where: { barbeariaId: barbearia.id, barbeiroId: barbeiro.id, inicio: { lte: fimDoDia }, fim: { gte: inicioDoDia } },
+  });
+  for (const b of bloqueiosNoDia) ocupados.push({ inicio: b.inicio, fim: b.fim });
+
   const jornadaDoDia: JornadaDia | undefined = barbeiro.jornadas.find((j) => j.diaSemana === horario.getDay());
   const slotsValidos = slotsDisponiveisNoDia({
     jornadaDoDia,
@@ -185,4 +195,59 @@ export async function iniciarAgendamento(atendimentoId: string) {
 
   revalidatePath("/admin/agenda");
   revalidatePath("/fila");
+}
+
+export type BloqueioState = { erro?: string; sucesso?: boolean };
+
+export async function criarBloqueioAgenda(_prevState: BloqueioState, formData: FormData): Promise<BloqueioState> {
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
+
+  const barbeiroIdForm = String(formData.get("barbeiroId") ?? "").trim();
+  const barbeiroId = session.role === "BARBEIRO" ? session.barbeiroId : barbeiroIdForm || session.barbeiroId;
+  if (!barbeiroId) return { erro: "Escolha o barbeiro." };
+  if (session.role === "BARBEIRO" && barbeiroId !== session.barbeiroId) {
+    return { erro: "Você só pode bloquear a sua própria agenda." };
+  }
+
+  const data = String(formData.get("data") ?? "").trim();
+  const diaTodo = formData.get("diaTodo") === "on";
+  const horaInicio = String(formData.get("horaInicio") ?? "").trim();
+  const horaFim = String(formData.get("horaFim") ?? "").trim();
+  const motivo = String(formData.get("motivo") ?? "").trim() || null;
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return { erro: "Escolha uma data." };
+  if (!diaTodo && (!horaInicio || !horaFim)) {
+    return { erro: "Informe o horário de início e fim, ou marque \"dia todo\"." };
+  }
+
+  const inicio = new Date(`${data}T${diaTodo ? "00:00" : horaInicio}:00`);
+  const fim = new Date(`${data}T${diaTodo ? "23:59" : horaFim}:59`);
+  if (Number.isNaN(inicio.getTime()) || Number.isNaN(fim.getTime())) return { erro: "Horário inválido." };
+  if (fim <= inicio) return { erro: "O horário de fim precisa ser depois do início." };
+
+  const barbeiro = await prisma.barbeiro.findFirst({ where: { id: barbeiroId, barbeariaId: session.barbeariaId } });
+  if (!barbeiro) return { erro: "Barbeiro inválido." };
+
+  await prisma.bloqueioAgenda.create({
+    data: { barbeariaId: session.barbeariaId, barbeiroId, inicio, fim, motivo },
+  });
+
+  revalidatePath("/meus-horarios-bloqueados");
+  revalidatePath("/admin/agenda-configuracoes");
+  return { sucesso: true };
+}
+
+export async function excluirBloqueioAgenda(id: string) {
+  const session = await requireSession(["ADMIN", "BARBEIRO"]);
+
+  await prisma.bloqueioAgenda.deleteMany({
+    where: {
+      id,
+      barbeariaId: session.barbeariaId,
+      ...(session.role === "BARBEIRO" && session.barbeiroId ? { barbeiroId: session.barbeiroId } : {}),
+    },
+  });
+
+  revalidatePath("/meus-horarios-bloqueados");
+  revalidatePath("/admin/agenda-configuracoes");
 }

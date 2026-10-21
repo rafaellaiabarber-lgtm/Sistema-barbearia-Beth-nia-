@@ -1,4 +1,4 @@
-import { Home, UserPlus, Trophy, GraduationCap, Wallet, QrCode, type LucideIcon } from "lucide-react";
+import { Home, UserPlus, Trophy, GraduationCap, Wallet, QrCode, CalendarDays, type LucideIcon } from "lucide-react";
 
 export const ICONES_NAV_BARBEIRO: Record<string, LucideIcon> = {
   inicio: Home,
@@ -7,4 +7,5 @@ export const ICONES_NAV_BARBEIRO: Record<string, LucideIcon> = {
   planos: QrCode,
   despesas: Wallet,
   treinamento: GraduationCap,
+  agenda: CalendarDays,
 };

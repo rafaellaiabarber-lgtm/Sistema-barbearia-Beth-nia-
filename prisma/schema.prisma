@@ -129,6 +129,7 @@ model Barbearia {
   feedbacks             Feedback[]
   ofertasRoleta         OfertaRoleta[]
   girosRoleta           GiroRoleta[]
+  bloqueiosAgenda       BloqueioAgenda[]
 
   configuracaoTotem      ConfiguracaoTotem?
   configuracaoAvaliacao  ConfiguracaoAvaliacao?
@@ -175,7 +176,22 @@ model Barbeiro {
   itensDistribuicaoPote   ItemDistribuicaoPote[]
   girosRoleta             GiroRoleta[]
   despesas                DespesaBarbeiro[]
+  bloqueiosAgenda         BloqueioAgenda[]
   criadoEm                DateTime               @default(now())
+}
+
+model BloqueioAgenda {
+  id          String    @id @default(cuid())
+  barbeariaId String
+  barbearia   Barbearia @relation(fields: [barbeariaId], references: [id])
+  barbeiro    Barbeiro  @relation(fields: [barbeiroId], references: [id], onDelete: Cascade)
+  barbeiroId  String
+  inicio      DateTime
+  fim         DateTime
+  motivo      String?
+  criadoEm    DateTime  @default(now())
+
+  @@index([barbeariaId, barbeiroId, inicio])
 }
 
 model JornadaTrabalho {

@@ -3,13 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { JornadaForm } from "../barbeiros/jornada-form";
 import { DuracaoServicoForm } from "./duracao-servico-form";
+import { BloqueioAdminForm } from "./bloqueio-admin-form";
+import { BloqueioRow } from "../../(barbeiro)/meus-horarios-bloqueados/bloqueio-row";
 
 export const dynamic = "force-dynamic";
 
 export default async function AgendaConfiguracoesPage() {
   const session = await requireSession(["ADMIN"]);
 
-  const [servicos, barbeiros] = await Promise.all([
+  const [servicos, barbeiros, bloqueios] = await Promise.all([
     prisma.servico.findMany({
       where: { ativo: true, barbeariaId: session.barbeariaId },
       orderBy: { nome: "asc" },
@@ -18,6 +20,11 @@ export default async function AgendaConfiguracoesPage() {
       where: { ativo: true, barbeariaId: session.barbeariaId },
       include: { jornadas: true },
       orderBy: { nome: "asc" },
+    }),
+    prisma.bloqueioAgenda.findMany({
+      where: { barbeariaId: session.barbeariaId, fim: { gte: new Date() } },
+      include: { barbeiro: true },
+      orderBy: { inicio: "asc" },
     }),
   ]);
 
@@ -84,6 +91,19 @@ export default async function AgendaConfiguracoesPage() {
             .
           </p>
         )}
+      </div>
+
+      <h2 className="text-lg font-semibold mb-1 mt-10">Bloqueios de agenda</h2>
+      <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-3">
+        Períodos em que um barbeiro não vai atender (consulta, viagem, folga) — somem da lista de horários livres
+        pra quem for marcar pelo link. Cada barbeiro também pode bloquear a própria agenda pelo painel dele.
+      </p>
+      <BloqueioAdminForm barbeiros={barbeiros.map((b) => ({ id: b.id, nome: b.nome }))} />
+      <div className="space-y-2">
+        {bloqueios.map((b) => (
+          <BloqueioRow key={b.id} id={b.id} inicio={b.inicio} fim={b.fim} motivo={b.motivo} barbeiroNome={b.barbeiro.nome} />
+        ))}
+        {bloqueios.length === 0 && <p className="text-neutral-400 dark:text-neutral-500 text-sm">Nenhum bloqueio futuro.</p>}
       </div>
     </div>
   );
