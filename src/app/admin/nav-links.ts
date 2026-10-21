@@ -8,6 +8,7 @@ export const gruposNav: NavGrupo[] = [
     links: [
       { href: "/admin", label: "Visão geral", icone: "dashboard" },
       { href: "/fila", label: "Fila", icone: "atendimentos" },
+      { href: "/admin/agenda", label: "Agenda", icone: "agenda" },
       { href: "/admin/clientes", label: "Clientes", icone: "clientes" },
       { href: "/admin/barbeiros", label: "Barbeiros", icone: "barbeiros" },
       { href: "/admin/servicos", label: "Serviços", icone: "servicos" },

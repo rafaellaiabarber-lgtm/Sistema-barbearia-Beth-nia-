@@ -174,8 +174,11 @@ export async function excluirServico(id: string) {
   const servico = await prisma.servico.findFirst({ where: { id, barbeariaId: session.barbeariaId } });
   if (!servico) return;
 
-  const emUso = await prisma.atendimentoServico.findFirst({ where: { servicoId: id } });
-  if (emUso) {
+  const [emUso, agendado] = await Promise.all([
+    prisma.atendimentoServico.findFirst({ where: { servicoId: id } }),
+    prisma.atendimento.findFirst({ where: { servicoAgendadoId: id } }),
+  ]);
+  if (emUso || agendado) {
     await prisma.servico.update({ where: { id }, data: { ativo: false } });
   } else {
     await prisma.servico.delete({ where: { id } });

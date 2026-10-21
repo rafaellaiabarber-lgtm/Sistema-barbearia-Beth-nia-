@@ -32,6 +32,7 @@ import {
   MessageCircle,
   Building2,
   GitCompare,
+  CalendarDays,
   type LucideIcon,
 } from "lucide-react";
 
@@ -69,4 +70,5 @@ export const ICONES_NAV: Record<string, LucideIcon> = {
   pedirAvaliacao: MessageCircle,
   plataforma: Building2,
   comparativo: GitCompare,
+  agenda: CalendarDays,
 };
