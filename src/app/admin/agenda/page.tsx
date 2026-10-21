@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { iniciarAgendamento } from "@/lib/actions/agenda";
@@ -45,11 +46,16 @@ export default async function AgendaPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-2">Agenda</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+        <h1 className="text-2xl font-bold">Agenda</h1>
+        <Link href="/admin/agenda-configuracoes" className="text-sm text-orange-600 dark:text-orange-400 hover:underline">
+          ⚙️ Configurações do agendamento
+        </Link>
+      </div>
       <p className="text-neutral-400 dark:text-neutral-500 text-sm mb-6">
-        Horários marcados pelo link de agendamento. Os horários de trabalho e almoço de cada barbeiro ficam em{" "}
-        <strong>Barbeiros</strong>, e a duração de cada serviço em <strong>Serviços</strong> — é a partir dos dois
-        que a agenda calcula o que está disponível.
+        Horários marcados pelo link de agendamento. Horário de cada barbeiro e duração de cada serviço ficam em{" "}
+        <strong>Configurações do agendamento</strong> — é a partir dos dois que a agenda calcula o que está
+        disponível.
       </p>
 
       <div className="mb-8 max-w-xs">

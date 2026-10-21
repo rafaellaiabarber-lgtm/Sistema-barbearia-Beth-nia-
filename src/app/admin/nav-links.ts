@@ -9,6 +9,7 @@ export const gruposNav: NavGrupo[] = [
       { href: "/admin", label: "Visão geral", icone: "dashboard" },
       { href: "/fila", label: "Fila", icone: "atendimentos" },
       { href: "/admin/agenda", label: "Agenda", icone: "agenda" },
+      { href: "/admin/agenda-configuracoes", label: "Configurações do agendamento", icone: "configuracoes" },
       { href: "/admin/clientes", label: "Clientes", icone: "clientes" },
       { href: "/admin/barbeiros", label: "Barbeiros", icone: "barbeiros" },
       { href: "/admin/servicos", label: "Serviços", icone: "servicos" },

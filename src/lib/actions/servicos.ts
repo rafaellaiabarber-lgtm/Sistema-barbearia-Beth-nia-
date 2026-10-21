@@ -133,6 +133,28 @@ export async function atualizarCustoServico(
   return {};
 }
 
+export async function atualizarDuracaoServico(
+  id: string,
+  _prevState: ServicoState,
+  formData: FormData
+): Promise<ServicoState> {
+  const session = await requireSession(["ADMIN"]);
+
+  const duracaoRaw = String(formData.get("duracao") ?? "").trim();
+  const duracao = Number(duracaoRaw);
+  if (!Number.isFinite(duracao) || duracao <= 0) {
+    return { erro: "Informe uma duração válida, em minutos." };
+  }
+
+  await prisma.servico.updateMany({
+    where: { id, barbeariaId: session.barbeariaId },
+    data: { duracaoMinutos: Math.round(duracao) },
+  });
+  revalidatePath("/admin/servicos");
+  revalidatePath("/admin/agenda-configuracoes");
+  return {};
+}
+
 export async function alternarPontuaRanking(id: string, pontuaRanking: boolean) {
   const session = await requireSession(["ADMIN"]);
   await prisma.servico.updateMany({ where: { id, barbeariaId: session.barbeariaId }, data: { pontuaRanking } });
